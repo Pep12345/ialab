@@ -1,7 +1,15 @@
 
+/* in questa soluzione rappresento ogni nodo come:
+nodo(posizione, percorso per raggiungerlo)
+
+asserta server per aggiungere clausole dinamicamente in cima (assertz uguale ma in fondo)
+retract al contrario, rimuove la clausola
+*/
+
+/* inizio da Start con soglia 0 */
 ida_star(Soluzione):-
 	iniziale(Start),
-	asserta(minimo(0)),
+	asserta(minimo(0)), % utilizzo asserta/retract per salvarmi la soglia come clausola
 	ida_aux(nodo(Start,[]),Soluzione).
 
 ida_aux(Nodo,Res):-
@@ -35,13 +43,14 @@ ida_aux3([nodo(N,Az)|Figli],PesoSoglia,Espansi,Res):-					%se il nodo espanso ha
 ida_aux3([_|Tail],PesoSoglia,Espansi,Res):-
 	ida_aux3(Tail,PesoSoglia,Espansi,Res).%,!.
 	
+/* espando i figli del nodo N */
 generaFigli(nodo(N,Azioni),Espansi,Result):- 
-	findall(Azione,applicabile(Azione,N),ListaApplicabili),
+	findall(Azione,applicabile(Azione,N),ListaApplicabili), % cerco le azioni applicabili al nodo N
 	generaFigli_aux(nodo(N,Azioni),ListaApplicabili,Espansi,Result).
 	
 generaFigli_aux(_,[],_,[]).
 generaFigli_aux(nodo(N,Azioni),[Azione|AltreAzioni],Espansi,[nodo(Figlio,AzioniFiglio)|ListaFigli]):-
-	trasforma(Azione,N,Figlio),
+	trasforma(Azione,N,Figlio), % operazione per generare il figlio dato un nodo e un'azione
 	\+isMember(Figlio,Azioni,Espansi),!,
 	append(Azioni,[Azione],AzioniFiglio),
 	generaFigli_aux(nodo(N,Azioni),AltreAzioni,Espansi,ListaFigli).
@@ -49,6 +58,7 @@ generaFigli_aux(nodo(S,Azioni),[_|AltreAzioni],Espansi,FigliTail):-
 	generaFigli_aux(nodo(S,Azioni),AltreAzioni,Espansi,FigliTail).
 		
 
+/* controlla se il nodo è contenuto con funzione costo maggiore*/
 isMember(N,Az,[nodo(N1,Az2)|_]):-
 	N == N1,
 	length(Az,A1),
@@ -57,13 +67,16 @@ isMember(N,Az,[nodo(N1,Az2)|_]):-
 isMember(N,Az,[_|Tail]):-
 	isMember(N,Az,Tail).
 		
+/* funzione F*/
 calcola_F(nodo(pos(X,Y),Az),F):-
 	calcola_G(Az,G),
 	calcola_H(pos(X,Y),H),
 	F is G + H.
 	
+/* funzione costo */
 calcola_G(Az,G):-length(Az,G).
 	
+/* funzione euristica */
 calcola_H(pos(X,Y),H):-
 	finale(pos(Xf,Yf)),
 	DistX is Xf - X,

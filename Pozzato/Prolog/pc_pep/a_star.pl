@@ -13,15 +13,26 @@ Sia s il nodo iniziale
 		raggiunti tramite un percorso migliore)
 */
 
+
+/* in questa soluzione rappresento ogni nodo come:
+nodo(posizione, costo G, costo H, percorso per raggiungerlo)
+G = costo funzione, quanto costa arivare a quel nodo, ovvero la lunghezza del percoso
+H = euristica, quanto si suppone costi arrivare da li alla fine
+
+nota: secondo me si può modificare nodo come in ida_star_v3, credo sia più 
+	leggibile ma forse meno efficente (deve calcolarsi sempre g invece di portarselo dietro)
+*/
+
 a_star(Result):-
 	iniziale(Start),
 	calcola_H(Start,H),
 	a_star_aux([nodo(Start,0,H,[])],[],Result).
 	
 a_star_aux(Opens,Closed,Result):-
-	min(Opens,CurrentMin),
+	min(Opens,CurrentMin), % mi salva in CurrentMin il nodo con costo (g+h) minore da cui parte la ricerca
 	search(Opens,Closed,CurrentMin,Result).
 	
+/* tolgo currentMin dai nodi aperti, lo sposto in chiusi, aggiungo figli e cerco */
 search(_,_,nodo(CurrentMin,_,_,Actions),Actions):-finale(CurrentMin),!.   % non deve guardare se ci sono altri percorsi aperti migliori?
 search(Opens,Closed,CurrentMin,Result):-
 	subtract(Opens,[CurrentMin],NewOpens), % cancella CurrentMin da opens
@@ -29,6 +40,9 @@ search(Opens,Closed,CurrentMin,Result):-
 	search_aux(NewOpens,[CurrentMin|Closed],Figli,ResOpens,ResClosed), % aggiunge figli in open/closed 	
 	a_star_aux(ResOpens,ResClosed,Result).
 	
+/* marca i figli come aperti se non son già in lista chiusi altrimenti ricontrolla la funzione costo
+ 	se il nuovo pecorso per tale nodo ha un costo minore viene riaperto
+*/
 search_aux(O,C,[],O,C).	
 search_aux(Open,Closed,[F|Figli],ResOpens,ResClosed):-  % marco come aperti i figli che non sono nella lista chiusi
 	\+isMember(F,Closed),!,
@@ -43,20 +57,29 @@ search_aux(Open,Closed,[nodo(Nodo,G,H,Actions)|Figli],ResOpens,ResClosed):- % se
 search_aux(Open,Closed,[_|Figli],ResOpens,ResClosed):-
 	search_aux(Open,Closed,Figli,ResOpens,ResClosed).
 
-
+/*
+	controlla se un nodo è parte di una lista
+*/
 isMember(nodo(N,_,_,_),[nodo(N1,_,_,_)|_]):-
 	N == N1,!.
 isMember(nodo(N,G,H,Actions),[_|Tail]):-
 	isMember(nodo(N,G,H,Actions),Tail).
 	
-% getNodeFromList(NodeToSearch,ListWithNode,Result)	
+/*
+	estrae un nodo da una lista
+	getNodeFromList(NodeToSearch,ListWithNode,Result)	  
+*/ 
+% che succede se non lo trova?? 
 getNodeFromList(Node,[nodo(N1,G1,H1,_)|_],nodo(N1,G1,H1,_)):-
 	Node == N1,!.
 getNodeFromList(Node,[_|Tail],Res):-
 	getNodeFromList(Node,Tail,Res).
 
+/*
+	resituisco tutti i nodi raggiungibili dato un nodo
+*/
 generateChild(nodo(N,G,H,Actions),Result):-  % non serve tracciare i nodi visitati tanto si usano open/closed
-	findall(Action,applicabile(Action,N),ListaApplicabili),
+	findall(Action,applicabile(Action,N),ListaApplicabili),  % cerco quali azioni sono applicabili al nodo
 	generateChild_aux(nodo(N,G,H,Actions),ListaApplicabili,Result).
 	
 generateChild_aux(_,[],[]).
@@ -67,12 +90,14 @@ generateChild_aux(nodo(N,G,H,ActSequence),[Action|ActionResult],[nodo(Figlio,GFi
 	append(ActSequence,[Action],SonActions),
 	generateChild_aux(nodo(N,G,H,ActSequence),ActionResult,ListaFigli).
 	
+/* funzione euristica, manhattan? */
 calcola_H(pos(X,Y),H):-
 	finale(pos(Xf,Yf)),
 	DistX is Xf - X,
 	DistY is Yf - Y,
 	H is (abs(DistX)+abs(DistY)).
 	
+/* cerco il nodo con funzione costo minore data una lista */
 min([Head|Tail],MinNode):-
 	min_aux(Tail,Head,MinNode).
 	
@@ -83,7 +108,8 @@ min_aux([Head|Tail],CurrentMin,Result):-
 min_aux([_|Tail],CurrentMin,Result):-
 	min_aux(Tail,CurrentMin,Result).
 
-/*
+/* credo questa soluzione sia identica ma più compatta
+
 min_aux([Head|Tail],CurrentMin,Result):-
 	lessthen(Head,CurrentMin,Res), min_aux(Tail,Head,Result);
 	min_aux(Tail,CurrentMin,Result).
