@@ -1,5 +1,5 @@
 /* Conta quanti elementi positivi
-    ci sono in una lista */
+    ci sono in una lista  */
 contaPositivi([],0).
 contaPositivi([Head|Tail],Positivi):-
      Head>0,!,
