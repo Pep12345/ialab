@@ -3,7 +3,7 @@ iterative_deepening(Soluzione):-
   iterative_deepening_aux(Soluzione,1).
 
 iterative_deepening_aux(Soluzione,Soglia):-
-  depth_limit_search(Soluzione,Soglia),!.
+  depth_limit_search(Soluzione,Soglia).
 iterative_deepening_aux(Soluzione,Soglia):-
   NuovaSoglia is Soglia+1,
   iterative_deepening_aux(Soluzione,NuovaSoglia).
