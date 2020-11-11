@@ -69,7 +69,7 @@ isMember(nodo(N,G,H,Actions),[_|Tail]):-
 	estrae un nodo da una lista
 	getNodeFromList(NodeToSearch,ListWithNode,Result)	  
 */ 
-% che succede se non lo trova?? 
+% DOMANDA: che succede se non lo trova?? 
 getNodeFromList(Node,[nodo(N1,G1,H1,_)|_],nodo(N1,G1,H1,_)):-
 	Node == N1,!.
 getNodeFromList(Node,[_|Tail],Res):-
@@ -87,7 +87,7 @@ generateChild_aux(nodo(N,G,H,ActSequence),[Action|ActionResult],[nodo(Figlio,GFi
 	trasforma(Action,N,Figlio),
 	GFiglio is G+1,
 	calcola_H(Figlio,HFiglio),
-	append(ActSequence,[Action],SonActions),
+	append(ActSequence,[Action],SonActions), % action+actsequence
 	generateChild_aux(nodo(N,G,H,ActSequence),ActionResult,ListaFigli).
 	
 /* funzione euristica, manhattan? */

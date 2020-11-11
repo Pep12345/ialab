@@ -21,4 +21,4 @@ occupata(pos(4,9)).
 occupata(pos(4,10)).
 
 iniziale(pos(4,2)).
-finale(pos(7,9)).
+finale(pos(11,9)).

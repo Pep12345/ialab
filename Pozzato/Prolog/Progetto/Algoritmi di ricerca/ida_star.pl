@@ -15,10 +15,11 @@ ida_star(Soluzione):-
 /*  */
 ida_aux(Nodo,Res):-
 	minimo(OldMin),		% leggo l'attuale minimo salvato
+	write_ln(OldMin),
 	generaFigli(Nodo,[],Figli),
 	retract(minimo(OldMin)),%write("riparto da 0 con min: "),write_ln(OldMin),
 	asserta(minimo(0)),	% risetto minimo a 0 ??? quando rinizia ??
-	ida_aux2(Nodo,Figli,OldMin,[Nodo],Res).
+	ida_aux2(Nodo,Figli,OldMin,[Nodo],Res),!.
 
 /* ricerco in profondita e se fallisce riparto da sopra */
 ida_aux2(_,Figli,OldMin,Espansi,Res):-  % non si può mettere in una riga sola con ; perchè si perderebbe il cut che evita backtracking
@@ -46,7 +47,7 @@ ida_aux3([nodo(N,Az)|Figli],PesoSoglia,Espansi,Res):-	%se il nodo espanso ha cos
 	asserta(minimo(F)),%write("nuovo minimo: "),write(F + " "),writeln(N),
 	ida_aux3(Figli,PesoSoglia,Espansi,Res).		% invece di usare una lista di valori tengo traccia solo del PesoSoglia
 ida_aux3([_|Tail],PesoSoglia,Espansi,Res):-
-	ida_aux3(Tail,PesoSoglia,Espansi,Res).%,!.
+	ida_aux3(Tail,PesoSoglia,Espansi,Res),!.
 	
 /* espando i figli del nodo N */
 generaFigli(nodo(N,Azioni),Espansi,Result):- 
