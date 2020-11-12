@@ -39,8 +39,9 @@ with open(pathLabirinto, 'r') as file:
             numy=int(line.split(',')[1].split(')')[0])-1
             finale=(numx,numy)
             
-maze=np.zeros((numRighe,numColonne)) 
-maze[finale[0],finale[1]]=0.6    
+maze=np.zeros((numRighe,numColonne))
+if finale[0]<numRighe and finale[1]<numColonne:
+    maze[finale[0],finale[1]]=0.6    
 maze[iniziale[0],iniziale[1]]=0.3
 
 for occupata in occupate:
