@@ -21,6 +21,7 @@ ida_star(Soluzione):-
 	setto i parametri iniziali
  */
 ida_aux(Nodo,Res):-
+	prossimoThreshold(Threshold),
 	generaFigli(Nodo,[],Figli),
 	retractall(thresholdCheck(_)), 
 	asserta(thresholdCheck(Threshold)),	% aggiorno il nuovo thresholdCheck per controllare se si blocca
