@@ -52,4 +52,6 @@ plt.axes().set_aspect('equal')
 plt.xticks([])
 plt.yticks([])
 plt.axes().invert_yaxis() 
+nameImage=pathLabirinto.split('.')[0]+'.png'
+plt.savefig(nameImage)
 plt.show()
