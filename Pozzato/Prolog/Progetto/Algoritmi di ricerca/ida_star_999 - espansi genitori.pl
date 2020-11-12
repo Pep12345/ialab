@@ -22,10 +22,10 @@ ida_star(Soluzione):-
  */
 ida_aux(Nodo,Res):-
 	prossimoThreshold(Threshold),
-	generaFigli(Nodo,Figli),
+	generaFigli(Nodo,[],Figli),
 	retractall(thresholdCheck(_)), 
 	asserta(thresholdCheck(Threshold)),	% aggiorno il nuovo thresholdCheck per controllare se si blocca
-	ida_aux2(Nodo,Figli,Threshold,[Nodo],Res),!.
+	ida_aux2(Nodo,Figli,Threshold,[Nodo],Res),!. %CUT DISCUTIBILE
 
 /* 
 	ricerco in profondita, se fallisce:
@@ -33,7 +33,7 @@ ida_aux(Nodo,Res):-
 	DOMANDA: i cut son da rivedere, non so perchè funzionano
  */
 ida_aux2(_,Figli,Threshold,Espansi,Res):-  
-	ricerca_in_profondita(Figli,Threshold,Espansi,Res),!.
+	ricerca_in_profondita(Figli,Threshold,Espansi,Res),!. %CUT DISCUTIBILE
 ida_aux2(Nodo,_,_,_,Res):-
 	thresholdCheck(Vs),
 	prossimoThreshold(Ps),
@@ -47,12 +47,11 @@ ida_aux2(Nodo,_,_,_,Res):-
 	ricerca in profondità
 */
 %ricerca_in_profondita([],_,_,_):- !,fail.   % DOMANDA: perchè questa riga causa casi di backtracking con altre soluzioni?
-ricerca_in_profondita([nodo(N,Az)|_],_,_,Az):-finale(N),!.		%se è nodo finale
+ricerca_in_profondita([nodo(N,Az)|_],_,_,Az):-finale(N),!.	%CUT DISCUTIBILE		%se è nodo finale
 ricerca_in_profondita([nodo(N,Az)|Figli],Threshold,Espansi,Res):-	%se il nodo espanso ha costo F <Threshold allora espando figli
 	calcola_F(nodo(N,Az),F),
 	F =< Threshold,!,
-	\+isMember(N,Az,Espansi),
-	generaFigli(nodo(N,Az),FigliDiN),%write("genero i figli di "+ N + " "),write_ln(FigliDiN),
+	generaFigli(nodo(N,Az),Espansi,FigliDiN),%write("genero i figli di "+ N + " "),write_ln(FigliDiN),
 	append(FigliDiN,Figli,NodiDaVisitare),
 	ricerca_in_profondita(NodiDaVisitare,Threshold,[nodo(N,Az)|Espansi],Res).
 ricerca_in_profondita([nodo(N,Az)|Figli],Threshold,Espansi,Res):-	%se il nodo espanso ha costo > Threshold, non lo espando e aggiorno soglia
@@ -70,15 +69,18 @@ ricerca_in_profondita([_|Tail],Threshold,Espansi,Res):-
 */
 	
 /* espando i figli del nodo N */
-generaFigli(nodo(N,Azioni),Result):- 
+generaFigli(nodo(N,Azioni),Espansi,Result):- 
 	findall(Azione,applicabile(Azione,N),ListaApplicabili), % cerco le azioni applicabili al nodo N
-	generaFigli_aux(nodo(N,Azioni),ListaApplicabili,Result).
+	generaFigli_aux(nodo(N,Azioni),ListaApplicabili,Espansi,Result).
 	
-generaFigli_aux(_,[],[]).
-generaFigli_aux(nodo(N,Azioni),[Azione|AltreAzioni],[nodo(Figlio,AzioniFiglio)|ListaFigli]):-
+generaFigli_aux(_,[],_,[]).
+generaFigli_aux(nodo(N,Azioni),[Azione|AltreAzioni],Espansi,[nodo(Figlio,AzioniFiglio)|ListaFigli]):-
 	trasforma(Azione,N,Figlio), % operazione per generare il figlio dato un nodo e un'azione
+	\+isMember(Figlio,Azioni,Espansi),!,
 	append(Azioni,[Azione],AzioniFiglio),
-	generaFigli_aux(nodo(N,Azioni),AltreAzioni,ListaFigli).
+	generaFigli_aux(nodo(N,Azioni),AltreAzioni,Espansi,ListaFigli).
+generaFigli_aux(nodo(S,Azioni),[_|AltreAzioni],Espansi,FigliTail):- 
+	generaFigli_aux(nodo(S,Azioni),AltreAzioni,Espansi,FigliTail).
 
 
 /* controlla se il nodo è contenuto con funzione costo maggiore*/
