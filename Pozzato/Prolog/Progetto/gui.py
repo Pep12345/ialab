@@ -110,7 +110,7 @@ def solveButtonFunction():
             msgBox.exec()
         else:
             if 0.5 in maze:
-                np.where(maze==0.5,0,maze)
+                maze=np.where(maze==0.5,0,maze)
             sol=list(prolog.query(queryString))
             if sol:
                 rebuildMazeImage(sol[0]['Soluzione'])
