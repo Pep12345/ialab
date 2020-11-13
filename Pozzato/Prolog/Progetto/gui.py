@@ -59,7 +59,7 @@ def buildImageMaze(pathLabirinto):
     
     for occupata in occupate:
         maze[occupata[0],occupata[1]]=1
-            
+    plt.clf()       
     plt.pcolor(maze,edgecolors ='black',cmap=cmap)
     plt.axes().set_aspect('equal')
     plt.xticks([])
