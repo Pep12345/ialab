@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>354</width>
+    <height>365</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Maze Solver</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>20</y>
+      <width>221</width>
+      <height>261</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>354</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuMenu">
+    <property name="title">
+     <string>Menu</string>
+    </property>
+    <widget class="QMenu" name="menuChoose_algorithm">
+     <property name="title">
+      <string>Choose algorithm</string>
+     </property>
+     <addaction name="actionIterative_deepining"/>
+     <addaction name="actionAstar"/>
+     <addaction name="actionIdaStar"/>
+    </widget>
+    <addaction name="actionLoad_labyrinth"/>
+    <addaction name="menuChoose_algorithm"/>
+    <addaction name="actionSolve"/>
+   </widget>
+   <addaction name="menuMenu"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionLoad_labyrinth">
+   <property name="text">
+    <string>Load labyrinth</string>
+   </property>
+  </action>
+  <action name="actionSolve">
+   <property name="text">
+    <string>Solve</string>
+   </property>
+  </action>
+  <action name="actionIterative_deepining">
+   <property name="text">
+    <string>iterative deepining</string>
+   </property>
+  </action>
+  <action name="actionAstar">
+   <property name="text">
+    <string>a*</string>
+   </property>
+  </action>
+  <action name="actionIdaStar">
+   <property name="text">
+    <string>ida*</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
