@@ -114,6 +114,11 @@ def solveButtonFunction():
             sol=list(prolog.query(queryString))
             if sol:
                 rebuildMazeImage(sol[0]['Soluzione'])
+            else:
+                 msgBox=QMessageBox()
+                 msgBox.setWindowTitle("Error!")
+                 msgBox.setText("No solution founded")
+                 msgBox.exec()
 def loadLabyrinthFunction():
     global prolog,mazeChoosed,maze
     dlg = QFileDialog()
