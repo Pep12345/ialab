@@ -1,4 +1,9 @@
 
+dovremmo considerare se iniziale è fuori?
+
+iterative-deepening:
+	come calcolare l'upper bound/soglia
+
 
 a-star:
 	quali altre euristiche potremmo usare?
