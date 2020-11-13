@@ -1,5 +1,5 @@
 num_righe(19).
-num_colonne(40).
+num_colonne(41).
 iniziale(pos(1,1)).
 finale(pos(19,40)).
 occupata(pos(19,20)).
