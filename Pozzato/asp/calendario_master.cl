@@ -1,6 +1,13 @@
 settimane(1..24).
 giorni_per_settimana_full(lunedi;martedi;mercoledi;giovedi).
 giorni_settimana(venerdi;sabato).
+numero_giorno(lunedi,1).
+numero_giorno(martedi,2).
+numero_giorno(mercoledi,3).
+numero_giorno(giovedi,4).
+numero_giorno(venerdi,5).
+numero_giorno(sabato,6).
+
 insegnamenti(project_Management;fondamenti_di_ICT_e_Paradigmi_di_Programmazione;linguaggi_di_markup;
              la_gestione_della_qualita;ambienti_di_sviluppo_e_linguaggi_client_side_per_il_web;
              progettazione_grafica_e_design_di_interfacce;progettazione_di_basi_di_dati;
@@ -90,7 +97,6 @@ insegnamento_successivo(grafica_3D,acquisizione_ed_elaborazione_di_immagini_stat
 
 
 
-
 %ad ogni settimana  associamo i suoi giorni 
 2{giorno_in_settimana(S,G):giorni_settimana(G)}2:-settimane(S).
 
@@ -106,17 +112,30 @@ insegnamento_successivo(grafica_3D,acquisizione_ed_elaborazione_di_immagini_stat
 %per ogni ora di ogni giorno di ogni settimana associo uno ed un solo insegnamento
 1{lezione(S,G,O,I):insegnamenti(I)}1:-inizio_ora_giorno_settimana(S,G,O).
 
-%un professore non può tenere corsi diversi nello stesso slot 
-:-lezione(S,G,O,I),lezione(S,G,O,I2),I!=I2, professori_Insegnamento(I,P),professori_Insegnamento(I2,P).
+%un professore non può tenere corsi diversi nello stesso slot(inutile)
+%:-lezione(S,G,O,I),lezione(S,G,O,I2),I!=I2, professori_Insegnamento(I,P),professori_Insegnamento(I2,P).
+
 
 %in un giorno un corso deve avere minimo 2 ore e massimo 4 ore(count)
+conteggioOreGiorno(I,S,G,Conteggio):-Conteggio=#count{O:lezione(S,G,O,I)},lezione(S,G,_,I).
+:-conteggioOreGiorno(I,S,G,Conteggio),Conteggio>4.
+:-conteggioOreGiorno(I,S,G,Conteggio),Conteggio<2.
 
 %la somma delle durate  delle lezioni di un insegnamento deve essere uguale alle ore assegnate all'insegnamento(count)
+conteggioOreTotali(I,Conteggio) :-Conteggio = #count{ S,G,O : lezione(S,G,O,I)}, insegnamenti(I).
+:-conteggioOreTotali(I,Conteggio),ore_insegnamento(I,O),Conteggio!=O.
 
-
+lezione(S,G,O,I,P):-lezione(S,G,O,I),professori_Insegnamento(I,P).
 %lo stesso docente non può fare più di 4 ore in un giorno(count)
+conteggioOreProf(S,G,P,Conteggio):-Conteggio=#count{O:lezione(S,G,O,_,P)},lezione(S,G,_,_,P).
+:-conteggioOreProf(_,_,_,Conteggio),Conteggio>4.
 
 %due blocchi liberi di due ore ciascuno
+insegnamenti_recupero(recupero).
+%insegnamenti(I):-insegnamenti_recupero(I).
+2{lezione_recupero(S,G,I):giorno_in_settimana(S,G)}2:-insegnamenti_recupero(I).
+2{lezione(S,G,O,I):inizio_ora(O)}2:-lezione_recupero(S,G,I).
+:-lezione(S,G,O,I),lezione(S,G,O1,I),insegnamenti_recupero(I),|O-O1|!=1,O!=O1.
 
 %project management deve essere finito prima della prima settimana_full_time(7)
 :-lezione(S,_,_,I),I==project_Management,S>6.
@@ -126,24 +145,44 @@ lezione(1,venerdi,8,presentazione_master).
 lezione(1,venerdi,9,presentazione_master).
 
 %prima lezione
-prima_lezione(S,I):-lezione(S,G,O,I),lezione(S2,G2,O2,I),S<=S2.
-%la prima lezione è unica
-1{prima_lezione(S,I):lezione(S,G,O,I)}1:-insegnamenti(I).
+prima_settimana(MINS,G,O,I):-#min{S:lezione(S,_,_,I)}=MINS,lezione(MINS,G,O,I).
+primo_giorno(S,G,O,I):-MING=#min{X:numero_giorno(G,X),prima_settimana(_,X,_,I)},prima_settimana(S,G,O,I),numero_giorno(G,MING).
+prima_lezione(S,G,MINO,I):-MINO=#min{O:primo_giorno(_,_,O,I)},primo_giorno(S,G,MINO,I).
 
 %ultima lezione
-ultima_lezione(S,I):-lezione(S,G,O,I),lezione(S2,G2,O2,I),S>=S2.
-%ultima lezione è unica
-1{ultima_lezione(S,I):lezione(S,G,O,I)}1:-insegnamenti(I).
+ultima_settimana(MAXS,G,O,I):-#max{S:lezione(S,_,_,I)}=MAXS,lezione(MAXS,G,O,I).
+ultima_giorno(S,G,O,I):-MAXG=#max{X:numero_giorno(G,X),prima_settimana(_,X,_,I)},prima_settimana(S,G,O,I),numero_giorno(G,MAXG).
+ultima_lezione(S,G,MAXO,I):-MAXO=#max{O:primo_giorno(_,_,O,I)},primo_giorno(S,G,MAXO,I).
+
 
 %la prima lezione dell’insegnamento “Accessibilità e usabilità nella
 %progettazione multimediale” deve essere collocata prima che siano
 %terminate le lezioni dell’insegnamento “Linguaggi di markup”
-:-prima_lezione(S,accessibilita_e_usabilita_nella_progettazione_multimediale),ultima_lezione(S2,linguaggi_di_markup),S>S2.
+:-prima_lezione(S,_,_,accessibilita_e_usabilita_nella_progettazione_multimediale),ultima_lezione(S2,_,_,linguaggi_di_markup),S>S2.
 
 %se un corso è successivo ad un altro, la prima lezione del corso deve essere successiva all'ultima lezione 
 %dell'altro corso
-:-insegnamento_successivo(I,I2),prima_lezione(S,I),ultima_lezione(S2,I2),S<=S2.
+:-insegnamento_successivo(I,I2),prima_lezione(S,_,_,I),ultima_lezione(S2,_,_,I2),S<=S2.
 
+%la distanza tra la prima e l’ultima lezione di ciascun insegnamento non deve superare le 6 settimane
+:-prima_lezione(S,_,_,I),ultima_lezione(S1,_,_,I),S1-S>6.
+
+%la prima lezione degli insegnamenti “Crossmedia: articolazione delle 
+%scritture multimediali” e “Introduzione al social media management”
+%devono essere collocate nella seconda settimana full-time
+:-prima_lezione(S,_,_,crossmedia_articolazione_delle_scritture_multimediali),S!=16.
+:-prima_lezione(S,_,_,introduzione_al_social_media_management),S!=16.
+
+%la distanza fra l’ultima lezione di “Progettazione e sviluppo di applicazioni
+%web su dispositivi mobile I” e la prima di “Progettazione e sviluppo di
+%applicazioni web su dispositivi mobile II” non deve superare le due
+%settimane.
+%:-ultima_lezione(S,_,_,progettazione_e_sviluppo_di_applicazioni_web_su_dispositivi_mobile_I),prima_lezione(S2,progettazione_e_sviluppo_di_applicazioni_web_su_dispositivi_mobile_II),S2-S>2.
+
+
+
+
+%:-Conteggio =#count{ S,G,O : lezione(S,G,O,fondamenti_di_ICT_e_Paradigmi_di_Programmazione),S<S1,prima_lezione(S1,progettazione_di_basi_di_dati)},Conteggio<4.
 
 
 #show lezione/4.
