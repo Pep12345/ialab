@@ -151,17 +151,31 @@ lezione(1,venerdi,9,presentazione_master).
 %prima_settimana(MINS,G,O,I):-#min{S:lezione(S,_,_,I)}=MINS,lezione(MINS,G,O,I).
 %primo_giorno(S,G,O,I):-MING=#min{X:numero_giorno(G,X),prima_settimana(_,X,_,I)},prima_settimana(S,G,O,I),numero_giorno(G,MING).
 %prima_lezione(S,G,MINO,I):-MINO=#min{O:primo_giorno(_,_,O,I)},primo_giorno(S,G,MINO,I).
-prima_settimana(S,G,O,I):-lezione(S,G,O,I),lezione(S2,G2,O2,I),S<=S2.
-primo_giorno(S,G,O,I):-prima_settimana(S,G,O,I),prima_settimana(S2,G2,O2,I),numero_giorno(G,X),numero_giorno(G2,X2),X<=X2.
-prima_lezione(S,G,O,I):-primo_giorno(S,G,O,I),primo_giorno(S2,G2,O2,I),O<O2.
+
+%prima lezione 2° metodo
+%prima_settimana(S,G,O,I):-lezione(S,G,O,I),lezione(S2,G2,O2,I),S<=S2.
+%primo_giorno(S,G,O,I):-prima_settimana(S,G,O,I),prima_settimana(S2,G2,O2,I),numero_giorno(G,X),numero_giorno(G2,X2),X<=X2.
+%prima_lezione(S,G,O,I):-primo_giorno(S,G,O,I),primo_giorno(S2,G2,O2,I),O<O2.
+
+%prima lezione 3° metodo(tempi migliori)
+prima_settimana(S,G,O,I):-lezione(S,G,O,I), not lezione(S1,G1,O1,I),S1<S,lezione(S1,G1,O1,I).
+primo_giorno(S,G,O,I):-prima_settimana(S,G,O,I),not prima_settimana(S,G1,O1,I),G<G1,prima_settimana(S1,G1,O1,I).
+prima_lezione(S,G,O,I):-primo_giorno(S,G,O,I),not primo_giorno(S,G,O1,I),O1<O,primo_giorno(S,G,O1,I).
 
 %ultima lezione
 %ultima_settimana(MAXS,G,O,I):-#max{S:lezione(S,_,_,I)}=MAXS,lezione(MAXS,G,O,I).
 %ultima_giorno(S,G,O,I):-MAXG=#max{X:numero_giorno(G,X),prima_settimana(_,X,_,I)},prima_settimana(S,G,O,I),numero_giorno(G,MAXG).
 %ultima_lezione(S,G,MAXO,I):-MAXO=#max{O:primo_giorno(_,_,O,I)},primo_giorno(S,G,MAXO,I).
-ultima_settimana(S,G,O,I):-lezione(S,G,O,I),lezione(S2,G2,O2,I),S>=S2.
-ultima_giorno(S,G,O,I):-ultima_settimana(S,G,O,I),ultima_settimana(S2,G2,O2,I),numero_giorno(G,X),numero_giorno(G2,X2),X>=X2.
-ultima_lezione(S,G,O,I):-ultima_giorno(S,G,O,I),ultima_giorno(S2,G2,O2,I),O>O2.
+
+%ultima lezione 2° metodo
+%ultima_settimana(S,G,O,I):-lezione(S,G,O,I),lezione(S2,G2,O2,I),S>=S2.
+%ultima_giorno(S,G,O,I):-ultima_settimana(S,G,O,I),ultima_settimana(S2,G2,O2,I),numero_giorno(G,X),numero_giorno(G2,X2),X>=X2.
+%ultima_lezione(S,G,O,I):-ultima_giorno(S,G,O,I),ultima_giorno(S2,G2,O2,I),O>O2.
+
+%ultima lezione 3° metodo(tempi migliori)
+ultima_settimana(S,G,O,I):-lezione(S,G,O,I), not lezione(S1,G1,O1,I),S1>S,lezione(S1,G1,O1,I).
+ultimo_giorno(S,G,O,I):-ultima_settimana(S,G,O,I),not ultima_settimana(S,G1,O1,I),G>G1,ultima_settimana(S1,G1,O1,I).
+ultima_lezione(S,G,O,I):-ultimo_giorno(S,G,O,I),not ultimo_giorno(S,G,O1,I),O1>O,ultimo_giorno(S,G,O1,I).
 
 
 %la prima lezione dell’insegnamento “Accessibilità e usabilità nella
@@ -186,7 +200,7 @@ ultima_lezione(S,G,O,I):-ultima_giorno(S,G,O,I),ultima_giorno(S2,G2,O2,I),O>O2.
 %web su dispositivi mobile I” e la prima di “Progettazione e sviluppo di
 %applicazioni web su dispositivi mobile II” non deve superare le due
 %settimane.
-%:-ultima_lezione(S,_,_,progettazione_e_sviluppo_di_applicazioni_web_su_dispositivi_mobile_I),prima_lezione(S2,_,_,progettazione_e_sviluppo_di_applicazioni_web_su_dispositivi_mobile_II),S2-S>2.
+:-ultima_lezione(S,_,_,progettazione_e_sviluppo_di_applicazioni_web_su_dispositivi_mobile_I),prima_lezione(S2,_,_,progettazione_e_sviluppo_di_applicazioni_web_su_dispositivi_mobile_II),S2-S>2.
 
 
 
