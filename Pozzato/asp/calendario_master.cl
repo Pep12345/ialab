@@ -96,9 +96,9 @@ insegnamento_successivo(acquisizione_ed_elaborazione_di_sequenze_di_immagini_dig
 insegnamento_successivo(grafica_3D,acquisizione_ed_elaborazione_di_immagini_statiche_grafica).
 
 insegnamento_successivo_4ore(progettazione_di_basi_di_dati,fondamenti_di_ICT_e_Paradigmi_di_Programmazione).
-insegnamento_successivo_4ore(introduzione_al_social_media_management,tecniche_e_strumenti_di_Marketing_digitale).
-insegnamento_successivo_4ore(la_gestione_delle_risorse_umane,comunicazione_pubblicitaria_e_comunicazione_pubblica).
-insegnamento_successivo_4ore(progettazione_e_sviluppo_di_applicazioni_web_su_dispositivi_mobile_I,tecnologie_server_side_per_il_web).
+%insegnamento_successivo_4ore(introduzione_al_social_media_management,tecniche_e_strumenti_di_Marketing_digitale).
+%insegnamento_successivo_4ore(la_gestione_delle_risorse_umane,comunicazione_pubblicitaria_e_comunicazione_pubblica).
+%insegnamento_successivo_4ore(progettazione_e_sviluppo_di_applicazioni_web_su_dispositivi_mobile_I,tecnologie_server_side_per_il_web).
 
 %ad ogni settimana  associamo i suoi giorni 
 2{giorno_in_settimana(S,G):giorni_settimana(G)}2:-settimane(S).
@@ -147,67 +147,54 @@ insegnamenti_recupero(recupero).
 lezione(1,venerdi,8,presentazione_master).
 lezione(1,venerdi,9,presentazione_master).
 
-%prima lezione
-prima_settimana(MINS,G,O,I):-#min{S:lezione(S,_,_,I)}=MINS,lezione(MINS,G,O,I).
-primo_giorno(S,G,O,I):-MING=#min{X:numero_giorno(G,X),prima_settimana(_,X,_,I)},prima_settimana(S,G,O,I),numero_giorno(G,MING).
-prima_lezione(S,G,MINO,I):-MINO=#min{O:primo_giorno(_,_,O,I)},primo_giorno(S,G,MINO,I).
-
-%prima lezione 2° metodo
-%prima_settimana(S,G,O,I):-lezione(S,G,O,I),lezione(S2,G2,O2,I),S<=S2.
-%primo_giorno(S,G,O,I):-prima_settimana(S,G,O,I),prima_settimana(S2,G2,O2,I),numero_giorno(G,X),numero_giorno(G2,X2),X<=X2.
-%prima_lezione(S,G,O,I):-primo_giorno(S,G,O,I),primo_giorno(S2,G2,O2,I),O<O2.
 
 %prima lezione 3° metodo(tempi migliori)
-%prima_settimana(S,G,O,I):-lezione(S,G,O,I), not lezione(S1,G1,O1,I),S1<S,lezione(S1,G1,O1,I).
-%primo_giorno(S,G,O,I):-prima_settimana(S,G,O,I),not prima_settimana(S,G1,O1,I),G1<G,prima_settimana(S1,G1,O1,I).
-%prima_lezione(S,G,O,I):-primo_giorno(S,G,O,I),not primo_giorno(S,G,O1,I),O1<O,primo_giorno(S,G,O1,I).
+x(S,G,O,I):-lezione(S,G,O,I),lezione(S1,G1,O1,I),S1<S.
+prima_settimana(S,G,O,I):- not x(S,G,O,I),lezione(S,G,O,I).
+x2(S,G,O,I):-prima_settimana(S,G,O,I),prima_settimana(S,G1,O1,I),G1<G.
+primo_giorno(S,G,O,I):- not x2(S,G,O,I),prima_settimana(S,G,O,I).
+x3(S,G,O,I):-primo_giorno(S,G,O,I), primo_giorno(S,G,O1,I),O1<O.
+prima_lezione(S,G,O,I):- not x3(S,G,O,I),primo_giorno(S,G,O,I).
 
-%ultima lezione
-%ultima_settimana(MAXS,G,O,I):-#max{S:lezione(S,_,_,I)}=MAXS,lezione(MAXS,G,O,I).
-%ultima_giorno(S,G,O,I):-MAXG=#max{X:numero_giorno(G,X),prima_settimana(_,X,_,I)},prima_settimana(S,G,O,I),numero_giorno(G,MAXG).
-%ultima_lezione(S,G,MAXO,I):-MAXO=#max{O:primo_giorno(_,_,O,I)},primo_giorno(S,G,MAXO,I).
-
-%ultima lezione 2° metodo
-%ultima_settimana(S,G,O,I):-lezione(S,G,O,I),lezione(S2,G2,O2,I),S>=S2.
-%ultima_giorno(S,G,O,I):-ultima_settimana(S,G,O,I),ultima_settimana(S2,G2,O2,I),numero_giorno(G,X),numero_giorno(G2,X2),X>=X2.
-%ultima_lezione(S,G,O,I):-ultima_giorno(S,G,O,I),ultima_giorno(S2,G2,O2,I),O>O2.
 
 %ultima lezione 3° metodo(tempi migliori)
-%ultima_settimana(S,G,O,I):-lezione(S,G,O,I), not lezione(S1,G1,O1,I),S1>S,lezione(S1,G1,O1,I).
-%ultimo_giorno(S,G,O,I):-ultima_settimana(S,G,O,I),not ultima_settimana(S,G1,O1,I),G1>G,ultima_settimana(S1,G1,O1,I).
-%ultima_lezione(S,G,O,I):-ultimo_giorno(S,G,O,I),not ultimo_giorno(S,G,O1,I),O1>O,ultimo_giorno(S,G,O1,I).
+y(S,G,O,I):-lezione(S,G,O,I),lezione(S1,G1,O1,I),S1>S.
+ultima_settimana(S,G,O,I):- not y(S,G,O,I),lezione(S,G,O,I).
+y2(S,G,O,I):-prima_settimana(S,G,O,I),prima_settimana(S,G1,O1,I),G1>G.
+ultimo_giorno(S,G,O,I):- not y2(S,G,O,I),prima_settimana(S,G,O,I).
+y3(S,G,O,I):-primo_giorno(S,G,O,I), ultimo_giorno(S,G,O1,I),O1>O.
+ultima_lezione(S,G,O,I):- not y3(S,G,O,I),ultimo_giorno(S,G,O,I).
 
 
 %la prima lezione dell’insegnamento “Accessibilità e usabilità nella
 %progettazione multimediale” deve essere collocata prima che siano
 %terminate le lezioni dell’insegnamento “Linguaggi di markup”
-%:-prima_lezione(S,_,_,accessibilita_e_usabilita_nella_progettazione_multimediale),ultima_lezione(S2,_,_,linguaggi_di_markup),S>S2.
+:-prima_lezione(S,_,_,accessibilita_e_usabilita_nella_progettazione_multimediale),ultima_lezione(S2,_,_,linguaggi_di_markup),S>S2.
 
 %se un corso è successivo ad un altro, la prima lezione del corso deve essere successiva all'ultima lezione 
 %dell'altro corso
-%:-insegnamento_successivo(I,I2),prima_lezione(S,_,_,I),ultima_lezione(S2,_,_,I2),S<=S2.
+:-insegnamento_successivo(I,I2),prima_lezione(S,_,_,I),ultima_lezione(S2,_,_,I2),S<=S2.
 
 %la distanza tra la prima e l’ultima lezione di ciascun insegnamento non deve superare le 6 settimane
-%:-prima_lezione(S,_,_,I),ultima_lezione(S1,_,_,I),S1-S>6.
+:-prima_lezione(S,_,_,I),ultima_lezione(S1,_,_,I),S1-S>6.
 
 %la prima lezione degli insegnamenti “Crossmedia: articolazione delle 
 %scritture multimediali” e “Introduzione al social media management”
 %devono essere collocate nella seconda settimana full-time
-%:-prima_lezione(S,_,_,crossmedia_articolazione_delle_scritture_multimediali),S!=16.
-%:-prima_lezione(S,_,_,introduzione_al_social_media_management),S!=16.
+:-prima_lezione(S,_,_,crossmedia_articolazione_delle_scritture_multimediali),S!=16.
+:-prima_lezione(S,_,_,introduzione_al_social_media_management),S!=16.
 
 %la distanza fra l’ultima lezione di “Progettazione e sviluppo di applicazioni
 %web su dispositivi mobile I” e la prima di “Progettazione e sviluppo di
 %applicazioni web su dispositivi mobile II” non deve superare le due
 %settimane.
-%:-ultima_lezione(S,_,_,progettazione_e_sviluppo_di_applicazioni_web_su_dispositivi_mobile_I),prima_lezione(S2,_,_,progettazione_e_sviluppo_di_applicazioni_web_su_dispositivi_mobile_II),S2-S>2.
-
-
+:-ultima_lezione(S,_,_,progettazione_e_sviluppo_di_applicazioni_web_su_dispositivi_mobile_I),prima_lezione(S2,_,_,progettazione_e_sviluppo_di_applicazioni_web_su_dispositivi_mobile_II),S2-S>2.
 
 %se un corso è successivo_4ore ad un altro, la prima lezione del corso deve essere successiva ad almeno 4 ore
 %di insegnamento dell'altro.
-%:-Conteggio =#count{ S,G,O : lezione(S,G,O,I2),insegnamento_successivo_4ore(I,I2),S<S1,prima_lezione(S1,_,_,I1)},Conteggio<4.
+conteggioOrePrecedente(I,I1,Conteggio):-#count{S,G,O: lezione(S,G,O,I),prima_lezione(S1,G1,O1,I1),S<=S1,numero_giorno(G,X),numero_giorno(G1,X1),X<=X1,O<O1}=Conteggio,insegnamenti(I),insegnamenti(I1).
+:-insegnamento_successivo_4ore(I,I1),conteggioOrePrecedente(I,I1,Conteggio),Conteggio<4.
 
 
-#show prima_lezione/4.
+#show lezione/4.
 
