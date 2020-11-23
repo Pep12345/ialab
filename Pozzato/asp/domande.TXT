@@ -1,1 +1,4 @@
-Dobbiamo assegnare le ore a due a due o a caso?
+Tempi di esecuzione
+Ultimo vincolo
+
+//per noi aggiungere nuovo blocco orari da 4-5h per il sabato
