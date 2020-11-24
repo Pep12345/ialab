@@ -3,43 +3,83 @@
 ;  ---------------------------------------------
 (defmodule AGENT (import MAIN ?ALL) (import ENV ?ALL) (export ?ALL))
 
-- definire 7 regole per k-cell (usare anche i k-row, k-col)[water,middle.....]
-- definire template b-cell
-- scegliere se dividere in moduli declaration - executation
-- scegliere euristiche da usare quando non abbiamo più k-cell
+;template
+(deftemplate visto
+	(slot x)
+	(slot y)
+)
 
-k-cell: cose che sappiamo per certo
-b-cell: cose che supponiamo
-f-cell: caselle che sono barche ma non sappiamo che parte di barca è e quindi non possiamo metterle come k-cell
-				rapprensentate come x,y,contenutoPadre
+;- definire 7 regole per k-cell (usare anche i k-row, k-col)[water,middle.....]
+;- definire template b-cell
+;- scegliere se dividere in moduli declaration - executation
+;- scegliere euristiche da usare quando non abbiamo più k-cell
 
-- nelle regole di f-cell controllo colonne/righe a fianco per vedere se siamo middle o estremo
-//prova regola
+;k-cell: cose che sappiamo per certo
+;b-cell: cose che supponiamo: le usiamo quando troviamo un middle che non sappiamo se andare vertiale o orizzontale
+;f-cell: caselle che sono barche ma non sappiamo che parte di barca è e quindi non possiamo metterle come k-cell
+			;	[TEMPLATE: rapprensentate come x,y,contenutoPadre]
+
+; nelle regole di f-cell controllo colonne/righe a fianco per vedere se siamo middle o estremo
+; regola estrema (da usare quando non so che fare) fire su incrocio con riga e colonna con numero più alto
 (defrule k-cell-water
 		(status (step ?s)(currently running))  // forse bisogna incrementare step
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c water)))
 	=>
-		// non dovrebbe fare nulla
+		; non dovrebbe fare nulla
 	     (pop-focus)
 )
 
-
-(defrule k-cell-left
-		(status (step ?s)(currently running))  // forse bisogna incrementare step
-		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
-		//controllare che la casella a fianco non sia k-cell altrimenti non deve fare nulla
+(defrule k-cell-genenral (declare (salience 10))
+		(k-cell (x ?x) (y ?y) (content ?c&:(neq ?c water)))
+		?kpr <- (k-per-row (row ?y) (num ?num-row))
+  	?kpc <-(k-per-col (col ?x) (num ?num-col))
+		(not (visto(x ?x)(y ?y)))
 	=>
-		// creare k-cell water in [x+1,y] // [x-1,y] // [x,y-1] // [x-1,y-1] // [x+1,y-1]
-		// decrementare k-row/k-col di 1 (forse conviene usare b-row/b-col) - controllare step precedende se fire per assicurarsi di non decrementare due volte
-		(assert (exec (step ?s) (action guess) (x ?x) (y (+ ?y 1))) // andiamo a mettere bandierina nella casella a fianco
+		(modify ?kpr (num (- ?num-row 1)))
+		(modify ?kpc (num (- ?num-col 1)))
+		(printout t "x: " ?x " y: " ?y  crlf)
+		(assert (visto (x ?x) (y ?y)))
+)
+
+;estremi
+;regola per quando non conosciamo cosa c'è a destra
+(defrule k-cell-left
+		(status (step ?s)(currently running))
+		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
+		; k-cell x,y+1 || f-cell x,y+1
+	=>
+		; creare k-cell water in [x+1,y] // [x-1,y] // [x,y-1] // [x-1,y-1] // [x+1,y-1]
 			 (pop-focus)
 )
-(defrule k-cell-middle
-		(status (step ?s)(currently running))  // forse bisogna incrementare step
-		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
+(defrule k-cell-left
+		(status (step ?s)(currently running))
+		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
+		; not k-cell x,y+1
+		; not f-cell x,y+1
 	=>
-	 (pop-focus)
+		; creare k-cell water in [x+1,y] // [x-1,y] // [x,y-1] // [x-1,y-1] // [x+1,y-1]
+		; segnare la casella x,y+1 come f-cell (perchè non sappiamo se middle/right)
+		(assert (exec (step ?s) (action guess) (x ?x) (y (+ ?y 1)))) // andiamo a mettere bandierina nella casella a fianco
+			 (pop-focus)
 )
+
+
+(defrule k-cell-sub
+		;(status (step ?s)(currently running))  // forse bisogna incrementare step
+		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c sub)))
+	=>
+		; creare k-cell water in [x+1,y] // [x-1,y] // [x,y-1] // [x-1,y-1] // [x+1,y-1] // [x+1,y+1] // [x-1,y+1]
+			 (pop-focus) ;non dovrebbe servire
+)
+
+
+
+;(defrule k-cell-middle
+;		(status (step ?s)(currently running))  // forse bisogna incrementare step
+;		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
+;	=>
+;	 (pop-focus)
+;)
 
 
 
