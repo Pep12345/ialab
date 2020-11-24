@@ -8,6 +8,12 @@
 - scegliere se dividere in moduli declaration - executation
 - scegliere euristiche da usare quando non abbiamo più k-cell
 
+k-cell: cose che sappiamo per certo
+b-cell: cose che supponiamo
+f-cell: caselle che sono barche ma non sappiamo che parte di barca è e quindi non possiamo metterle come k-cell
+				rapprensentate come x,y,contenutoPadre
+
+- nelle regole di f-cell controllo colonne/righe a fianco per vedere se siamo middle o estremo
 //prova regola
 (defrule k-cell-water
 		(status (step ?s)(currently running))  // forse bisogna incrementare step
@@ -23,7 +29,7 @@
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
 		//controllare che la casella a fianco non sia k-cell altrimenti non deve fare nulla
 	=>
-		// creare b-cell water in [x+1,y] // [x-1,y] // [x,y-1] // [x-1,y-1] // [x+1,y-1]
+		// creare k-cell water in [x+1,y] // [x-1,y] // [x,y-1] // [x-1,y-1] // [x+1,y-1]
 		// decrementare k-row/k-col di 1 (forse conviene usare b-row/b-col) - controllare step precedende se fire per assicurarsi di non decrementare due volte
 		(assert (exec (step ?s) (action guess) (x ?x) (y (+ ?y 1))) // andiamo a mettere bandierina nella casella a fianco
 			 (pop-focus)
