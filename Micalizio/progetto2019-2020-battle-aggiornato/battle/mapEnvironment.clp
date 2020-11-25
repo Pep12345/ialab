@@ -103,7 +103,7 @@
 (boat-hor (name sub2) (x 3) (ys 4) (size 1) (status safe))
 (boat-ver (name nav3) (y 4) (xs 5 6 7 ) (size 3) (status safe safe safe ))
 (k-cell (x 4) (y 1) (content water))
-(k-cell (x 6) (y 4) (content middle))
+(k-cell (x 3) (y 4) (content sub))
 (k-per-row (row 0) (num 0))
 (k-per-row (row 1) (num 2))
 (k-per-row (row 2) (num 0))

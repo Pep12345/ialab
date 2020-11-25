@@ -105,4 +105,5 @@
 (boat-ver (name nav4) (y 9) (xs 6 7 8 9 ) (size 4) (status safe safe safe safe ))
 (boat-hor (name sub5) (x 7) (ys 1) (size 1) (status safe))
 (boat-hor (name nav6) (x 8) (ys 3 4 5 ) (size 3) (status safe safe safe ))
+(k-cell (x 7) (y 1) (content water))
 )

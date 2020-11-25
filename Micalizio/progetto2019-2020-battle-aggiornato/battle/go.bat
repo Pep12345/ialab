@@ -6,5 +6,5 @@
 (set-break game-over)
 (run)
 (run 2)
-(focus ENV)
+(focus AGENT)
 (facts)
