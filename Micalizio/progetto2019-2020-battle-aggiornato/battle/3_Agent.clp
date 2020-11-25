@@ -80,8 +80,8 @@
 (defrule k-cell-left-know-neighbor (declare (salience 10))
 		(status (step ?s)(currently running))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
-		?z <- (+ ?y 1)
-		(or (k-cell (x ?x)(y ?z)) (f-cell (x ?x)(y ?z))) ;caso in cui conosciamo cosa c'è a fianco
+		(or (k-cell (x ?x)(y ?z&:(eq ?z (+ ?y 1))))
+				(f-cell (x ?x)(y ?z&:(eq ?z (+ ?y 1))))) ;caso in cui conosciamo cosa c'è a fianco
 	=>
 		; creare k-cell water in [x+1,y] // [x-1,y] // [x,y-1] // [x-1,y-1] // [x+1,y-1]
 		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
@@ -96,9 +96,8 @@
 (defrule k-cell-left-unknown-neighbor (declare (salience 10))
 		(status (step ?s)(currently running))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
-		?z <- (+ ?y 1)
-		(not (k-cell (x ?x)(y ?z)(content ?)))
-		(not (f-cell (x ?x)(y ?z)(padre ?)))
+		(not (k-cell (x ?x)(y ?z&:(eq ?z (+ ?y 1)))))
+		(not (f-cell (x ?x)(y ?z&:(eq ?z (+ ?y 1)))))
 	=>
 		; creare k-cell water in [x+1,y] // [x-1,y] // [x,y-1] // [x-1,y-1] // [x+1,y-1]
 		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
