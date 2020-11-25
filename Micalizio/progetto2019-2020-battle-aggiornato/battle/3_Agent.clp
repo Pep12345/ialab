@@ -45,21 +45,6 @@
 		(assert (visto (x ?x) (y ?y)))
 )
 
-;sub
-(defrule k-cell-sub (declare (salience 20))
-		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c sub)))
-	=>
-; creare k-cell water in [x+1,y] // [x-1,y] // [x,y-1] // [x,y+1] //[x+1,y-1] // [x-1,y-1] // [x+1,y+1] // [x-1,y+1]
-		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x ?x) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x ?x) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
-		;(printout t "TROVATO K-CELL SUB IN x: " ?x " y: " ?y  crlf)
-)
 
 ;creatore per k-cell che controlla di non superare i limiti della mappa
 (defrule k-cell-cretor-water (declare (salience 20))
@@ -75,8 +60,23 @@
 )
 
 
-;estremi
-;regola per quando non conosciamo cosa c'è a destra
+;K CELL RULES
+
+(defrule k-cell-sub (declare (salience 20))
+		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c sub)))
+	=>
+		; creare k-cell water in [x+1,y] // [x-1,y] // [x,y-1] // [x,y+1] //[x+1,y-1] // [x-1,y-1] // [x+1,y+1] // [x-1,y+1]
+		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
+		(assert (crea-k-cell (x (- ?x 1)) (y ?y) (c water)))
+		(assert (crea-k-cell (x ?x) (y (- ?y 1)) (c water)))
+		(assert (crea-k-cell (x ?x) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
+		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
+		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
+		;(printout t "TROVATO K-CELL SUB IN x: " ?x " y: " ?y  crlf)
+)
+
 (defrule k-cell-left-know-neighbor (declare (salience 10))
 		(status (step ?s)(currently running))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
@@ -87,7 +87,7 @@
 		; creare k-cell water in [x+1,y] // [x-1,y] // [x,y-1] // [x-1,y-1] // [x+1,y-1]
 		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
 		(assert (crea-k-cell (x (- ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x ?x) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell (x ?x) (y (- ?y 1)) (c water)))
 		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
 		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
 		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
@@ -105,7 +105,7 @@
 		; creare k-cell water in [x+1,y] // [x-1,y] // [x,y-1] // [x-1,y-1] // [x+1,y-1]
 		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
 		(assert (crea-k-cell (x (- ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x ?x) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell (x ?x) (y (- ?y 1)) (c water)))
 		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
 		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
 		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
@@ -122,7 +122,6 @@
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c right)))
 		(or (k-cell (x ?x)(y =(- ?y 1))) (f-cell (x ?x)(y =(- ?y 1)))) ;caso in cui conosciamo cosa c'è a fianco
 	=>
-
 		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
 		(assert (crea-k-cell (x (- ?x 1)) (y ?y) (c water)))
 		(assert (crea-k-cell (x ?x) (y (+ ?y 1)) (c water)))
@@ -184,24 +183,62 @@
 		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
 		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
 
-		(assert (f-cell (x =(+ 1 ?x))(y ?y)) (padre ?c)))
+		(assert (f-cell (x =(+ 1 ?x))(y ?y)) (padre ?c))
 		(printout t "TOP K CELL- REGOLA UNKNOW IN x: " ?x " y: " ?y  crlf)
 		(assert (exec (step ?s) (action guess) (x =(+ 1 ?x))(y ?y))) ;andiamo a mettere bandierina nella casella a fianco
 			 (pop-focus)
 )
 
+(defrule k-cell-bot-know-neighbor (declare (salience 10))
+		(status (step ?s)(currently running))
+		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c bot)))
+		(or (k-cell (x =(- 1 ?x))(y ?y)) (f-cell (x =(- 1 ?x))(y ?y))) ;caso in cui conosciamo cosa c'è a fianco
+	=>
+		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
+		(assert (crea-k-cell (x ?x) (y (- ?y 1)) (c water)))
+		(assert (crea-k-cell (x ?x) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
+		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
+		(printout t "BOT K CELL- REGOLA KNOW IN x: " ?x " y: " ?y  crlf)
+)
+(defrule k-cell-bot-unknown-neighbor (declare (salience 10))
+		(status (step ?s)(currently running))
+		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c bot)))
+		(not (k-cell (x =(- 1 ?x))(y ?y)))
+		(not (f-cell (x =(- 1 ?x))(y ?y)))
+	=>
+		;[x-1,y],[x-1,y+1],[x-1,y-1],[x,y-1],[x,y+1],[x+1,y+1],[x+1,y-1]
+		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
+		(assert (crea-k-cell (x ?x) (y (- ?y 1)) (c water)))
+		(assert (crea-k-cell (x ?x) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
+		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
+
+		(assert (f-cell (x =(- 1 ?x))(y ?y)) (padre ?c))
+		(printout t "BOT K CELL- REGOLA KNOW IN x: " ?x " y: " ?y  crlf)
+		(assert (exec (step ?s) (action guess) (x =(- 1 ?x))(y ?y))) ;andiamo a mettere bandierina nella casella a fianco
+			 (pop-focus)
+)
+
+;middle:
+ ;- non serve creare water perchè gli estremi li mettono anche in diagonale
+; se arriviamo qua significa che siamo almeno in una barca da tre:
+	; - se a destra abbiamo k cell -> bandierina a sinistra
+	; - se a sinistra abbiamo k cell -> bandierina a dentra...
+	; se non abbiamo k cell vicine -> b cell sopra,sotto destra e sinistra
+	; [regole b-cell massima priorità: se abbiamo una b cell su riga o colonna con 0 -> rimuovere b cell]
+	; oppure creare metodo per creare b cell che controlla prima di creare il valore di col/riga e se ci sono f cell lungo quella col/riga (forse sevono entrambi)
 
 
+; f-cell:
+	; regola priorità alta: per ogni f cell in base ai valori che può assumere, guardo valore riga/col adiacente, se 0 -> questa f cell diventa k cell estremo
 
-;(defrule k-cell-middle
-;		(status (step ?s)(currently running))  // forse bisogna incrementare step
-;		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
-;	=>
-;	 (pop-focus)
-;)
-
-
-
+;regola ultima spiaggia:
+	; sparo fire a caso nell'incrocio tra riga e col con valori più alti ( da qusare quando non so che pesci pijare)
 
 (defrule print-what-i-know-since-the-beginning (declare (salience 50))
 	(k-cell (x ?x) (y ?y) (content ?t) )
