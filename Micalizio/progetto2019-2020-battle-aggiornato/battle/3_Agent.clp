@@ -19,6 +19,11 @@
 	(slot y)
 	(slot padre) ;da rivedere perchè nel caso di middle come padre si perde l'informazione di orizzontale/verticale
 )
+(deftemplate crea-f-cell
+	(slot x)
+	(slot y)
+	(slot padre)
+)
 
 ;- definire 7 regole per k-cell (usare anche i k-row, k-col)[water,middle.....]
 ;- definire template b-cell
@@ -33,10 +38,13 @@
 ; nelle regole di f-cell controllo colonne/righe a fianco per vedere se siamo middle o estremo
 ; regola estrema (da usare quando non so che fare) fire su incrocio con riga e colonna con numero più alto
 
-(defrule k-cell-genenral (declare (salience 10)) ; PROBABILMENTE X/Y SONO INVERTITE
-		(k-cell (x ?x) (y ?y) (content ?c&:(neq ?c water)))
-		?kpr <- (k-per-row (row ?y) (num ?num-row))
-  	?kpc <-(k-per-col (col ?x) (num ?num-col))
+;Regola che decrementa i contatori in k-row, k-col per ogni parte di barca conosciuta
+;(considera sia le k-cell che le f-cell, una pos x,y non può riattivarsi grazie a (visto x/y))
+(defrule rule-for-decrement-k-row-col (declare (salience 10))
+		(or (k-cell (x ?x) (y ?y) (content ?c&:(neq ?c water)))
+		    (f-cell (x ?x)(y ?y)))
+		?kpr <- (k-per-row (row ?x) (num ?num-row))
+  	?kpc <-(k-per-col (col ?y) (num ?num-col))
 		(not (visto(x ?x)(y ?y)))
 	=>
 		(modify ?kpr (num (- ?num-row 1)))
@@ -74,15 +82,11 @@
 		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
 		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
 		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
-		;(printout t "TROVATO K-CELL SUB IN x: " ?x " y: " ?y  crlf)
+		(printout t "Ho trovato una K-cell di tipo sub in x " ?x " y: " ?y  crlf)
 )
 
-(defrule k-cell-left-know-neighbor (declare (salience 10))
-		(status (step ?s)(currently running))
+(defrule k-cell-left (declare (salience 10))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
-		(or (k-cell (x ?x)(y =(+ 1 ?y))) (f-cell (x ?x)(y =(+ 1 ?y)))) ;caso in cui conosciamo cosa c'è a fianco
-		;	(or (k-cell (x ?x)(y ?z&:(eq ?z (+ ?y 1))))
-					;(f-cell (x ?x)(y ?z&:(eq ?z (+ ?y 1))))) ;caso in cui conosciamo cosa c'è a fianco
 	=>
 		; creare k-cell water in [x+1,y] // [x-1,y] // [x,y-1] // [x-1,y-1] // [x+1,y-1]
 		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
@@ -92,35 +96,13 @@
 		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
 		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
 		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
-		(printout t "LEFT K CELL- REGOLA KNOW IN x: " ?x " y: " ?y  crlf)
-)
-(defrule k-cell-left-unknown-neighbor (declare (salience 10))
-		(status (step ?s)(currently running))
-		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
-		(not (k-cell (x ?x)(y =(+ 1 ?y))))
-		(not (f-cell (x ?x)(y =(+ 1 ?y))))
-		;		(not (k-cell (x ?x)(y ?z&:(eq ?z (+ ?y 1)))))
-		;		(not (f-cell (x ?x)(y ?z&:(eq ?z (+ ?y 1)))))
-	=>
-		; creare k-cell water in [x+1,y] // [x-1,y] // [x,y-1] // [x-1,y-1] // [x+1,y-1]
-		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x ?x) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
-		; segnare la casella x,y+1 come f-cell (perchè non sappiamo se middle/right)
-		(assert (f-cell (x ?x) (y (+ ?y 1)) (padre ?c)))
-		(printout t "LEFT K CELL- REGOLA UNKNOW IN x: " ?x " y: " ?y  crlf)
-		(assert (exec (step ?s) (action guess) (x ?x) (y (+ ?y 1)))) ;andiamo a mettere bandierina nella casella a fianco
-			 (pop-focus)
+
+		(assert (crea-f-cell (x ?x) (y (+ ?y 1)) (padre ?c)))
+		(printout t "Ho trovato una K-cell di tipo left in x: " ?x " y: " ?y  crlf)
 )
 
-(defrule k-cell-right-know-neighbor (declare (salience 10))
-		(status (step ?s)(currently running))
+(defrule k-cell-right (declare (salience 10))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c right)))
-		(or (k-cell (x ?x)(y =(- ?y 1))) (f-cell (x ?x)(y =(- ?y 1)))) ;caso in cui conosciamo cosa c'è a fianco
 	=>
 		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
 		(assert (crea-k-cell (x (- ?x 1)) (y ?y) (c water)))
@@ -129,34 +111,13 @@
 		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
 		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
 		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
-		(printout t "RIGHT K CELL- REGOLA KNOW IN x: " ?x " y: " ?y  crlf)
+
+		(assert (crea-f-cell (x ?x) (y (- ?y 1)) (padre ?c)))
+		(printout t "Ho trovato una K-cell di tipo right in x: " ?x " y: " ?y  crlf)
 )
 
-(defrule k-cell-right-unknown-neighbor (declare (salience 10))
-		(status (step ?s)(currently running))
-		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c right)))
-		(not (k-cell (x ?x)(y =(- ?y 1))))
-		(not (f-cell (x ?x)(y =(- ?y 1))))
-	=>
-
-		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x ?x) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
-
-		(assert (f-cell (x ?x) (y (- ?y 1)) (padre ?c)))
-		(printout t "RIGHT K CELL- REGOLA UNKNOW IN x: " ?x " y: " ?y  crlf)
-		(assert (exec (step ?s) (action guess) (x ?x) (y (- ?y 1)))) ;andiamo a mettere bandierina nella casella a fianco
-			 (pop-focus)
-)
-
-(defrule k-cell-top-know-neighbor (declare (salience 10))
-		(status (step ?s)(currently running))
+(defrule k-cell-top (declare (salience 10))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c top)))
-		(or (k-cell (x =(+ 1 ?x))(y ?y)) (f-cell (x =(+ 1 ?x))(y ?y))) ;caso in cui conosciamo cosa c'è a fianco
 	=>
 
 		(assert (crea-k-cell (x (- ?x 1)) (y ?y) (c water)))
@@ -166,67 +127,15 @@
 		(assert (crea-k-cell (x ?x) (y (+ ?y 1)) (c water)))
 		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
 		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
-		(printout t "TOP K CELL- REGOLA KNOW IN x: " ?x " y: " ?y  crlf)
-)
-(defrule k-cell-top-unknown-neighbor (declare (salience 10))
-		(status (step ?s)(currently running))
-		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c top)))
-		(not (k-cell (x =(+ 1 ?x))(y ?y)))
-		(not (f-cell (x =(+ 1 ?x))(y ?y)))
-	=>
-		;[x-1,y],[x-1,y+1],[x-1,y-1],[x,y-1],[x,y+1],[x+1,y+1],[x+1,y-1]
-		(assert (crea-k-cell (x (- ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x ?x) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x ?x) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
 
-		(assert (f-cell (x =(+ 1 ?x))(y ?y)) (padre ?c))
-		(printout t "TOP K CELL- REGOLA UNKNOW IN x: " ?x " y: " ?y  crlf)
-		(assert (exec (step ?s) (action guess) (x =(+ 1 ?x))(y ?y))) ;andiamo a mettere bandierina nella casella a fianco
-			 (pop-focus)
+		(assert (crea-f-cell (x =(+ 1 ?x))(y ?y)) (padre ?c))
+		(printout t "Ho trovato una K-cell di tipo top in x: " ?x " y: " ?y  crlf)
 )
 
-(defrule k-cell-bot-know-neighbor (declare (salience 10))
-		(status (step ?s)(currently running))
-		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c bot)))
-		(or (k-cell (x =(- 1 ?x))(y ?y)) (f-cell (x =(- 1 ?x))(y ?y))) ;caso in cui conosciamo cosa c'è a fianco
-	=>
-		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x ?x) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x ?x) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
-		(printout t "BOT K CELL- REGOLA KNOW IN x: " ?x " y: " ?y  crlf)
-)
-(defrule k-cell-bot-unknown-neighbor (declare (salience 10))
-		(status (step ?s)(currently running))
-		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c bot)))
-		(not (k-cell (x =(- 1 ?x))(y ?y)))
-		(not (f-cell (x =(- 1 ?x))(y ?y)))
-	=>
-		;[x-1,y],[x-1,y+1],[x-1,y-1],[x,y-1],[x,y+1],[x+1,y+1],[x+1,y-1]
-		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x ?x) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x ?x) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
 
-		(assert (f-cell (x =(- 1 ?x))(y ?y)) (padre ?c))
-		(printout t "BOT K CELL- REGOLA KNOW IN x: " ?x " y: " ?y  crlf)
-		(assert (exec (step ?s) (action guess) (x =(- 1 ?x))(y ?y))) ;andiamo a mettere bandierina nella casella a fianco
-			 (pop-focus)
-)
 ;; soluzione compatta: da provare, potremmo risparmiare 2 regole per estremo
-(defrule k-cell-X-unknown-neighbor (declare (salience 10))
-		(status (step ?s)(currently running))
-		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c X)))
+(defrule k-cell-bot (declare (salience 10))
+		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c bot)))
 	=>
 		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
 		(assert (crea-k-cell (x ?x) (y (- ?y 1)) (c water)))
@@ -236,17 +145,19 @@
 		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
 		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
 
-		(assert (crea-f-cell  (step ?s)(x (- ?x 1))(y ?y)(padre ?c)))
-		(printout t "BOT K CELL- REGOLA KNOW IN x: " ?x " y: " ?y  crlf)
+		(assert (crea-f-cell  (x (- ?x 1))(y ?y)(padre ?c)))
+		(printout t "Ho trovato una K-cell di tipo bot in x: " ?x " y: " ?y  crlf)
 )
+
 (defrule crea-f-cell (declare (salience 10))
-	(crea-f-cell  (step ?s)(x ?x)(y ?y)(padre ?c))
-	(not (k-cell (x ?x)(y ?y)))
-	(not (f-cell (x ?x)(y ?y)))
+		(status (step ?s)(currently running))
+		(crea-f-cell  (x ?x)(y ?y)(padre ?c))
+		(not (k-cell (x ?x)(y ?y)))
+		(not (f-cell (x ?x)(y ?y)))
 	=>
-	(assert (f-cell (x ?x)(y ?y)) (padre ?c))
-	(assert (exec (step ?s) (action guess) (x ?x)(y ?y)))
-		 (pop-focus)
+		(assert (f-cell (x ?x)(y ?y)) (padre ?c))
+		(assert (exec (step ?s) (action guess) (x ?x)(y ?y)))
+		 	(pop-focus)
 )
 
 
