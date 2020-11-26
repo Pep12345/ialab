@@ -223,6 +223,32 @@
 		(assert (exec (step ?s) (action guess) (x =(- 1 ?x))(y ?y))) ;andiamo a mettere bandierina nella casella a fianco
 			 (pop-focus)
 )
+;; soluzione compatta: da provare, potremmo risparmiare 2 regole per estremo
+(defrule k-cell-X-unknown-neighbor (declare (salience 10))
+		(status (step ?s)(currently running))
+		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c X)))
+	=>
+		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
+		(assert (crea-k-cell (x ?x) (y (- ?y 1)) (c water)))
+		(assert (crea-k-cell (x ?x) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
+		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
+
+		(assert (crea-f-cell  (step ?s)(x (- ?x 1))(y ?y)(padre ?c)))
+		(printout t "BOT K CELL- REGOLA KNOW IN x: " ?x " y: " ?y  crlf)
+)
+(defrule crea-f-cell (declare (salience 10))
+	(crea-f-cell  (step ?s)(x ?x)(y ?y)(padre ?c))
+	(not (k-cell (x ?x)(y ?y)))
+	(not (f-cell (x ?x)(y ?y)))
+	=>
+	(assert (f-cell (x ?x)(y ?y)) (padre ?c))
+	(assert (exec (step ?s) (action guess) (x ?x)(y ?y)))
+		 (pop-focus)
+)
+
 
 ;middle:
  ;- non serve creare water perchè gli estremi li mettono anche in diagonale
