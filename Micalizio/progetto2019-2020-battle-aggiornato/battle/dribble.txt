@@ -1,0 +1,1075 @@
+TRUE
+CLIPS> (clear)
+CLIPS> (batch "E:/ialab/Micalizio/progetto2019-2020-battle-aggiornato/battle/go.bat")
+TRUE
+CLIPS> (load 0_Main.clp)
+
+[CSTRCPSR1] WARNING: Redefining defmodule: MAIN
+Defining deftemplate: exec
+Defining deftemplate: status
+Defining deftemplate: moves
+Defining deftemplate: statistics
+Defining defrule: go-on-env-first +j+j
+Defining defrule: go-on-agent +j+j+j
+Defining defrule: go-on-env +j+j+j
+Defining defrule: game-over =j+j+j
+Defining deffacts: initial-facts
+TRUE
+CLIPS> (load 1_Env.clp)
+Defining defmodule: ENV
+Defining deftemplate: cell
+Defining deftemplate: boat-hor
+Defining deftemplate: boat-ver
+Defining deftemplate: k-cell
+Defining deftemplate: k-per-row
+Defining deftemplate: k-per-col
+Defining defrule: action-fire +j+j+j+j
+Defining defrule: action-guess =j+j+j+j
+Defining defrule: action-unguess =j+j+j+j+j
+Defining defrule: action-solve =j+j+j
+Defining defrule: fire-ok +j+j+j+j
+Defining defrule: fire-ko =j+j+j+j
+Defining defrule: hit-boat-hor-trace +j+j+j+j
+Defining defrule: hit-boat-ver-trace =j+j+j+j
+Defining defrule: sink-boat-hor =j+j+j
+=j+j+j
+=j+j+j
+=j+j+j
+Defining defrule: sink-boat-ver =j+j+j
+=j+j+j
+=j+j+j
+=j+j+j
+Defining defrule: solve-count-guessed-ok +j+j+j+j+j
+Defining defrule: solve-count-guessed-ko =j=j+j+j+j
+Defining defrule: solve-count-safe =j+j+j+j+j
+Defining defrule: solve-sink-count =j+j+j+j+j
+Defining deffunction: scoring
+Defining defrule: solve-scoring =j+j+j
+Defining defrule: reset-map +j+j+j+j
+Defining defrule: make-visible-sub =j+j+j+j+j
+Defining defrule: make-visible-left =j=j+j+j+j
+Defining defrule: make-visible-right =j=j+j+j+j
+Defining defrule: make-visible-top =j=j+j+j+j
+Defining defrule: make-visible-bot =j=j+j+j+j
+Defining defrule: make-visible-middle =j=j+j+j
+TRUE
+CLIPS> (load case1_obs_2.clp)
+Defining deffacts: battle-field
+TRUE
+CLIPS> (load 3_Agent.clp)
+Defining defmodule: AGENT
+Defining deftemplate: visto
+Defining deftemplate: crea-k-cell
+Defining deftemplate: f-cell
+Defining deftemplate: crea-f-cell
+Defining deftemplate: b-cell
+Defining deftemplate: crea-b-cell
+Defining defrule: rule-for-decrement-k-row-col =j+j+j+j+j
++j+j+j+j+j
+Defining defrule: k-cell-cretor-water +j+j+j
+Defining defrule: k-cell-sub +j+j
+Defining defrule: k-cell-left +j+j
+Defining defrule: k-cell-right +j+j
+Defining defrule: k-cell-top +j+j
+Defining defrule: k-cell-bot +j+j
+Defining defrule: k-cell-middle-vertical-border +j+j
++j+j
+Defining defrule: k-cell-middle-horizontal-border +j+j
++j+j
+Defining defrule: k-cell-middle-general +j+j
+Defining defrule: middle-near-left =j+j+j
+=j+j+j
+Defining defrule: middle-near-right =j+j+j
+=j+j+j
+Defining defrule: middle-near-top =j+j+j
+=j+j+j
+Defining defrule: middle-near-bot =j+j+j
+=j+j+j
+Defining defrule: k-cell-middle-ultimaspiaggia =j+j+j+j+j+j+j+j+j+j
+Defining defrule: crea-f-cell =j+j+j+j+j
+Defining defrule: crea-b-cell =j+j+j+j+j
+Defining defrule: print-what-i-know-since-the-beginning +j+j
+TRUE
+CLIPS> (reset)
+CLIPS> (set-break game-over)
+CLIPS> (run)
+ HO VISTO x: 5 y: 4
+ HO VISTO x: 6 y: 4
+I know that cell [6, 4] contains middle.
+I know that cell [5, 4] contains top.
+I know that cell [4, 1] contains water.
+Creo water vicino middle: 6 y: 4
+I know that cell [7, 3] contains water.
+I know that cell [7, 5] contains water.
+I know that cell [5, 3] contains water.
+I know that cell [5, 5] contains water.
+Ho trovato una K-cell di tipo top in x: 5 y: 4
+I know that cell [6, 3] contains water.
+I know that cell [6, 5] contains water.
+I know that cell [4, 3] contains water.
+I know that cell [4, 5] contains water.
+I know that cell [4, 4] contains water.
+CLIPS> (run 2)
+CLIPS> (focus AGENT)
+TRUE
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (maxduration 100)
+f-2     (status (step 0) (currently running))
+f-5     (moves (fires 5) (guesses 20))
+f-109   (k-cell (x 4) (y 1) (content water))
+f-110   (k-cell (x 5) (y 4) (content top))
+f-111   (k-cell (x 6) (y 4) (content middle))
+f-112   (k-per-row (row 0) (num 0))
+f-113   (k-per-row (row 1) (num 2))
+f-114   (k-per-row (row 2) (num 0))
+f-115   (k-per-row (row 3) (num 1))
+f-116   (k-per-row (row 4) (num 0))
+f-119   (k-per-row (row 7) (num 1))
+f-120   (k-per-row (row 8) (num 0))
+f-121   (k-per-row (row 9) (num 0))
+f-122   (k-per-col (col 0) (num 0))
+f-123   (k-per-col (col 1) (num 0))
+f-124   (k-per-col (col 2) (num 0))
+f-125   (k-per-col (col 3) (num 1))
+f-127   (k-per-col (col 5) (num 0))
+f-128   (k-per-col (col 6) (num 0))
+f-129   (k-per-col (col 7) (num 0))
+f-130   (k-per-col (col 8) (num 0))
+f-131   (k-per-col (col 9) (num 0))
+f-141   (statistics (num_fire_ok 0) (num_fire_ko 0) (num_guess_ok 0) (num_guess_ko 0) (num_safe 0) (num_sink 0))
+f-146   (k-per-row (row 5) (num 0))
+f-148   (visto (x 5) (y 4))
+f-149   (k-per-row (row 6) (num 0))
+f-150   (k-per-col (col 4) (num 3))
+f-151   (visto (x 6) (y 4))
+f-152   (crea-k-cell (x 5) (y 5) (c water))
+f-153   (crea-k-cell (x 5) (y 3) (c water))
+f-154   (crea-k-cell (x 7) (y 5) (c water))
+f-155   (crea-k-cell (x 7) (y 3) (c water))
+f-156   (k-cell (x 7) (y 3) (content water))
+f-157   (k-cell (x 7) (y 5) (content water))
+f-158   (k-cell (x 5) (y 3) (content water))
+f-159   (k-cell (x 5) (y 5) (content water))
+f-160   (crea-k-cell (x 4) (y 4) (c water))
+f-161   (crea-k-cell (x 4) (y 5) (c water))
+f-162   (crea-k-cell (x 4) (y 3) (c water))
+f-163   (crea-k-cell (x 6) (y 5) (c water))
+f-164   (crea-k-cell (x 6) (y 3) (c water))
+f-165   (crea-f-cell (x 6) (y 4) (padre nil))
+f-166   (padre top)
+f-167   (k-cell (x 6) (y 3) (content water))
+f-168   (k-cell (x 6) (y 5) (content water))
+f-169   (k-cell (x 4) (y 3) (content water))
+f-170   (k-cell (x 4) (y 5) (content water))
+f-171   (k-cell (x 4) (y 4) (content water))
+For a total of 50 facts.
+CLIPS> (clear)
+CLIPS> (batch "E:/ialab/Micalizio/progetto2019-2020-battle-aggiornato/battle/go.bat")
+TRUE
+CLIPS> (load 0_Main.clp)
+
+[CSTRCPSR1] WARNING: Redefining defmodule: MAIN
+Defining deftemplate: exec
+Defining deftemplate: status
+Defining deftemplate: moves
+Defining deftemplate: statistics
+Defining defrule: go-on-env-first +j+j
+Defining defrule: go-on-agent +j+j+j
+Defining defrule: go-on-env +j+j+j
+Defining defrule: game-over =j+j+j
+Defining deffacts: initial-facts
+TRUE
+CLIPS> (load 1_Env.clp)
+Defining defmodule: ENV
+Defining deftemplate: cell
+Defining deftemplate: boat-hor
+Defining deftemplate: boat-ver
+Defining deftemplate: k-cell
+Defining deftemplate: k-per-row
+Defining deftemplate: k-per-col
+Defining defrule: action-fire +j+j+j+j
+Defining defrule: action-guess =j+j+j+j
+Defining defrule: action-unguess =j+j+j+j+j
+Defining defrule: action-solve =j+j+j
+Defining defrule: fire-ok +j+j+j+j
+Defining defrule: fire-ko =j+j+j+j
+Defining defrule: hit-boat-hor-trace +j+j+j+j
+Defining defrule: hit-boat-ver-trace =j+j+j+j
+Defining defrule: sink-boat-hor =j+j+j
+=j+j+j
+=j+j+j
+=j+j+j
+Defining defrule: sink-boat-ver =j+j+j
+=j+j+j
+=j+j+j
+=j+j+j
+Defining defrule: solve-count-guessed-ok +j+j+j+j+j
+Defining defrule: solve-count-guessed-ko =j=j+j+j+j
+Defining defrule: solve-count-safe =j+j+j+j+j
+Defining defrule: solve-sink-count =j+j+j+j+j
+Defining deffunction: scoring
+Defining defrule: solve-scoring =j+j+j
+Defining defrule: reset-map +j+j+j+j
+Defining defrule: make-visible-sub =j+j+j+j+j
+Defining defrule: make-visible-left =j=j+j+j+j
+Defining defrule: make-visible-right =j=j+j+j+j
+Defining defrule: make-visible-top =j=j+j+j+j
+Defining defrule: make-visible-bot =j=j+j+j+j
+Defining defrule: make-visible-middle =j=j+j+j
+TRUE
+CLIPS> (load case1_obs_2.clp)
+Defining deffacts: battle-field
+TRUE
+CLIPS> (load 3_Agent.clp)
+Defining defmodule: AGENT
+Defining deftemplate: visto
+Defining deftemplate: crea-k-cell
+Defining deftemplate: f-cell
+Defining deftemplate: crea-f-cell
+Defining deftemplate: b-cell
+Defining deftemplate: crea-b-cell
+Defining defrule: rule-for-decrement-k-row-col =j+j+j+j+j
++j+j+j+j+j
+Defining defrule: k-cell-cretor-water +j+j+j
+Defining defrule: k-cell-sub +j+j
+Defining defrule: k-cell-left +j+j
+Defining defrule: k-cell-right +j+j
+Defining defrule: k-cell-top +j+j
+Defining defrule: k-cell-bot +j+j
+Defining defrule: k-cell-middle-vertical-border +j+j
++j+j
+Defining defrule: k-cell-middle-horizontal-border +j+j
++j+j
+Defining defrule: k-cell-middle-general +j+j
+Defining defrule: middle-near-left =j+j+j
+=j+j+j
+Defining defrule: middle-near-right =j+j+j
+=j+j+j
+Defining defrule: middle-near-top =j+j+j
+=j+j+j
+Defining defrule: middle-near-bot =j+j+j
+=j+j+j
+Defining defrule: k-cell-middle-ultimaspiaggia =j+j+j+j+j+j+j+j+j+j
+Defining defrule: crea-f-cell =j+j+j+j+j
+Defining defrule: crea-b-cell =j+j+j+j+j
+Defining defrule: print-what-i-know-since-the-beginning +j+j
+TRUE
+CLIPS> (reset)
+CLIPS> (set-break game-over)
+CLIPS> (run)
+ HO VISTO x: 5 y: 4
+ HO VISTO x: 6 y: 4
+I know that cell [6, 4] contains middle.
+I know that cell [5, 4] contains top.
+I know that cell [4, 1] contains water.
+Creo water vicino middle: 6 y: 4
+I know that cell [7, 3] contains water.
+I know that cell [7, 5] contains water.
+I know that cell [5, 3] contains water.
+I know that cell [5, 5] contains water.
+Ho trovato una K-cell di tipo top in x: 5 y: 4
+I know that cell [6, 3] contains water.
+I know that cell [6, 5] contains water.
+I know that cell [4, 3] contains water.
+I know that cell [4, 5] contains water.
+I know that cell [4, 4] contains water.
+CLIPS> (run 2)
+CLIPS> (focus AGENT)
+TRUE
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (maxduration 100)
+f-2     (status (step 0) (currently running))
+f-5     (moves (fires 5) (guesses 20))
+f-109   (k-cell (x 4) (y 1) (content water))
+f-110   (k-cell (x 5) (y 4) (content top))
+f-111   (k-cell (x 6) (y 4) (content middle))
+f-112   (k-per-row (row 0) (num 0))
+f-113   (k-per-row (row 1) (num 2))
+f-114   (k-per-row (row 2) (num 0))
+f-115   (k-per-row (row 3) (num 1))
+f-116   (k-per-row (row 4) (num 0))
+f-119   (k-per-row (row 7) (num 1))
+f-120   (k-per-row (row 8) (num 0))
+f-121   (k-per-row (row 9) (num 0))
+f-122   (k-per-col (col 0) (num 0))
+f-123   (k-per-col (col 1) (num 0))
+f-124   (k-per-col (col 2) (num 0))
+f-125   (k-per-col (col 3) (num 1))
+f-127   (k-per-col (col 5) (num 0))
+f-128   (k-per-col (col 6) (num 0))
+f-129   (k-per-col (col 7) (num 0))
+f-130   (k-per-col (col 8) (num 0))
+f-131   (k-per-col (col 9) (num 0))
+f-141   (statistics (num_fire_ok 0) (num_fire_ko 0) (num_guess_ok 0) (num_guess_ko 0) (num_safe 0) (num_sink 0))
+f-146   (k-per-row (row 5) (num 0))
+f-148   (visto (x 5) (y 4))
+f-149   (k-per-row (row 6) (num 0))
+f-150   (k-per-col (col 4) (num 3))
+f-151   (visto (x 6) (y 4))
+f-152   (crea-k-cell (x 5) (y 5) (c water))
+f-153   (crea-k-cell (x 5) (y 3) (c water))
+f-154   (crea-k-cell (x 7) (y 5) (c water))
+f-155   (crea-k-cell (x 7) (y 3) (c water))
+f-156   (k-cell (x 7) (y 3) (content water))
+f-157   (k-cell (x 7) (y 5) (content water))
+f-158   (k-cell (x 5) (y 3) (content water))
+f-159   (k-cell (x 5) (y 5) (content water))
+f-160   (crea-k-cell (x 4) (y 4) (c water))
+f-161   (crea-k-cell (x 4) (y 5) (c water))
+f-162   (crea-k-cell (x 4) (y 3) (c water))
+f-163   (crea-k-cell (x 6) (y 5) (c water))
+f-164   (crea-k-cell (x 6) (y 3) (c water))
+f-165   (crea-f-cell (x 6) (y 4) (padre nil))
+f-166   (padre top)
+f-167   (k-cell (x 6) (y 3) (content water))
+f-168   (k-cell (x 6) (y 5) (content water))
+f-169   (k-cell (x 4) (y 3) (content water))
+f-170   (k-cell (x 4) (y 5) (content water))
+f-171   (k-cell (x 4) (y 4) (content water))
+For a total of 50 facts.
+CLIPS> (clear)
+CLIPS> (batch "E:/ialab/Micalizio/progetto2019-2020-battle-aggiornato/battle/go.bat")
+TRUE
+CLIPS> (load 0_Main.clp)
+
+[CSTRCPSR1] WARNING: Redefining defmodule: MAIN
+Defining deftemplate: exec
+Defining deftemplate: status
+Defining deftemplate: moves
+Defining deftemplate: statistics
+Defining defrule: go-on-env-first +j+j
+Defining defrule: go-on-agent +j+j+j
+Defining defrule: go-on-env +j+j+j
+Defining defrule: game-over =j+j+j
+Defining deffacts: initial-facts
+TRUE
+CLIPS> (load 1_Env.clp)
+Defining defmodule: ENV
+Defining deftemplate: cell
+Defining deftemplate: boat-hor
+Defining deftemplate: boat-ver
+Defining deftemplate: k-cell
+Defining deftemplate: k-per-row
+Defining deftemplate: k-per-col
+Defining defrule: action-fire +j+j+j+j
+Defining defrule: action-guess =j+j+j+j
+Defining defrule: action-unguess =j+j+j+j+j
+Defining defrule: action-solve =j+j+j
+Defining defrule: fire-ok +j+j+j+j
+Defining defrule: fire-ko =j+j+j+j
+Defining defrule: hit-boat-hor-trace +j+j+j+j
+Defining defrule: hit-boat-ver-trace =j+j+j+j
+Defining defrule: sink-boat-hor =j+j+j
+=j+j+j
+=j+j+j
+=j+j+j
+Defining defrule: sink-boat-ver =j+j+j
+=j+j+j
+=j+j+j
+=j+j+j
+Defining defrule: solve-count-guessed-ok +j+j+j+j+j
+Defining defrule: solve-count-guessed-ko =j=j+j+j+j
+Defining defrule: solve-count-safe =j+j+j+j+j
+Defining defrule: solve-sink-count =j+j+j+j+j
+Defining deffunction: scoring
+Defining defrule: solve-scoring =j+j+j
+Defining defrule: reset-map +j+j+j+j
+Defining defrule: make-visible-sub =j+j+j+j+j
+Defining defrule: make-visible-left =j=j+j+j+j
+Defining defrule: make-visible-right =j=j+j+j+j
+Defining defrule: make-visible-top =j=j+j+j+j
+Defining defrule: make-visible-bot =j=j+j+j+j
+Defining defrule: make-visible-middle =j=j+j+j
+TRUE
+CLIPS> (load case1_obs_2.clp)
+Defining deffacts: battle-field
+TRUE
+CLIPS> (load 3_Agent.clp)
+Defining defmodule: AGENT
+Defining deftemplate: visto
+Defining deftemplate: crea-k-cell
+Defining deftemplate: f-cell
+Defining deftemplate: crea-f-cell
+Defining deftemplate: b-cell
+Defining deftemplate: crea-b-cell
+Defining defrule: rule-for-decrement-k-row-col =j+j+j+j+j
++j+j+j+j+j
+Defining defrule: k-cell-cretor-water +j+j+j
+Defining defrule: k-cell-sub +j+j
+Defining defrule: k-cell-left +j+j
+Defining defrule: k-cell-right +j+j
+Defining defrule: k-cell-top +j+j
+Defining defrule: k-cell-bot +j+j
+Defining defrule: k-cell-middle-vertical-border +j+j
++j+j
+Defining defrule: k-cell-middle-horizontal-border +j+j
++j+j
+Defining defrule: k-cell-middle-general +j+j
+Defining defrule: middle-near-left =j+j+j
+=j+j+j
+Defining defrule: middle-near-right =j+j+j
+=j+j+j
+Defining defrule: middle-near-top =j+j+j
+=j+j+j
+Defining defrule: middle-near-bot =j+j+j
+=j+j+j
+Defining defrule: k-cell-middle-ultimaspiaggia =j+j+j+j+j+j+j+j+j+j
+Defining defrule: crea-f-cell =j+j+j+j+j
+Defining defrule: crea-b-cell =j+j+j+j+j
+Defining defrule: print-what-i-know-since-the-beginning +j+j
+TRUE
+CLIPS> (reset)
+CLIPS> (set-break game-over)
+CLIPS> (run)
+ HO VISTO x: 5 y: 4
+ HO VISTO x: 6 y: 4
+I know that cell [6, 4] contains middle.
+I know that cell [5, 4] contains top.
+I know that cell [4, 1] contains water.
+Creo water vicino middle: 6 y: 4
+I know that cell [7, 3] contains water.
+I know that cell [7, 5] contains water.
+I know that cell [5, 3] contains water.
+I know that cell [5, 5] contains water.
+Ho trovato una K-cell di tipo middle vicino ad una top in x: 6 y: 4
+ HO VISTO x: 7 y: 4
+Ho trovato una K-cell di tipo top in x: 5 y: 4
+I know that cell [6, 3] contains water.
+I know that cell [6, 5] contains water.
+I know that cell [4, 3] contains water.
+I know that cell [4, 5] contains water.
+I know that cell [4, 4] contains water.
+CLIPS> (run 2)
+CLIPS> (focus AGENT)
+TRUE
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (maxduration 100)
+f-109   (k-cell (x 4) (y 1) (content water))
+f-110   (k-cell (x 5) (y 4) (content top))
+f-111   (k-cell (x 6) (y 4) (content middle))
+f-112   (k-per-row (row 0) (num 0))
+f-113   (k-per-row (row 1) (num 2))
+f-114   (k-per-row (row 2) (num 0))
+f-115   (k-per-row (row 3) (num 1))
+f-116   (k-per-row (row 4) (num 0))
+f-120   (k-per-row (row 8) (num 0))
+f-121   (k-per-row (row 9) (num 0))
+f-122   (k-per-col (col 0) (num 0))
+f-123   (k-per-col (col 1) (num 0))
+f-124   (k-per-col (col 2) (num 0))
+f-125   (k-per-col (col 3) (num 1))
+f-127   (k-per-col (col 5) (num 0))
+f-128   (k-per-col (col 6) (num 0))
+f-129   (k-per-col (col 7) (num 0))
+f-130   (k-per-col (col 8) (num 0))
+f-131   (k-per-col (col 9) (num 0))
+f-141   (statistics (num_fire_ok 0) (num_fire_ko 0) (num_guess_ok 0) (num_guess_ko 0) (num_safe 0) (num_sink 0))
+f-146   (k-per-row (row 5) (num 0))
+f-148   (visto (x 5) (y 4))
+f-149   (k-per-row (row 6) (num 0))
+f-151   (visto (x 6) (y 4))
+f-152   (crea-k-cell (x 5) (y 5) (c water))
+f-153   (crea-k-cell (x 5) (y 3) (c water))
+f-154   (crea-k-cell (x 7) (y 5) (c water))
+f-155   (crea-k-cell (x 7) (y 3) (c water))
+f-156   (k-cell (x 7) (y 3) (content water))
+f-157   (k-cell (x 7) (y 5) (content water))
+f-158   (k-cell (x 5) (y 3) (content water))
+f-159   (k-cell (x 5) (y 5) (content water))
+f-160   (crea-f-cell (x 7) (y 4) (padre middle))
+f-161   (f-cell (x 7) (y 4) (padre nil))
+f-162   (padre middle)
+f-163   (exec (step 0) (action guess) (x 7) (y 4))
+f-165   (status (step 1) (currently running))
+f-166   (moves (fires 5) (guesses 19))
+f-167   (k-per-row (row 7) (num 0))
+f-168   (k-per-col (col 4) (num 2))
+f-169   (visto (x 7) (y 4))
+f-170   (crea-f-cell (x 5) (y 4) (padre middle))
+f-171   (crea-k-cell (x 4) (y 4) (c water))
+f-172   (crea-k-cell (x 4) (y 5) (c water))
+f-173   (crea-k-cell (x 4) (y 3) (c water))
+f-174   (crea-k-cell (x 6) (y 5) (c water))
+f-175   (crea-k-cell (x 6) (y 3) (c water))
+f-176   (crea-f-cell (x 6) (y 4) (padre nil))
+f-177   (padre top)
+f-178   (k-cell (x 6) (y 3) (content water))
+f-179   (k-cell (x 6) (y 5) (content water))
+f-180   (k-cell (x 4) (y 3) (content water))
+f-181   (k-cell (x 4) (y 5) (content water))
+f-182   (k-cell (x 4) (y 4) (content water))
+For a total of 56 facts.
+CLIPS> (clear)
+CLIPS> (batch "E:/ialab/Micalizio/progetto2019-2020-battle-aggiornato/battle/go.bat")
+TRUE
+CLIPS> (load 0_Main.clp)
+
+[CSTRCPSR1] WARNING: Redefining defmodule: MAIN
+Defining deftemplate: exec
+Defining deftemplate: status
+Defining deftemplate: moves
+Defining deftemplate: statistics
+Defining defrule: go-on-env-first +j+j
+Defining defrule: go-on-agent +j+j+j
+Defining defrule: go-on-env +j+j+j
+Defining defrule: game-over =j+j+j
+Defining deffacts: initial-facts
+TRUE
+CLIPS> (load 1_Env.clp)
+Defining defmodule: ENV
+Defining deftemplate: cell
+Defining deftemplate: boat-hor
+Defining deftemplate: boat-ver
+Defining deftemplate: k-cell
+Defining deftemplate: k-per-row
+Defining deftemplate: k-per-col
+Defining defrule: action-fire +j+j+j+j
+Defining defrule: action-guess =j+j+j+j
+Defining defrule: action-unguess =j+j+j+j+j
+Defining defrule: action-solve =j+j+j
+Defining defrule: fire-ok +j+j+j+j
+Defining defrule: fire-ko =j+j+j+j
+Defining defrule: hit-boat-hor-trace +j+j+j+j
+Defining defrule: hit-boat-ver-trace =j+j+j+j
+Defining defrule: sink-boat-hor =j+j+j
+=j+j+j
+=j+j+j
+=j+j+j
+Defining defrule: sink-boat-ver =j+j+j
+=j+j+j
+=j+j+j
+=j+j+j
+Defining defrule: solve-count-guessed-ok +j+j+j+j+j
+Defining defrule: solve-count-guessed-ko =j=j+j+j+j
+Defining defrule: solve-count-safe =j+j+j+j+j
+Defining defrule: solve-sink-count =j+j+j+j+j
+Defining deffunction: scoring
+Defining defrule: solve-scoring =j+j+j
+Defining defrule: reset-map +j+j+j+j
+Defining defrule: make-visible-sub =j+j+j+j+j
+Defining defrule: make-visible-left =j=j+j+j+j
+Defining defrule: make-visible-right =j=j+j+j+j
+Defining defrule: make-visible-top =j=j+j+j+j
+Defining defrule: make-visible-bot =j=j+j+j+j
+Defining defrule: make-visible-middle =j=j+j+j
+TRUE
+CLIPS> (load case1_obs_2.clp)
+Defining deffacts: battle-field
+TRUE
+CLIPS> (load 3_Agent.clp)
+Defining defmodule: AGENT
+Defining deftemplate: visto
+Defining deftemplate: crea-k-cell
+Defining deftemplate: f-cell
+Defining deftemplate: crea-f-cell
+Defining deftemplate: b-cell
+Defining deftemplate: crea-b-cell
+Defining defrule: rule-for-decrement-k-row-col =j+j+j+j+j
++j+j+j+j+j
+Defining defrule: k-cell-cretor-water +j+j+j
+Defining defrule: k-cell-sub +j+j
+Defining defrule: k-cell-left +j+j
+Defining defrule: k-cell-right +j+j
+Defining defrule: k-cell-top +j+j
+Defining defrule: k-cell-bot +j+j
+Defining defrule: k-cell-middle-vertical-border +j+j
++j+j
+Defining defrule: k-cell-middle-horizontal-border +j+j
++j+j
+Defining defrule: k-cell-middle-general +j+j
+Defining defrule: k-cell-middle-near-left =j+j+j
+=j+j+j
+Defining defrule: k-cell-middle-near-right =j+j+j
+=j+j+j
+Defining defrule: k-cell-middle-near-top =j+j+j
+=j+j+j
+Defining defrule: k-cell-middle-near-bot =j+j+j
+
+[PRCCODE3] Undefined variable c referenced in RHS of defrule.
+
+ERROR:
+(defrule AGENT::k-cell-middle-near-bot
+   (declare (salience 10))
+   (k-cell (x ?x) (y ?y) (content ?c1&:(eq ?c1 middle)))
+   (or  (k-cell (x =(+ 1 ?x)) (y ?y) (content ?c&:(neq ?c water)))
+        (f-cell (x =(+ 1 ?x)) (y ?y)))
+   =>
+   (assert (crea-f-cell (x (- ?x 1)) (y ?y) (padre ?c))))
+Defining defrule: k-cell-middle-ultimaspiaggia =j+j+j+j+j+j+j+j+j+j
+Defining defrule: delete-b-cell-where-row-is-0 
+[EXPRNPSR3] Missing function declaration for b-cell.
+
+ERROR:
+(defrule AGENT::delete-b-cell-where-row-is-0
+   (declare (salience 20))
+   (k-per-row (row ?row) (num ?num-row&:(eq ?num-row 0)))
+   (b-cell (x ?x&:(eq ?x ?row)) (y ?y))
+   =>
+   (retract (b-cell
+Defining defrule: delete-b-cell-where-col-is-0 
+[EXPRNPSR3] Missing function declaration for b-cell.
+
+ERROR:
+(defrule AGENT::delete-b-cell-where-col-is-0
+   (declare (salience 20))
+   (k-per-col (col ?col) (num ?num-col&:(eq ?num-col 0)))
+   (b-cell (x ?x) (y ?y&:(eq ?y ?col)))
+   =>
+   (retract (b-cell
+Defining defrule: crea-f-cell =j+j+j+j+j
+Defining defrule: crea-b-cell =j+j+j+j+j+j+j
+Defining defrule: print-what-i-know-since-the-beginning +j+j
+FALSE
+CLIPS> (reset)
+CLIPS> (set-break game-over)
+CLIPS> (run)
+ HO VISTO x: 5 y: 4
+ HO VISTO x: 6 y: 4
+I know that cell [6, 4] contains middle.
+I know that cell [5, 4] contains top.
+I know that cell [4, 1] contains water.
+Creo water vicino middle: 6 y: 4
+I know that cell [7, 3] contains water.
+I know that cell [7, 5] contains water.
+I know that cell [5, 3] contains water.
+I know that cell [5, 5] contains water.
+Ho trovato una K-cell di tipo middle vicino ad una top in x: 6 y: 4
+ HO VISTO x: 7 y: 4
+Ho trovato una K-cell di tipo top in x: 5 y: 4
+I know that cell [6, 3] contains water.
+I know that cell [6, 5] contains water.
+I know that cell [4, 3] contains water.
+I know that cell [4, 5] contains water.
+I know that cell [4, 4] contains water.
+CLIPS> (run 2)
+CLIPS> (focus AGENT)
+TRUE
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (maxduration 100)
+f-109   (k-cell (x 4) (y 1) (content water))
+f-110   (k-cell (x 5) (y 4) (content top))
+f-111   (k-cell (x 6) (y 4) (content middle))
+f-112   (k-per-row (row 0) (num 0))
+f-113   (k-per-row (row 1) (num 2))
+f-114   (k-per-row (row 2) (num 0))
+f-115   (k-per-row (row 3) (num 1))
+f-116   (k-per-row (row 4) (num 0))
+f-120   (k-per-row (row 8) (num 0))
+f-121   (k-per-row (row 9) (num 0))
+f-122   (k-per-col (col 0) (num 0))
+f-123   (k-per-col (col 1) (num 0))
+f-124   (k-per-col (col 2) (num 0))
+f-125   (k-per-col (col 3) (num 1))
+f-127   (k-per-col (col 5) (num 0))
+f-128   (k-per-col (col 6) (num 0))
+f-129   (k-per-col (col 7) (num 0))
+f-130   (k-per-col (col 8) (num 0))
+f-131   (k-per-col (col 9) (num 0))
+f-141   (statistics (num_fire_ok 0) (num_fire_ko 0) (num_guess_ok 0) (num_guess_ko 0) (num_safe 0) (num_sink 0))
+f-146   (k-per-row (row 5) (num 0))
+f-148   (visto (x 5) (y 4))
+f-149   (k-per-row (row 6) (num 0))
+f-151   (visto (x 6) (y 4))
+f-152   (crea-k-cell (x 5) (y 5) (c water))
+f-153   (crea-k-cell (x 5) (y 3) (c water))
+f-154   (crea-k-cell (x 7) (y 5) (c water))
+f-155   (crea-k-cell (x 7) (y 3) (c water))
+f-156   (k-cell (x 7) (y 3) (content water))
+f-157   (k-cell (x 7) (y 5) (content water))
+f-158   (k-cell (x 5) (y 3) (content water))
+f-159   (k-cell (x 5) (y 5) (content water))
+f-160   (crea-f-cell (x 7) (y 4) (padre middle))
+f-161   (f-cell (x 7) (y 4) (padre nil))
+f-162   (padre middle)
+f-163   (exec (step 0) (action guess) (x 7) (y 4))
+f-165   (status (step 1) (currently running))
+f-166   (moves (fires 5) (guesses 19))
+f-167   (k-per-row (row 7) (num 0))
+f-168   (k-per-col (col 4) (num 2))
+f-169   (visto (x 7) (y 4))
+f-170   (crea-k-cell (x 4) (y 4) (c water))
+f-171   (crea-k-cell (x 4) (y 5) (c water))
+f-172   (crea-k-cell (x 4) (y 3) (c water))
+f-173   (crea-k-cell (x 6) (y 5) (c water))
+f-174   (crea-k-cell (x 6) (y 3) (c water))
+f-175   (crea-f-cell (x 6) (y 4) (padre nil))
+f-176   (padre top)
+f-177   (k-cell (x 6) (y 3) (content water))
+f-178   (k-cell (x 6) (y 5) (content water))
+f-179   (k-cell (x 4) (y 3) (content water))
+f-180   (k-cell (x 4) (y 5) (content water))
+f-181   (k-cell (x 4) (y 4) (content water))
+For a total of 55 facts.
+CLIPS> (clear)
+CLIPS> (batch "E:/ialab/Micalizio/progetto2019-2020-battle-aggiornato/battle/go.bat")
+TRUE
+CLIPS> (load 0_Main.clp)
+
+[CSTRCPSR1] WARNING: Redefining defmodule: MAIN
+Defining deftemplate: exec
+Defining deftemplate: status
+Defining deftemplate: moves
+Defining deftemplate: statistics
+Defining defrule: go-on-env-first +j+j
+Defining defrule: go-on-agent +j+j+j
+Defining defrule: go-on-env +j+j+j
+Defining defrule: game-over =j+j+j
+Defining deffacts: initial-facts
+TRUE
+CLIPS> (load 1_Env.clp)
+Defining defmodule: ENV
+Defining deftemplate: cell
+Defining deftemplate: boat-hor
+Defining deftemplate: boat-ver
+Defining deftemplate: k-cell
+Defining deftemplate: k-per-row
+Defining deftemplate: k-per-col
+Defining defrule: action-fire +j+j+j+j
+Defining defrule: action-guess =j+j+j+j
+Defining defrule: action-unguess =j+j+j+j+j
+Defining defrule: action-solve =j+j+j
+Defining defrule: fire-ok +j+j+j+j
+Defining defrule: fire-ko =j+j+j+j
+Defining defrule: hit-boat-hor-trace +j+j+j+j
+Defining defrule: hit-boat-ver-trace =j+j+j+j
+Defining defrule: sink-boat-hor =j+j+j
+=j+j+j
+=j+j+j
+=j+j+j
+Defining defrule: sink-boat-ver =j+j+j
+=j+j+j
+=j+j+j
+=j+j+j
+Defining defrule: solve-count-guessed-ok +j+j+j+j+j
+Defining defrule: solve-count-guessed-ko =j=j+j+j+j
+Defining defrule: solve-count-safe =j+j+j+j+j
+Defining defrule: solve-sink-count =j+j+j+j+j
+Defining deffunction: scoring
+Defining defrule: solve-scoring =j+j+j
+Defining defrule: reset-map +j+j+j+j
+Defining defrule: make-visible-sub =j+j+j+j+j
+Defining defrule: make-visible-left =j=j+j+j+j
+Defining defrule: make-visible-right =j=j+j+j+j
+Defining defrule: make-visible-top =j=j+j+j+j
+Defining defrule: make-visible-bot =j=j+j+j+j
+Defining defrule: make-visible-middle =j=j+j+j
+TRUE
+CLIPS> (load case1_obs_2.clp)
+Defining deffacts: battle-field
+TRUE
+CLIPS> (load 3_Agent.clp)
+Defining defmodule: AGENT
+Defining deftemplate: visto
+Defining deftemplate: crea-k-cell
+Defining deftemplate: f-cell
+Defining deftemplate: crea-f-cell
+Defining deftemplate: b-cell
+Defining deftemplate: crea-b-cell
+Defining defrule: rule-for-decrement-k-row-col =j+j+j+j+j
++j+j+j+j+j
+Defining defrule: k-cell-cretor-water +j+j+j
+Defining defrule: k-cell-sub +j+j
+Defining defrule: k-cell-left +j+j
+Defining defrule: k-cell-right +j+j
+Defining defrule: k-cell-top +j+j
+Defining defrule: k-cell-bot +j+j
+Defining defrule: k-cell-middle-vertical-border +j+j
++j+j
+Defining defrule: k-cell-middle-horizontal-border +j+j
++j+j
+Defining defrule: k-cell-middle-general +j+j
+Defining defrule: k-cell-middle-near-left =j+j+j
+=j+j+j
+Defining defrule: k-cell-middle-near-right =j+j+j
+=j+j+j
+Defining defrule: k-cell-middle-near-top =j+j+j
+=j+j+j
+Defining defrule: k-cell-middle-near-bot =j+j+j
+=j+j+j
+Defining defrule: k-cell-middle-ultimaspiaggia =j+j+j+j+j+j+j+j+j+j
+Defining defrule: delete-b-cell-where-row-is-0 
+[EXPRNPSR3] Missing function declaration for b-cell.
+
+ERROR:
+(defrule AGENT::delete-b-cell-where-row-is-0
+   (declare (salience 20))
+   (k-per-row (row ?row) (num ?num-row&:(eq ?num-row 0)))
+   (b-cell (x ?x&:(eq ?x ?row)) (y ?y))
+   =>
+   (retract (b-cell
+Defining defrule: delete-b-cell-where-col-is-0 
+[EXPRNPSR3] Missing function declaration for b-cell.
+
+ERROR:
+(defrule AGENT::delete-b-cell-where-col-is-0
+   (declare (salience 20))
+   (k-per-col (col ?col) (num ?num-col&:(eq ?num-col 0)))
+   (b-cell (x ?x) (y ?y&:(eq ?y ?col)))
+   =>
+   (retract (b-cell
+Defining defrule: crea-f-cell =j+j+j+j+j
+Defining defrule: crea-b-cell =j+j+j+j+j+j+j
+Defining defrule: print-what-i-know-since-the-beginning +j+j
+FALSE
+CLIPS> (reset)
+CLIPS> (set-break game-over)
+CLIPS> (run)
+ HO VISTO x: 5 y: 4
+ HO VISTO x: 6 y: 4
+I know that cell [6, 4] contains middle.
+I know that cell [5, 4] contains top.
+I know that cell [4, 1] contains water.
+Creo water vicino middle: 6 y: 4
+I know that cell [7, 3] contains water.
+I know that cell [7, 5] contains water.
+I know that cell [5, 3] contains water.
+I know that cell [5, 5] contains water.
+Ho trovato una K-cell di tipo middle vicino ad una top in x: 6 y: 4
+ HO VISTO x: 7 y: 4
+Ho trovato una K-cell di tipo top in x: 5 y: 4
+I know that cell [6, 3] contains water.
+I know that cell [6, 5] contains water.
+I know that cell [4, 3] contains water.
+I know that cell [4, 5] contains water.
+I know that cell [4, 4] contains water.
+CLIPS> (run 2)
+CLIPS> (focus AGENT)
+TRUE
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (maxduration 100)
+f-109   (k-cell (x 4) (y 1) (content water))
+f-110   (k-cell (x 5) (y 4) (content top))
+f-111   (k-cell (x 6) (y 4) (content middle))
+f-112   (k-per-row (row 0) (num 0))
+f-113   (k-per-row (row 1) (num 2))
+f-114   (k-per-row (row 2) (num 0))
+f-115   (k-per-row (row 3) (num 1))
+f-116   (k-per-row (row 4) (num 0))
+f-120   (k-per-row (row 8) (num 0))
+f-121   (k-per-row (row 9) (num 0))
+f-122   (k-per-col (col 0) (num 0))
+f-123   (k-per-col (col 1) (num 0))
+f-124   (k-per-col (col 2) (num 0))
+f-125   (k-per-col (col 3) (num 1))
+f-127   (k-per-col (col 5) (num 0))
+f-128   (k-per-col (col 6) (num 0))
+f-129   (k-per-col (col 7) (num 0))
+f-130   (k-per-col (col 8) (num 0))
+f-131   (k-per-col (col 9) (num 0))
+f-141   (statistics (num_fire_ok 0) (num_fire_ko 0) (num_guess_ok 0) (num_guess_ko 0) (num_safe 0) (num_sink 0))
+f-146   (k-per-row (row 5) (num 0))
+f-148   (visto (x 5) (y 4))
+f-149   (k-per-row (row 6) (num 0))
+f-151   (visto (x 6) (y 4))
+f-152   (crea-k-cell (x 5) (y 5) (c water))
+f-153   (crea-k-cell (x 5) (y 3) (c water))
+f-154   (crea-k-cell (x 7) (y 5) (c water))
+f-155   (crea-k-cell (x 7) (y 3) (c water))
+f-156   (k-cell (x 7) (y 3) (content water))
+f-157   (k-cell (x 7) (y 5) (content water))
+f-158   (k-cell (x 5) (y 3) (content water))
+f-159   (k-cell (x 5) (y 5) (content water))
+f-160   (crea-f-cell (x 7) (y 4) (padre middle))
+f-161   (f-cell (x 7) (y 4) (padre nil))
+f-162   (padre middle)
+f-163   (exec (step 0) (action guess) (x 7) (y 4))
+f-165   (status (step 1) (currently running))
+f-166   (moves (fires 5) (guesses 19))
+f-167   (k-per-row (row 7) (num 0))
+f-168   (k-per-col (col 4) (num 2))
+f-169   (visto (x 7) (y 4))
+f-170   (crea-f-cell (x 5) (y 4) (padre middle))
+f-171   (crea-k-cell (x 4) (y 4) (c water))
+f-172   (crea-k-cell (x 4) (y 5) (c water))
+f-173   (crea-k-cell (x 4) (y 3) (c water))
+f-174   (crea-k-cell (x 6) (y 5) (c water))
+f-175   (crea-k-cell (x 6) (y 3) (c water))
+f-176   (crea-f-cell (x 6) (y 4) (padre nil))
+f-177   (padre top)
+f-178   (k-cell (x 6) (y 3) (content water))
+f-179   (k-cell (x 6) (y 5) (content water))
+f-180   (k-cell (x 4) (y 3) (content water))
+f-181   (k-cell (x 4) (y 5) (content water))
+f-182   (k-cell (x 4) (y 4) (content water))
+For a total of 56 facts.
+CLIPS> (clear)
+CLIPS> (batch "E:/ialab/Micalizio/progetto2019-2020-battle-aggiornato/battle/go.bat")
+TRUE
+CLIPS> (load 0_Main.clp)
+
+[CSTRCPSR1] WARNING: Redefining defmodule: MAIN
+Defining deftemplate: exec
+Defining deftemplate: status
+Defining deftemplate: moves
+Defining deftemplate: statistics
+Defining defrule: go-on-env-first +j+j
+Defining defrule: go-on-agent +j+j+j
+Defining defrule: go-on-env +j+j+j
+Defining defrule: game-over =j+j+j
+Defining deffacts: initial-facts
+TRUE
+CLIPS> (load 1_Env.clp)
+Defining defmodule: ENV
+Defining deftemplate: cell
+Defining deftemplate: boat-hor
+Defining deftemplate: boat-ver
+Defining deftemplate: k-cell
+Defining deftemplate: k-per-row
+Defining deftemplate: k-per-col
+Defining defrule: action-fire +j+j+j+j
+Defining defrule: action-guess =j+j+j+j
+Defining defrule: action-unguess =j+j+j+j+j
+Defining defrule: action-solve =j+j+j
+Defining defrule: fire-ok +j+j+j+j
+Defining defrule: fire-ko =j+j+j+j
+Defining defrule: hit-boat-hor-trace +j+j+j+j
+Defining defrule: hit-boat-ver-trace =j+j+j+j
+Defining defrule: sink-boat-hor =j+j+j
+=j+j+j
+=j+j+j
+=j+j+j
+Defining defrule: sink-boat-ver =j+j+j
+=j+j+j
+=j+j+j
+=j+j+j
+Defining defrule: solve-count-guessed-ok +j+j+j+j+j
+Defining defrule: solve-count-guessed-ko =j=j+j+j+j
+Defining defrule: solve-count-safe =j+j+j+j+j
+Defining defrule: solve-sink-count =j+j+j+j+j
+Defining deffunction: scoring
+Defining defrule: solve-scoring =j+j+j
+Defining defrule: reset-map +j+j+j+j
+Defining defrule: make-visible-sub =j+j+j+j+j
+Defining defrule: make-visible-left =j=j+j+j+j
+Defining defrule: make-visible-right =j=j+j+j+j
+Defining defrule: make-visible-top =j=j+j+j+j
+Defining defrule: make-visible-bot =j=j+j+j+j
+Defining defrule: make-visible-middle =j=j+j+j
+TRUE
+CLIPS> (load case1_obs_2.clp)
+Defining deffacts: battle-field
+TRUE
+CLIPS> (load 3_Agent.clp)
+Defining defmodule: AGENT
+Defining deftemplate: visto
+Defining deftemplate: crea-k-cell
+Defining deftemplate: f-cell
+Defining deftemplate: crea-f-cell
+Defining deftemplate: b-cell
+Defining deftemplate: crea-b-cell
+Defining defrule: rule-for-decrement-k-row-col =j+j+j+j+j
++j+j+j+j+j
+Defining defrule: k-cell-cretor-water +j+j+j
+Defining defrule: k-cell-sub +j+j
+Defining defrule: k-cell-left +j+j
+Defining defrule: k-cell-right +j+j
+Defining defrule: k-cell-top +j+j
+Defining defrule: k-cell-bot +j+j
+Defining defrule: k-cell-middle-vertical-border +j+j
++j+j
+Defining defrule: k-cell-middle-horizontal-border +j+j
++j+j
+Defining defrule: k-cell-middle-general +j+j
+Defining defrule: k-cell-middle-near-left =j+j+j
+=j+j+j
+Defining defrule: k-cell-middle-near-right =j+j+j
+=j+j+j
+Defining defrule: k-cell-middle-near-top =j+j+j
+=j+j+j
+Defining defrule: k-cell-middle-near-bot =j+j+j
+=j+j+j
+Defining defrule: k-cell-middle-ultimaspiaggia =j+j+j+j+j+j+j+j+j+j
+Defining defrule: delete-b-cell-where-row-is-0 +j+j+j
+Defining defrule: delete-b-cell-where-col-is-0 +j+j+j
+Defining defrule: crea-f-cell =j+j+j+j+j
+Defining defrule: crea-b-cell =j+j+j+j+j+j+j
+Defining defrule: print-what-i-know-since-the-beginning +j+j
+TRUE
+CLIPS> (reset)
+CLIPS> (set-break game-over)
+CLIPS> (run)
+ HO VISTO x: 5 y: 4
+ HO VISTO x: 6 y: 4
+I know that cell [6, 4] contains middle.
+I know that cell [5, 4] contains top.
+I know that cell [4, 1] contains water.
+Creo water vicino middle: 6 y: 4
+I know that cell [7, 3] contains water.
+I know that cell [7, 5] contains water.
+I know that cell [5, 3] contains water.
+I know that cell [5, 5] contains water.
+Ho trovato una K-cell di tipo middle vicino ad una top in x: 6 y: 4
+ HO VISTO x: 7 y: 4
+Ho trovato una K-cell di tipo top in x: 5 y: 4
+I know that cell [6, 3] contains water.
+I know that cell [6, 5] contains water.
+I know that cell [4, 3] contains water.
+I know that cell [4, 5] contains water.
+I know that cell [4, 4] contains water.
+CLIPS> (run 2)
+CLIPS> (focus AGENT)
+TRUE
+CLIPS> (facts)
+f-0     (initial-fact)
+f-1     (maxduration 100)
+f-109   (k-cell (x 4) (y 1) (content water))
+f-110   (k-cell (x 5) (y 4) (content top))
+f-111   (k-cell (x 6) (y 4) (content middle))
+f-112   (k-per-row (row 0) (num 0))
+f-113   (k-per-row (row 1) (num 2))
+f-114   (k-per-row (row 2) (num 0))
+f-115   (k-per-row (row 3) (num 1))
+f-116   (k-per-row (row 4) (num 0))
+f-120   (k-per-row (row 8) (num 0))
+f-121   (k-per-row (row 9) (num 0))
+f-122   (k-per-col (col 0) (num 0))
+f-123   (k-per-col (col 1) (num 0))
+f-124   (k-per-col (col 2) (num 0))
+f-125   (k-per-col (col 3) (num 1))
+f-127   (k-per-col (col 5) (num 0))
+f-128   (k-per-col (col 6) (num 0))
+f-129   (k-per-col (col 7) (num 0))
+f-130   (k-per-col (col 8) (num 0))
+f-131   (k-per-col (col 9) (num 0))
+f-141   (statistics (num_fire_ok 0) (num_fire_ko 0) (num_guess_ok 0) (num_guess_ko 0) (num_safe 0) (num_sink 0))
+f-146   (k-per-row (row 5) (num 0))
+f-148   (visto (x 5) (y 4))
+f-149   (k-per-row (row 6) (num 0))
+f-151   (visto (x 6) (y 4))
+f-152   (crea-k-cell (x 5) (y 5) (c water))
+f-153   (crea-k-cell (x 5) (y 3) (c water))
+f-154   (crea-k-cell (x 7) (y 5) (c water))
+f-155   (crea-k-cell (x 7) (y 3) (c water))
+f-156   (k-cell (x 7) (y 3) (content water))
+f-157   (k-cell (x 7) (y 5) (content water))
+f-158   (k-cell (x 5) (y 3) (content water))
+f-159   (k-cell (x 5) (y 5) (content water))
+f-160   (crea-f-cell (x 7) (y 4) (padre middle))
+f-161   (f-cell (x 7) (y 4) (padre nil))
+f-162   (padre middle)
+f-163   (exec (step 0) (action guess) (x 7) (y 4))
+f-165   (status (step 1) (currently running))
+f-166   (moves (fires 5) (guesses 19))
+f-167   (k-per-row (row 7) (num 0))
+f-168   (k-per-col (col 4) (num 2))
+f-169   (visto (x 7) (y 4))
+f-170   (crea-f-cell (x 5) (y 4) (padre middle))
+f-171   (crea-k-cell (x 4) (y 4) (c water))
+f-172   (crea-k-cell (x 4) (y 5) (c water))
+f-173   (crea-k-cell (x 4) (y 3) (c water))
+f-174   (crea-k-cell (x 6) (y 5) (c water))
+f-175   (crea-k-cell (x 6) (y 3) (c water))
+f-176   (crea-f-cell (x 6) (y 4) (padre nil))
+f-177   (padre top)
+f-178   (k-cell (x 6) (y 3) (content water))
+f-179   (k-cell (x 6) (y 5) (content water))
+f-180   (k-cell (x 4) (y 3) (content water))
+f-181   (k-cell (x 4) (y 5) (content water))
+f-182   (k-cell (x 4) (y 4) (content water))
+For a total of 56 facts.
+CLIPS> 
