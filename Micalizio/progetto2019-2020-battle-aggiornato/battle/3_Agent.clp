@@ -228,7 +228,7 @@
 		(assert (crea-f-cell  (x (- ?x 1))(y ?y)(direzione top)))
 		(assert (crea-b-cell (x (- ?x 2))(y ?y)))
 )
-;DA FARE se hai una middle vicino a qualcosa, crei f affainco e b due slot dopo
+
 
 ; caso finale in cui conosco solo k-cell water
 (defrule k-cell-middle-ultimaspiaggia (declare (salience 5))
