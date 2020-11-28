@@ -3,20 +3,25 @@
 ;  ---------------------------------------------
 (defmodule AGENT (import MAIN ?ALL) (import ENV ?ALL) (export ?ALL))
 
-(deffacts numerobarche
-	(barca-da-quattro 1)
-	(barca-da-tre 2)
-	(barca-da-due 3)
-	(barca-da-uno 4)
+(deftemplate barca
+	(slot tipo)
+	(slot num)
 )
 
-;template
+(deffacts numerobarche
+	(barca (tipo 4)(num 1))
+	(barca (tipo 3)(num 2))
+	(barca (tipo 2)(num 3))
+	(barca (tipo 1)(num 4))
+)
+
+
+; // TEMPLATE //
 (deftemplate visto
 	(slot x)
 	(slot y)
 )
-
-(deftemplate crea-k-cell
+(deftemplate crea-k-cell-water
 	(slot x)
 	(slot y)
 	(slot c)
@@ -39,16 +44,48 @@
 	(slot x)
 	(slot y)
 )
+(deftemplate k-per-row-number-water
+	(slot row)
+	(slot num)
+)
+(deftemplate k-per-col-number-water
+	(slot col)
+	(slot num)
+)
+(deffacts k-row-col-water
+	(k-per-row-number-water (row 0) (num 0))
+	(k-per-row-number-water (row 1) (num 0))
+	(k-per-row-number-water (row 2) (num 0))
+	(k-per-row-number-water (row 3) (num 0))
+	(k-per-row-number-water (row 4) (num 0))
+	(k-per-row-number-water (row 5) (num 0))
+	(k-per-row-number-water (row 6) (num 0))
+	(k-per-row-number-water (row 7) (num 0))
+	(k-per-row-number-water (row 8) (num 0))
+	(k-per-row-number-water (row 9) (num 0))
+	(k-per-col-number-water (col 0) (num 0))
+	(k-per-col-number-water (col 1) (num 0))
+	(k-per-col-number-water (col 2) (num 0))
+	(k-per-col-number-water (col 3) (num 0))
+	(k-per-col-number-water (col 4) (num 0))
+	(k-per-col-number-water (col 5) (num 0))
+	(k-per-col-number-water (col 6) (num 0))
+	(k-per-col-number-water (col 7) (num 0))
+	(k-per-col-number-water (col 8) (num 0))
+	(k-per-col-number-water (col 9) (num 0))
+)
 
-;- scegliere se dividere in moduli declaration - executation
-;- scegliere euristiche da usare quando non abbiamo più k-cell
+; TODO => - scegliere se dividere in moduli declaration - executation
+;TODO => - scegliere euristiche da usare quando non abbiamo più k-cell
 
+; // DESCRIZIONE CELLE USATE //
 ;k-cell: cose che sappiamo per certo
 ;b-cell: cose che supponiamo: le usiamo quando troviamo un middle che non sappiamo se andare vertiale o orizzontale
 ;f-cell: caselle che sono barche ma non sappiamo che parte di barca è e quindi non possiamo metterle come k-cell
 			;	[TEMPLATE: rapprensentate come x,y,contenutoPadre?]
 
-(defrule rule-for-decrement-k-row-col (declare (salience 50))
+; // REGOLA PER DECREMENTARE I VALORI IN K-ROW K-COL //
+(defrule decrement-k-row-col-battleship (declare (salience 50))
 		(or (k-cell (x ?x) (y ?y) (content ?c&:(neq ?c water)))
 		    (f-cell (x ?x)(y ?y)))
 		?kpr <- (k-per-row (row ?x) (num ?num-row))
@@ -61,10 +98,21 @@
 		(assert (visto (x ?x) (y ?y)))
 )
 
+(defrule increase-k-row-col-water (declare (salience 50))
+		(k-cell (x ?x) (y ?y) (content water))
+		?kprnw <- (k-per-row-number-water (row ?x) (num ?num-row))
+  	?kpcnw <-(k-per-col-number-water (col ?y) (num ?num-col))
+		(not (visto(x ?x)(y ?y)))
+	=>
+		(modify ?kprnw (num (+ ?num-row 1)))
+		(modify ?kpcnw (num (+ ?num-col 1)))
+		(assert (visto (x ?x) (y ?y)))
+)
 
-;creatore per k-cell che controlla di non superare i limiti della mappa
+
+; // REGOLA PER CREARE CELLE WATER //
 (defrule k-cell-cretor-water (declare (salience 20))
-		(crea-k-cell (x ?x) (y ?y) (c ?c&:(eq ?c water)))
+		(crea-k-cell-water (x ?x) (y ?y) (c ?c&:(eq ?c water)))
 		(test(>= ?x 0))
 		(test(< ?x 10))
 		(test(>= ?y 0))
@@ -75,36 +123,46 @@
 		(assert (k-cell (x ?x) (y ?y) (content ?c)))
 		;(printout t "CREATO K CELL water IN x: " ?x " y: " ?y  crlf)
 )
+(defrule create-k-cell-water-in-diagonal (declare (salience 30))
+		(or (k-cell (x ?x) (y ?y) (content ?c&:(neq ?c water)))
+				(f-cell (x ?x) (y ?y)))
+	=>
+		(assert (crea-k-cell-water (x (- ?x 1)) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell-water (x (- ?x 1)) (y (- ?y 1)) (c water)))
+		(assert (crea-k-cell-water (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell-water (x (+ ?x 1)) (y (- ?y 1)) (c water)))
+)
 
-
-; K CELL RULES
-; REGOLE ESTREMI
+; // REGOLE K CELL  //
+; REGOLA SUB
 (defrule k-cell-sub (declare (salience 20))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c sub)))
 	=>
 		; creare k-cell water in [x+1,y] // [x-1,y] // [x,y-1] // [x,y+1] //[x+1,y-1] // [x-1,y-1] // [x+1,y+1] // [x-1,y+1]
-		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x ?x) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x ?x) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
+		(assert (decrement-sub-counter))
+		(assert (crea-k-cell-water (x (+ ?x 1)) (y ?y) (c water)))
+		(assert (crea-k-cell-water (x (- ?x 1)) (y ?y) (c water)))
+		(assert (crea-k-cell-water (x ?x) (y (- ?y 1)) (c water)))
+		(assert (crea-k-cell-water (x ?x) (y (+ ?y 1)) (c water)))
 		(printout t "Ho trovato una K-cell di tipo sub in x " ?x " y: " ?y  crlf)
 )
 
+(defrule decrement-battleship-sub-counter
+		?dsc <- (decrement-sub-counter)
+		?nb <- (barca (tipo 1)(num ?t))
+	=>
+		(modify ?nb (num (- ?t 1)))
+		(retract ?dsc)
+)
+
+; REGOLE ESTREMI
 (defrule k-cell-left (declare (salience 10))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
 	=>
 		; creare k-cell water in [x+1,y] // [x-1,y] // [x,y-1] // [x-1,y-1] // [x+1,y-1]
-		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x ?x) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell-water (x (+ ?x 1)) (y ?y) (c water)))
+		(assert (crea-k-cell-water (x (- ?x 1)) (y ?y) (c water)))
+		(assert (crea-k-cell-water (x ?x) (y (- ?y 1)) (c water)))
 
 		(assert (crea-f-cell (x ?x) (y (+ ?y 1)) (direzione right)))
 		(assert (crea-b-cell (x ?x)(y (+ ?y 2))))
@@ -114,13 +172,9 @@
 (defrule k-cell-right (declare (salience 10))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c right)))
 	=>
-		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x ?x) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell-water (x (+ ?x 1)) (y ?y) (c water)))
+		(assert (crea-k-cell-water (x (- ?x 1)) (y ?y) (c water)))
+		(assert (crea-k-cell-water (x ?x) (y (+ ?y 1)) (c water)))
 
 		(assert (crea-f-cell (x ?x) (y (- ?y 1)) (direzione left)))
 		(assert (crea-b-cell (x ?x)(y (- ?y 2))))
@@ -131,13 +185,13 @@
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c top)))
 	=>
 
-		(assert (crea-k-cell (x (- ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x ?x) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x ?x) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
+		(assert (crea-k-cell-water (x (- ?x 1)) (y ?y) (c water)))
+		(assert (crea-k-cell-water (x (- ?x 1)) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell-water (x (- ?x 1)) (y (- ?y 1)) (c water)))
+		(assert (crea-k-cell-water (x ?x) (y (- ?y 1)) (c water)))
+		(assert (crea-k-cell-water (x ?x) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell-water (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
+		(assert (crea-k-cell-water (x (+ ?x 1)) (y (- ?y 1)) (c water)))
 
 		(assert (crea-f-cell (x =(+ 1 ?x))(y ?y)) (direzione bot))
 		(assert (crea-b-cell (x =(+ 2 ?x))(y ?y)))
@@ -147,21 +201,18 @@
 (defrule k-cell-bot (declare (salience 10))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c bot)))
 	=>
-		(assert (crea-k-cell (x (+ ?x 1)) (y ?y) (c water)))
-		(assert (crea-k-cell (x ?x) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x ?x) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
+		(assert (crea-k-cell-water (x (+ ?x 1)) (y ?y) (c water)))
+		(assert (crea-k-cell-water (x ?x) (y (- ?y 1)) (c water)))
+		(assert (crea-k-cell-water (x ?x) (y (+ ?y 1)) (c water)))
 
 		(assert (crea-f-cell  (x (- ?x 1))(y ?y)(direzione top)))
 		(assert (crea-b-cell (x (- ?x 2))(y ?y)))
 		(printout t "Ho trovato una K-cell di tipo bot in x: " ?x " y: " ?y  crlf)
 )
 
-; MIDDLE RULES
-(defrule k-cell-middle-vertical-border (declare (salience 30))
+; REGOLE MIDDLE
+; CASI PARTICOLARI, VICINO BORDI MAPPA
+(defrule k-cell-middle-near-vertical-border (declare (salience 30))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
 		(or (test(eq ?y 0)) (test(eq ?y 9)))
 	=>
@@ -172,7 +223,7 @@
 		(printout t "Ho trovato una K-cell di tipo middle vicino al bordo in x: " ?x " y: " ?y  crlf)
 )
 
-(defrule k-cell-middle-horizontal-border (declare (salience 30))
+(defrule k-cell-middle-near-horizontal-border (declare (salience 30))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
 		(or (test(eq ?x 0)) (test(eq ?x 9)))
 	=>
@@ -183,17 +234,8 @@
 		(printout t "Ho trovato una K-cell di tipo middle vicino al bordo in x: " ?x " y: " ?y  crlf)
 )
 
-(defrule k-cell-middle-general (declare (salience 30))
-		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
-	=>
-		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
-		(printout t "Creo water vicino middle: " ?x " y: " ?y  crlf)
-)
 
-; serie di regole in cui middle è vicina a k cell
+; REGOLE MIDDLE VICINO KCELL O FCELL
 (defrule k-cell-middle-near-left-or-middle (declare (salience 10))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
 		(or (k-cell (x ?x) (y =(- ?y 1)) (content ?c1&:(neq ?c1 water)))
@@ -220,7 +262,7 @@
 		(assert (crea-b-cell (x (+ ?x 2))(y ?y)))
 		(printout t "Ho trovato una K-cell di tipo middle vicino ad una top in x: " ?x " y: " ?y  crlf)
 )
-(defrule k-cell-middle-conqualcosasotto-or-middle (declare (salience 10))
+(defrule k-cell-middle-near-bot-or-middle (declare (salience 10))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
 		(or (k-cell (x =(+ 1 ?x)) (y ?y) (content ?c1&:(neq ?c1 water)))
 				(f-cell (x =(+ 1 ?x)) (y ?y)))
@@ -228,7 +270,6 @@
 		(assert (crea-f-cell  (x (- ?x 1))(y ?y)(direzione top)))
 		(assert (crea-b-cell (x (- ?x 2))(y ?y)))
 )
-
 
 ; caso finale in cui conosco solo k-cell water
 (defrule k-cell-middle-ultimaspiaggia (declare (salience 5))
@@ -245,21 +286,21 @@
 		(assert (crea-b-cell  (x ?x)(y (+ ?y 1))))
 )
 
-;K-CELL water rules krow/kcol = 0
+; // REGOLE K-ROW/K-COL IS ZERO (metto tutte le caselle sconosciute come water) //
 (defrule create-k-cell-water-when-row-value-is-zero (declare (salience 50))
 		(k-per-row (row ?row) (num ?num-row&:(eq ?num-row 0)))
 	=>
 		(loop-for-count (?i 0 9) do
-			(assert (crea-k-cell (x ?row) (y ?i) (c water))))
+			(assert (crea-k-cell-water (x ?row) (y ?i) (c water))))
 )
 (defrule create-k-cell-water-when-col-value-is-zero (declare (salience 50))
 		(k-per-col (col ?col) (num ?num-col&:(eq ?num-col 0)))
 	=>
 		(loop-for-count (?i 0 9) do
-			(assert (crea-k-cell (x ?i) (y ?col) (c water))))
+			(assert (crea-k-cell-water (x ?i) (y ?col) (c water))))
 )
 
-;F-CELL rules
+; // REGOLE F-CELL //
 (defrule delete-f-cell-when-is-extreme (declare (salience 20))
 		?fcell <- (f-cell (x ?x)(y ?y)(direzione ?d))
 		(or
@@ -273,11 +314,9 @@
 		(retract ?fcell)
 		(printout t "trasformo la fcell in kcell: " ?x " " ?y crlf)
 )
-; regola priorità alta: per ogni f cell in base ai valori che può assumere, guardo valore riga/col adiacente, se 0 -> questa f cell diventa k cell estremo
-; se ho una f-cell vicina a una b cell è molto probabile quella bcell sia barca <- opzione fire
-; se siamo vicini al confine è una k cell estremo
 
-;B-CELL rules
+
+; // REGOLE B-CELL //
 (defrule delete-b-cell-where-row-is-zero (declare (salience 20))
 		(k-per-row (row ?row) (num ?num-row&:(eq ?num-row 0)))
 		?bcell <- (b-cell (x ?x&:(eq ?x ?row))(y ?y))
@@ -296,20 +335,16 @@
 	=>
 		(retract ?bcell)
 )
-; scrivere euristiche per eliminare b-cell (usando il numero di barche)
+; TODO => scrivere euristiche per eliminare b-cell (usando il numero di barche)
 
 
-; CREA CELLE
+; // REGOLE PER CREARE CELL //
 (defrule crea-f-cell (declare (salience 10))
 		(status (step ?s)(currently running))
 		(crea-f-cell  (x ?x)(y ?y)(direzione ?c))
 		(not (k-cell (x ?x)(y ?y)))
 		(not (f-cell (x ?x)(y ?y)))
 	=>
-		(assert (crea-k-cell (x (+ ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (- ?y 1)) (c water)))
-		(assert (crea-k-cell (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
-		(assert (crea-k-cell (x (- ?x 1)) (y (+ ?y 1)) (c water)))
 		(assert (f-cell (x ?x)(y ?y)(direzione ?c)))
 		(assert (exec (step ?s) (action guess) (x ?x)(y ?y)))
 		 	(pop-focus)
@@ -324,21 +359,40 @@
 		(test(>= ?num-col 0))
 		(not (k-cell (x ?x)(y ?y)))
 		(not (f-cell (x ?x)(y ?y)))
+		(test(>= ?x 0))
+		(test(< ?x 10))
+		(test(>= ?y 0))
+		(test(< ?y 10))
 	=>
 		(assert (b-cell (x ?x)(y ?y)))
 )
 
 ;regole generali:
-	; se la somma di k-cell water e il contatore della riga/colonna = max allora le restanti sono barche
+	; TODO => se la somma di k-cell water e il contatore della riga/colonna = max allora le restanti sono barche
 	; 8kcell water e 2 sconosciute allora dato che la riga = 10 le ultime 2 sono barche
+(defrule nonsocomechiamarla
+		(k-per-row-number-water (row ?x) (num ?num-row-water))
+		(k-per-row (row ?x) (num ?num-row))
+		(test(eq (+ ?num-row ?num-row-water) 10))
+		;(exists (bind ?y (random 0 9)))
+		(not (k-cell (x ?x) (y ?y)))
+		(not (f-cell (x ?x) (y ?y)))
+		;(member$ ?y create$ 0 1 2 3 4 5 6 7 8 9)
+	=>
+		(printout t "nonsocome chiamarla ma c'è una barca in : " ?x " " crlf)
+		;create f cell in x y
+)
 
-	; se ho una kcell estremo vicino a middle -> 2 casi: se la barca da 4 è scoperta faccio fire
-	; creare clasuole che salvano quanti barche ci sono e fare regole che quando trova 3 k cell o k cell + f cell circondate da mare -> decrementa valore e segna quelle f-cell come k-cell
-	; mettere guess sulle b-cell con valori di k-row e k-col più alti
-	; quando hai 4 caselle k-f cell allineate mettere water intorno
+	; TODO => creare clasuole che salvano quanti barche ci sono e fare regole che quando trova 3 k cell o k cell + f cell circondate da mare -> decrementa valore e segna quelle f-cell come k-cell
+	; TODO => quando hai 4 caselle k-f cell allineate mettere water intorno
+	; TODO => mettere guess sulle b-cell con valori di k-row e k-col più alti
 
-;regola ultima spiaggia:
-	; sparo fire a caso nell'incrocio tra riga e col con valori più alti ( da qusare quando non so che pesci pijare)
+; regole fire
+	; TODO => se ho una f-cell vicina a una b cell è molto probabile quella bcell sia barca <- opzione fire
+	; TODO => se ho una kcell estremo vicino a middle -> 2 casi: se la barca da 4 non è scoperta faccio fire
+	; TODO => sparo fire a caso nell'incrocio tra riga e col con valori più alti ( da qusare quando non so che pesci pijare)
+
+
 
 ;DOMANDE:
 ; se facciamo la fire su una casella su cui abbiamo fatto la guess dobbiamo fare unguess?
