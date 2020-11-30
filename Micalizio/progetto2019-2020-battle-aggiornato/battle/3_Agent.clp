@@ -147,14 +147,6 @@
 		(printout t "Ho trovato una K-cell di tipo sub in x " ?x " y: " ?y  crlf)
 )
 
-(defrule decrement-battleship-sub-counter
-		?dsc <- (decrement-sub-counter)
-		?nb <- (barca (tipo 1)(num ?t))
-	=>
-		(modify ?nb (num (- ?t 1)))
-		(retract ?dsc)
-)
-
 ; REGOLE ESTREMI
 (defrule k-cell-left (declare (salience 10))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
@@ -193,7 +185,7 @@
 		(assert (crea-k-cell-water (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
 		(assert (crea-k-cell-water (x (+ ?x 1)) (y (- ?y 1)) (c water)))
 
-		(assert (crea-f-cell (x =(+ 1 ?x))(y ?y)) (direzione bot))
+		(assert (crea-f-cell (x =(+ 1 ?x))(y ?y)(direzione bot)))
 		(assert (crea-b-cell (x =(+ 2 ?x))(y ?y)))
 		(printout t "Ho trovato una K-cell di tipo top in x: " ?x " y: " ?y  crlf)
 )
@@ -367,6 +359,76 @@
 		(assert (b-cell (x ?x)(y ?y)))
 )
 
+; // REGOLE BARCHE TROVATE //
+(defrule found-battleship-type-two
+		(or
+			(and 	(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
+						(k-cell (x ?x) (y =(+ 1 ?y)) (content ?c1&:(eq ?c1 right))))
+			(and 	(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c top)))
+						(k-cell (x =(+ 1 ?x)) (y ?y) (content ?c1&:(eq ?c1 bot))))
+		)
+	=>
+		(assert (decrement-double-counter))
+)
+(defrule found-battleship-type-three
+		(or
+			(and 	(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
+						(k-cell (x ?x) (y =(+ 1 ?y)) (content ?c1&:(eq ?c1 middle)))
+						(k-cell (x ?x) (y =(+ 2 ?y)) (content ?c2&:(eq ?c2 right))))
+			(and 	(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c top)))
+						(k-cell (x =(+ 1 ?x)) (y ?y) (content ?c1&:(eq ?c1 middle)))
+						(k-cell (x =(+ 2 ?x)) (y ?y) (content ?c2&:(eq ?c2 bot))))
+		)
+	=>
+		(assert (decrement-triple-counter))
+)
+(defrule found-battleship-type-four
+	(or
+		(and 	(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
+					(k-cell (x ?x) (y =(+ 1 ?y)) (content ?c1&:(eq ?c1 middle)))
+					(k-cell (x ?x) (y =(+ 2 ?y)) (content ?c2&:(eq ?c2 middle)))
+					(k-cell (x ?x) (y =(+ 3 ?y)) (content ?c3&:(eq ?c3 right))))
+		(and 	(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c top)))
+					(k-cell (x =(+ 1 ?x)) (y ?y) (content ?c1&:(eq ?c1 middle)))
+					(k-cell (x =(+ 2 ?x)) (y ?y) (content ?c2&:(eq ?c2 middle)))
+					(k-cell (x =(+ 3 ?x)) (y ?y) (content ?c3&:(eq ?c3 bot))))
+	)
+	=>
+		(assert (decrement-fourth-counter))
+)
+
+
+; regole per decrementare contatori
+(defrule decrement-battleship-sub-counter
+		?dsc <- (decrement-sub-counter)
+		?nb <- (barca (tipo 1)(num ?t))
+	=>
+		(modify ?nb (num (- ?t 1)))
+		(retract ?dsc)
+)
+(defrule decrement-battleship-type-two-counter
+		?dsc <- (decrement-double-counter)
+		?nb <- (barca (tipo 2)(num ?t))
+	=>
+		(modify ?nb (num (- ?t 1)))
+		(retract ?dsc)
+)
+(defrule decrement-battleship-type-three-counter
+		?dsc <- (decrement-triple-counter)
+		?nb <- (barca (tipo 3)(num ?t))
+	=>
+		(modify ?nb (num (- ?t 1)))
+		(retract ?dsc)
+)
+(defrule decrement-battleship-type-four-counter
+		?dsc <- (decrement-fourth-counter)
+		?nb <- (barca (tipo 4)(num ?t))
+	=>
+		(modify ?nb (num (- ?t 1)))
+		(retract ?dsc)
+)
+
+
 ;regole generali:
 	; TODO => se la somma di k-cell water e il contatore della riga/colonna = max allora le restanti sono barche
 	; 8kcell water e 2 sconosciute allora dato che la riga = 10 le ultime 2 sono barche
@@ -385,7 +447,7 @@
 
 	; TODO => creare clasuole che salvano quanti barche ci sono e fare regole che quando trova 3 k cell o k cell + f cell circondate da mare -> decrementa valore e segna quelle f-cell come k-cell
 	; TODO => quando hai 4 caselle k-f cell allineate mettere water intorno
-	; TODO => mettere guess sulle b-cell con valori di k-row e k-col più alti
+		; TODO => mettere guess sulle b-cell con valori di k-row e k-col più alti
 
 ; regole fire
 	; TODO => se ho una f-cell vicina a una b cell è molto probabile quella bcell sia barca <- opzione fire
