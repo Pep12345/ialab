@@ -464,9 +464,14 @@
 	=>
 		(printout t " FIRE di tipo 3 in x: " ?x " y: " ?y  crlf)
 		(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
-	     (pop-focus)
-
-
+	  (pop-focus)
+)
+(defrule add-k-cell-water-if-fire-fail
+		(exec (step ?s) (action fire) (x ?x) (y ?y))
+		(status (step ?s1&:(> ?s1 ?s))(currently running))
+		(not (k-cell (x ?x) (y ?y)))
+	=>
+		(assert(k-cell(x ?x) (y ?y)(content water)))
 )
 
 ;regole generali:
