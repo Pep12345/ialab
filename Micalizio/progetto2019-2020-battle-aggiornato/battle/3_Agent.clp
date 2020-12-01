@@ -84,28 +84,6 @@
 ;f-cell: caselle che sono barche ma non sappiamo che parte di barca è e quindi non possiamo metterle come k-cell
 			;	[TEMPLATE: rapprensentate come x,y,contenutoPadre?]
 
-; // Regola per trovare parti della barca middle affiancata da f-cell o k-cell//
-(defrule f-cell-near-horizontal (declare (salience 20))
-		(f-cell (x ?x) (y ?y))
-		(or (f-cell (x ?x) (y =(- ?y 1)))
-			(k-cell (x ?x) (y =(- ?y 1)) (content ?c1&:(neq ?c1 water))))
-		(or (f-cell (x ?x) (y =(+ 1 ?y)))
-			(k-cell (x ?x) (y =(+ 1 ?y)) (content ?c&:(neq ?c water))))
-	=>
-		(assert (k-cell (x ?x) (y ?y) (content middle)))
-		(printout t "Ho trovato una parte middle di una barca orizzontale x: " ?x " y: " ?y  crlf)
-)
-(defrule f-cell-near-vertical (declare (salience 20))
-		(f-cell (x ?x) (y ?y))
-		(or (f-cell (x =(- ?x 1)) (y ?y))
-			(k-cell (x =(- ?x 1)) (y ?y) (content ?c1&:(neq ?c1 water))))
-		(or (f-cell (x =(+ 1 ?x)) (y ?y))
-			(k-cell (x =(+ 1 ?x)) (y ?y) (content ?c&:(neq ?c water))))
-	=>
-		(assert (k-cell (x ?x) (y ?y) (content middle)))
-		(printout t "Ho trovato una parte middle di una barca verticale x: " ?x " y: " ?y  crlf)
-)
-
 
 ; // REGOLA PER DECREMENTARE I VALORI IN K-ROW K-COL //
 (defrule decrement-k-row-col-battleship (declare (salience 50))
@@ -329,6 +307,29 @@
 		(retract ?fcell)
 		(printout t "trasformo la fcell in kcell: " ?x " " ?y crlf)
 )
+; // Regola per trovare parti della barca middle affiancata da f-cell o k-cell//
+(defrule f-cell-near-horizontal (declare (salience 20))
+		?fcell <- (f-cell (x ?x) (y ?y))
+		(or (f-cell (x ?x) (y =(- ?y 1)))
+			(k-cell (x ?x) (y =(- ?y 1)) (content ?c1&:(neq ?c1 water))))
+		(or (f-cell (x ?x) (y =(+ 1 ?y)))
+			(k-cell (x ?x) (y =(+ 1 ?y)) (content ?c&:(neq ?c water))))
+	=>
+		(assert (k-cell (x ?x) (y ?y) (content middle)))
+		(retract ?fcell)
+		(printout t "Ho trovato una parte middle di una barca orizzontale x: " ?x " y: " ?y  crlf)
+)
+(defrule f-cell-near-vertical (declare (salience 20))
+		?fcell <- (f-cell (x ?x) (y ?y))
+		(or (f-cell (x =(- ?x 1)) (y ?y))
+			(k-cell (x =(- ?x 1)) (y ?y) (content ?c1&:(neq ?c1 water))))
+		(or (f-cell (x =(+ 1 ?x)) (y ?y))
+			(k-cell (x =(+ 1 ?x)) (y ?y) (content ?c&:(neq ?c water))))
+	=>
+		(assert (k-cell (x ?x) (y ?y) (content middle)))
+		(retract ?fcell)
+		(printout t "Ho trovato una parte middle di una barca verticale x: " ?x " y: " ?y  crlf)
+)
 
 
 ; // REGOLE B-CELL //
@@ -359,6 +360,7 @@
 		(crea-f-cell  (x ?x)(y ?y)(direzione ?c))
 		(not (k-cell (x ?x)(y ?y)))
 		(not (f-cell (x ?x)(y ?y)))
+		(not (exec (step ?s) (action guess) (x ?x)(y ?y))) ; non dovrebbe servire ma l'ha messa il prof nelle fire
 	=>
 		(assert (f-cell (x ?x)(y ?y)(direzione ?c)))
 		(assert (exec (step ?s) (action guess) (x ?x)(y ?y)))
@@ -419,8 +421,6 @@
 	=>
 		(assert (decrement-fourth-counter))
 )
-
-
 ; regole per decrementare contatori
 (defrule decrement-battleship-sub-counter
 		?dsc <- (decrement-sub-counter)
@@ -451,6 +451,23 @@
 		(retract ?dsc)
 )
 
+; // REGOLE FIRE
+; fire 3
+(defrule fire-where-krow-kcol-have-max-value (declare (salience -55))
+		(k-per-row (row ?x) (num ?num-row))
+		(not (k-per-row (num ?num-row2&:(> ?num-row2 ?num-row))))
+		(k-per-col (col ?y) (num ?num-col))
+		(not (k-per-col (num ?num-col2&:(> ?num-col2 ?num-col))))
+		(status (step ?s)(currently running))
+		(not (exec  (action fire) (x ?x) (y ?y))) ; non dovrebbe servire ma l'ha messa il prof
+		(not (k-cell (x ?x) (y ?y)))
+	=>
+		(printout t " FIRE di tipo 3 in x: " ?x " y: " ?y  crlf)
+		(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
+	     (pop-focus)
+
+
+)
 
 ;regole generali:
 	; TODO => se la somma di k-cell water e il contatore della riga/colonna = max allora le restanti sono barche
