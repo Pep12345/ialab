@@ -464,3 +464,40 @@
 =>
 	(printout t "I know that cell [" ?x ", " ?y "] contains " ?t "." crlf)
 )
+
+;se f-cell è compresa tra acqua e f cell(okcell middle) allora è estremo
+(defrule f-cell-is-k-cell-bot
+        ?f<-(f-cell(x ?x) (y ?y))
+        (or (f-cell(x =(- ?x 1))(y ?y))(k-cell(x =(- ?x 1))(y ?y)))
+        (k-cell (x =(+ 1 ?x))(y ?y)(content ?c&:(eq ?c water)))
+        =>
+        (retract ?f)
+        (assert(k-cell(x ?x) (y ?y)(content bot)))
+)
+
+(defrule f-cell-is-k-cell-top
+        ?f<-(f-cell(x ?x) (y ?y))
+        (or (f-cell(x =(+ 1 ?x))(y ?y))(k-cell(x =(+ 1 ?x))(y ?y)))
+        (k-cell (x =(- ?x 1))(y ?y)(content ?c&:(eq ?c water)))
+        =>
+        (retract ?f)
+        (assert(k-cell(x ?x) (y ?y)(content top)))
+)
+
+(defrule f-cell-is-k-cell-left
+        ?f<-(f-cell(x ?x) (y ?y))
+        (or (f-cell(x ?x)(y =(+ 1 ?y)))(k-cell(x ?x)(y =(+ 1 ?y))))
+        (k-cell (x ?x)(y =(- ?y 1))(content ?c&:(eq ?c water)))
+        =>
+        (retract ?f)
+        (assert(k-cell(x ?x) (y ?y)(content left)))
+)
+
+(defrule f-cell-is-k-cell-right
+        ?f<-(f-cell(x ?x) (y ?y))
+        (or (f-cell(x ?x)(y =(- ?y 1)))(k-cell(x ?x)(y =(- ?y 1))))
+        (k-cell (x ?x)(y =(+ 1 ?y))(content ?c&:(eq ?c water)))
+        =>
+        (retract ?f)
+        (assert(k-cell(x ?x) (y ?y)(content right)))
+)
