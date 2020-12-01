@@ -84,6 +84,29 @@
 ;f-cell: caselle che sono barche ma non sappiamo che parte di barca è e quindi non possiamo metterle come k-cell
 			;	[TEMPLATE: rapprensentate come x,y,contenutoPadre?]
 
+; // Regola per trovare parti della barca middle affiancata da f-cell o k-cell//
+(defrule f-cell-near-horizontal (declare (salience 20))
+		(f-cell (x ?x) (y ?y))
+		(or (f-cell (x ?x) (y =(- ?y 1)))
+			(k-cell (x ?x) (y =(- ?y 1)) (content ?c1&:(neq ?c1 water))))
+		(or (f-cell (x ?x) (y =(+ 1 ?y)))
+			(k-cell (x ?x) (y =(+ 1 ?y)) (content ?c&:(neq ?c water))))
+	=>
+		(assert (k-cell (x ?x) (y ?y) (content middle)))
+		(printout t "Ho trovato una parte middle di una barca orizzontale x: " ?x " y: " ?y  crlf)
+)
+(defrule f-cell-near-vertical (declare (salience 20))
+		(f-cell (x ?x) (y ?y))
+		(or (f-cell (x =(- ?x 1)) (y ?y))
+			(k-cell (x =(- ?x 1)) (y ?y) (content ?c1&:(neq ?c1 water))))
+		(or (f-cell (x =(+ 1 ?x)) (y ?y))
+			(k-cell (x =(+ 1 ?x)) (y ?y) (content ?c&:(neq ?c water))))
+	=>
+		(assert (k-cell (x ?x) (y ?y) (content middle)))
+		(printout t "Ho trovato una parte middle di una barca verticale x: " ?x " y: " ?y  crlf)
+)
+
+
 ; // REGOLA PER DECREMENTARE I VALORI IN K-ROW K-COL //
 (defrule decrement-k-row-col-battleship (declare (salience 50))
 		(or (k-cell (x ?x) (y ?y) (content ?c&:(neq ?c water)))
