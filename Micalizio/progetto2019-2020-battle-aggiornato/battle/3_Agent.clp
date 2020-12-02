@@ -85,6 +85,8 @@
 			;	[TEMPLATE: rapprensentate come x,y,contenutoPadre?]
 
 
+
+
 ; // REGOLA PER DECREMENTARE I VALORI IN K-ROW K-COL //
 (defrule decrement-k-row-col-battleship (declare (salience 50))
 		(or (k-cell (x ?x) (y ?y) (content ?c&:(neq ?c water)))
@@ -452,6 +454,23 @@
 )
 
 ; // REGOLE FIRE
+;Regola Fire-two
+(defrule fire-two (declare (salience 50))
+		?fcell <- (f-cell (x ?x)(y ?y))
+		(or
+		(and (k-cell (x =(+ ?x 1)) (y ?y) (content ?c&:(eq ?c middle))) (k-cell (x =(+ ?x 2)) (y ?y) (content ?c1&:(eq ?c1 bot))))
+		(and (k-cell (x =(- 1 ?x)) (y ?y) (content ?c&:(eq ?c middle))) (k-cell (x =(- 2 ?x)) (y ?y) (content ?c2&:(eq ?c2 top))))
+		(and (k-cell (x ?x) (y =(+ ?y 1)) (content ?c&:(eq ?c middle))) (k-cell (x ?x) (y =(+ ?y 2)) (content ?c3&:(eq ?c3 right))))
+		(and (k-cell (x ?x) (y =(- 1 ?y)) (content ?c&:(eq ?c middle))) (k-cell (x ?x) (y =(- 2 ?y)) (content ?c4&:(eq ?c4 left))))
+		)
+		(status (step ?s)(currently running))
+		(not (exec  (action fire) (x ?x) (y ?y)))
+	=>
+		(printout t "Sto per eseguire Fire-two in x: " ?x " y: " ?y  crlf)
+		(retract ?fcell)
+		(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
+	  	(pop-focus)
+)
 ; fire 3
 (defrule fire-where-krow-kcol-have-max-value (declare (salience -55))
 		(k-per-row (row ?x) (num ?num-row))
