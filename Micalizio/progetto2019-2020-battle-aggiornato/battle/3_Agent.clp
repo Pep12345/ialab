@@ -547,3 +547,31 @@
 ;         (retract ?f)
 ;         (assert(k-cell(x ?x) (y ?y)(content right)))
 ; )
+
+(defrule fire1-bcell (declare (salience -55))
+  (status (step ?s)(currently running))
+  (b-cell(x ?x) (y ?y))
+  (or
+     (f-cell (x ?x)(y =(- ?y 1)))
+     (f-cell(x ?x)(y =(+ 1 ?y)))
+     (f-cell(x =(+ 1 ?x))(y ?y))
+     (f-cell(x =(- ?x 1))(y ?y))
+   )
+ =>
+ (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
+     (pop-focus)
+)
+
+(defrule fire1-fcell (declare (salience -55))
+  (status (step ?s)(currently running))
+  (f-cell(x ?x) (y ?y))
+  (or
+     (b-cell (x ?x)(y =(- ?y 1)))
+     (b-cell(x ?x)(y =(+ 1 ?y)))
+     (b-cell(x =(+ 1 ?x))(y ?y))
+     (b-cell(x =(- ?x 1))(y ?y))
+   )
+ =>
+ (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
+      (pop-focus)
+)
