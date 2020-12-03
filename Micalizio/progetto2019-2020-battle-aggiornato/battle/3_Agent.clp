@@ -556,11 +556,27 @@
 ;DOMANDE:
 ; se facciamo la fire su una casella su cui abbiamo fatto la guess dobbiamo fare unguess?
 ; dovremmo fare guess sulle k-cell iniziali?
+(defrule print-what-i-know-first-to-fire-k (declare (salience 0))
+	(k-cell (x ?x) (y ?y)(content ?t) )
+=>
+	(printout t "K cell  [" ?x ", " ?y "] type: " ?t crlf)
+)
+(defrule print-what-i-know-first-to-fire-f (declare (salience 0))
+	(f-cell (x ?x) (y ?y)(direzione ?t))
+=>
+	(printout t "F cell [" ?x ", " ?y "] direzione " ?t  crlf)
+)
+(defrule print-what-i-know-first-to-fire-b (declare (salience 0))
+		(b-cell (x ?x)(y ?y))
+=>
+	(printout t "B cell [" ?x ", " ?y "] " crlf)
+)
 (defrule print-what-i-know-since-the-beginning (declare (salience 50))
 	(k-cell (x ?x) (y ?y) (content ?t) )
 =>
 	(printout t "I know that cell [" ?x ", " ?y "] contains " ?t "." crlf)
 )
+
 
 ;se f-cell è compresa tra acqua e f cell(okcell middle) allora è estremo
 ; regole superflue
