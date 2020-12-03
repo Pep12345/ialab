@@ -348,7 +348,7 @@
 		(retract ?bcell)
 )
 (defrule delete-b-cell-if-k-cell-water (declare (salience 20))
-		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c water)))
+		(k-cell (x ?x) (y ?y))
 		?bcell <- (b-cell (x ?x)(y ?y))
 	=>
 		(retract ?bcell)
@@ -473,6 +473,7 @@
 	  	(pop-focus)
 )
 ; fire 3: sparo sulla riga e colonna con la maggiore probabilità di avere una barca
+; nota: nel caso in cui fa fire su water, k row max e k col max restano gli stessi e quindi sta regola si blocca e non fa altre fire
 (defrule fire-where-krow-kcol-have-max-value (declare (salience -999))
 		(k-per-row (row ?x) (num ?num-row))
 		(not (k-per-row (num ?num-row2&:(> ?num-row2 ?num-row))))
