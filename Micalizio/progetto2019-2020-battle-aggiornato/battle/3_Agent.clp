@@ -154,7 +154,7 @@
 (defrule k-cell-left (declare (salience 10))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
 	=>
-		; creare k-cell water in [x+1,y] // [x-1,y] // [x,y-1] // [x-1,y-1] // [x+1,y-1]
+		; creo k-cell water sopra,sotto e a sinistra
 		(assert (crea-k-cell-water (x (+ ?x 1)) (y ?y) (c water)))
 		(assert (crea-k-cell-water (x (- ?x 1)) (y ?y) (c water)))
 		(assert (crea-k-cell-water (x ?x) (y (- ?y 1)) (c water)))
@@ -457,6 +457,7 @@
 ;Regola Fire-two: sparo sulla f-cell che si trova dopo una kcell estrema e una kcell middle
 (defrule fire-two (declare (salience -55))
 		?fcell <- (f-cell (x ?x)(y ?y))
+		(barca (tipo 4)(num ?value&:(> ?value 0)))
 		(or
 		(and (k-cell (x =(+ ?x 1)) (y ?y) (content ?c&:(eq ?c middle))) (k-cell (x =(+ ?x 2)) (y ?y) (content ?c1&:(eq ?c1 bot))))
 		(and (k-cell (x =(- 1 ?x)) (y ?y) (content ?c&:(eq ?c middle))) (k-cell (x =(- 2 ?x)) (y ?y) (content ?c2&:(eq ?c2 top))))
@@ -497,6 +498,7 @@
    )
  =>
  (retract ?b)
+ (printout t " FIRE di tipo 1 - b in x: " ?x " y: " ?y  crlf)
  (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
      (pop-focus)
 )
@@ -511,6 +513,7 @@
    )
  =>
  (retract ?f)
+ (printout t " FIRE di tipo 1 - f in x: " ?x " y: " ?y  crlf)
  (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
       (pop-focus)
 )
@@ -534,7 +537,8 @@
 		(not (f-cell (x ?x) (y ?y)))
 		;(member$ ?y create$ 0 1 2 3 4 5 6 7 8 9)
 	=>
-		(printout t "nonsocome chiamarla ma c'è una barca in : " ?x " " crlf)
+		(printout t "NONSOCOMECHIAMARLA -  c'è una barca in riga : " ?x " " crlf)
+		(printout t "numero di barche da scoprire in riga " ?x " = " ?num-row crlf)
 		;create f cell in x y
 )
 
