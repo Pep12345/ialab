@@ -454,8 +454,8 @@
 )
 
 ; // REGOLE FIRE
-;Regola Fire-two
-(defrule fire-two (declare (salience 50))
+;Regola Fire-two: sparo sulla f-cell che si trova dopo una kcell estrema e una kcell middle
+(defrule fire-two (declare (salience -55))
 		?fcell <- (f-cell (x ?x)(y ?y))
 		(or
 		(and (k-cell (x =(+ ?x 1)) (y ?y) (content ?c&:(eq ?c middle))) (k-cell (x =(+ ?x 2)) (y ?y) (content ?c1&:(eq ?c1 bot))))
@@ -471,8 +471,8 @@
 		(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
 	  	(pop-focus)
 )
-; fire 3
-(defrule fire-where-krow-kcol-have-max-value (declare (salience -55))
+; fire 3: sparo sulla riga e colonna con la maggiore probabilità di avere una barca
+(defrule fire-where-krow-kcol-have-max-value (declare (salience -999))
 		(k-per-row (row ?x) (num ?num-row))
 		(not (k-per-row (num ?num-row2&:(> ?num-row2 ?num-row))))
 		(k-per-col (col ?y) (num ?num-col))
@@ -484,6 +484,35 @@
 		(printout t " FIRE di tipo 3 in x: " ?x " y: " ?y  crlf)
 		(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
 	  (pop-focus)
+)
+; fire 1: sparo su b/f cell vicina ad una f cell
+(defrule fire1-bcell (declare (salience -55))
+  (status (step ?s)(currently running))
+  ?b<-(b-cell(x ?x) (y ?y))
+  (or
+     (f-cell (x ?x)(y =(- ?y 1)))
+     (f-cell(x ?x)(y =(+ 1 ?y)))
+     (f-cell(x =(+ 1 ?x))(y ?y))
+     (f-cell(x =(- ?x 1))(y ?y))
+   )
+ =>
+ (retract ?b)
+ (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
+     (pop-focus)
+)
+(defrule fire1-fcell (declare (salience -55))
+  (status (step ?s)(currently running))
+  ?f<-(f-cell(x ?x) (y ?y))
+  (or
+     (b-cell (x ?x)(y =(- ?y 1)))
+     (b-cell(x ?x)(y =(+ 1 ?y)))
+     (b-cell(x =(+ 1 ?x))(y ?y))
+     (b-cell(x =(- ?x 1))(y ?y))
+   )
+ =>
+ (retract ?f)
+ (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
+      (pop-focus)
 )
 (defrule add-k-cell-water-if-fire-fail
 		(exec (step ?s) (action fire) (x ?x) (y ?y))
@@ -566,33 +595,3 @@
 ;         (retract ?f)
 ;         (assert(k-cell(x ?x) (y ?y)(content right)))
 ; )
-
-(defrule fire1-bcell (declare (salience -55))
-  (status (step ?s)(currently running))
-  ?b<-(b-cell(x ?x) (y ?y))
-  (or
-     (f-cell (x ?x)(y =(- ?y 1)))
-     (f-cell(x ?x)(y =(+ 1 ?y)))
-     (f-cell(x =(+ 1 ?x))(y ?y))
-     (f-cell(x =(- ?x 1))(y ?y))
-   )
- =>
- (retract ?b)
- (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
-     (pop-focus)
-)
-
-(defrule fire1-fcell (declare (salience -55))
-  (status (step ?s)(currently running))
-  ?f<-(f-cell(x ?x) (y ?y))
-  (or
-     (b-cell (x ?x)(y =(- ?y 1)))
-     (b-cell(x ?x)(y =(+ 1 ?y)))
-     (b-cell(x =(+ 1 ?x))(y ?y))
-     (b-cell(x =(- ?x 1))(y ?y))
-   )
- =>
- (retract ?f)
- (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
-      (pop-focus)
-)
