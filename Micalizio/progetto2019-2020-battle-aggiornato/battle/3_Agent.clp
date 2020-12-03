@@ -518,7 +518,7 @@
  (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
       (pop-focus)
 )
-(defrule add-k-cell-water-if-fire-fail
+(defrule add-k-cell-water-if-fire-fail (declare (salience 20))
 		(exec (step ?s) (action fire) (x ?x) (y ?y))
 		(status (step ?s1&:(> ?s1 ?s))(currently running))
 		(not (k-cell (x ?x) (y ?y)))
@@ -529,16 +529,18 @@
 ;regole generali:
 	; TODO => se la somma di k-cell water e il contatore della riga/colonna = max allora le restanti sono barche
 	; 8kcell water e 2 sconosciute allora dato che la riga = 10 le ultime 2 sono barche
-(defrule nonsocomechiamarla
-		(k-per-row-number-water (row ?x) (num ?num-row-water))
+(defrule nonsocomechiamarla (declare (salience 1))
+		;(k-per-row-number-water (row ?x) (num ?num-row-water))
 		(k-per-row (row ?x) (num ?num-row))
-		(test(eq (+ ?num-row ?num-row-water) 10))
+		;(test (eq (+ (+ (length$ (find-all-facts ((?f k-cell)) (eq ?f:x ?x))) (length$ (find-all-facts ((?f1 f-cell)) (eq ?f1:x ?x)))) ?num-row) 10))
+		(test (> (length$ (find-all-facts ((?f k-cell)) (eq ?f:x ?x))) 0)) ;???? mi trova solo 1-9-0, tutte le altre = a 0 wtff
+																																			; ma se la copio su console funziona wtf2222
 		;(exists (bind ?y (random 0 9)))
-		(not (k-cell (x ?x) (y ?y)))
-		(not (f-cell (x ?x) (y ?y)))
+		;(not (k-cell (x ?x) (y ?y)))
+		;(not (f-cell (x ?x) (y ?y)))
 		;(member$ ?y create$ 0 1 2 3 4 5 6 7 8 9)
 	=>
-		(printout t "NONSOCOMECHIAMARLA -  c'è una barca in riga : " ?x " " crlf)
+		(printout t "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -  c'è una barca in riga : " ?x " " crlf)
 		(printout t "numero di barche da scoprire in riga " ?x " = " ?num-row crlf)
 		;create f cell in x y
 )
