@@ -296,7 +296,9 @@
 )
 
 ; // REGOLE F-CELL //
-(defrule delete-f-cell-when-is-extreme (declare (salience 20))
+
+; // regole per convertire f cell
+(defrule convert-f-to-k-cell-when-is-extreme (declare (salience 20))
 		?fcell <- (f-cell (x ?x)(y ?y)(direzione ?d))
 		(or
 			(and (test(eq ?d right)) (or (k-cell (x ?x)(y =(+ 1 ?y))(content ?c&:(eq ?c water))) (test(>= ?y 9))))
@@ -309,8 +311,8 @@
 		(retract ?fcell)
 		(printout t "trasformo la fcell in kcell: " ?x " " ?y crlf)
 )
-; // Regola per trovare parti della barca middle affiancata da f-cell o k-cell//
-(defrule f-cell-near-horizontal (declare (salience 20))
+; Regola per trovare parti della barca middle affiancata da f-cell o k-cell
+(defrule convert-f-to-k-cell-if-between-ship-horizontal (declare (salience 20))
 		?fcell <- (f-cell (x ?x) (y ?y))
 		(or (f-cell (x ?x) (y =(- ?y 1)))
 			(k-cell (x ?x) (y =(- ?y 1)) (content ?c1&:(neq ?c1 water))))
@@ -321,7 +323,7 @@
 		(retract ?fcell)
 		(printout t "Ho trovato una parte middle di una barca orizzontale x: " ?x " y: " ?y  crlf)
 )
-(defrule f-cell-near-vertical (declare (salience 20))
+(defrule convert-f-to-k-cell-if-between-ship-vertical (declare (salience 20))
 		?fcell <- (f-cell (x ?x) (y ?y))
 		(or (f-cell (x =(- ?x 1)) (y ?y))
 			(k-cell (x =(- ?x 1)) (y ?y) (content ?c1&:(neq ?c1 water))))
@@ -331,6 +333,31 @@
 		(assert (k-cell (x ?x) (y ?y) (content middle)))
 		(retract ?fcell)
 		(printout t "Ho trovato una parte middle di una barca verticale x: " ?x " y: " ?y  crlf)
+)
+
+; // regole per creare f cell
+; se le restanti celle da scoprire lungo la riga = numer barche di quella riga => creo f cell
+(defrule create-f-cell-in-row-where-i-know-all-water-cells (declare (salience 20))
+		(k-per-row (row ?x) (num ?num-row&:(> ?num-row 0)))
+		(status (step ?s)(currently running))
+		(test (eq (+ (+ (length$ (find-all-facts ((?f k-cell)) (eq ?f:x ?x))) (length$ (find-all-facts ((?f1 f-cell)) (eq ?f1:x ?x)))) ?num-row) 10))
+		(k-per-col (col ?y)(num ?num-col&:(> ?num-col 0))) ; (num...) velocizza perchè salta subito tutta la colonna ma funziona anche senza
+		(not (k-cell (x ?x) (y ?y)))
+		(not (f-cell (x ?x) (y ?y)))
+	=>
+		;(printout t "Creo f-cell usando nonsocomechiamarla x: " ?x " y: " ?y  crlf)
+		(assert (crea-f-cell (x ?x)(y ?y)))
+)
+(defrule create-f-cell-in-col-where-i-know-all-water-cells (declare (salience 20))
+		(k-per-col (col ?y) (num ?num-col&:(> ?num-col 0)))
+		(status (step ?s)(currently running))
+		(test (eq (+ (+ (length$ (find-all-facts ((?f k-cell)) (eq ?f:y ?y))) (length$ (find-all-facts ((?f1 f-cell)) (eq ?f1:y ?y)))) ?num-col) 10))
+		(k-per-row (row ?x)(num ?num-row&:(> ?num-row 0)))
+		(not (k-cell (x ?x) (y ?y)))
+		(not (f-cell (x ?x) (y ?y)))
+	=>
+		;(printout t "Creo f-cell usando nonsocomechiamarla x: " ?x " y: " ?y  crlf)
+		(assert (crea-f-cell (x ?x)(y ?y)))
 )
 
 
@@ -455,6 +482,7 @@
 
 ; // REGOLE FIRE
 ;Regola Fire-two: sparo sulla f-cell che si trova dopo una kcell estrema e una kcell middle
+; se la barca da 4 non è scoperta
 (defrule fire-two (declare (salience -55))
 		?fcell <- (f-cell (x ?x)(y ?y))
 		(barca (tipo 4)(num ?value&:(> ?value 0)))
@@ -526,41 +554,7 @@
 		(assert(k-cell(x ?x) (y ?y)(content water)))
 )
 
-;regole generali:
-	; TODO => se la somma di k-cell water e il contatore della riga/colonna = max allora le restanti sono barche
-	; 8kcell water e 2 sconosciute allora dato che la riga = 10 le ultime 2 sono barche
-(defrule nonsocomechiamarla (declare (salience 20))
-		(k-per-row (row ?x) (num ?num-row&:(> ?num-row 0)))
-		(status (step ?s)(currently running))
-		(test (eq (+ (+ (length$ (find-all-facts ((?f k-cell)) (eq ?f:x ?x))) (length$ (find-all-facts ((?f1 f-cell)) (eq ?f1:x ?x)))) ?num-row) 10))
-		(k-per-col (col ?y)(num ?num-col&:(> ?num-col 0))) ; (num...) velocizza perchè salta subito tutta la colonna ma funziona anche senza
-		(not (k-cell (x ?x) (y ?y)))
-		(not (f-cell (x ?x) (y ?y)))
-	=>
-		;(printout t "Creo f-cell usando nonsocomechiamarla x: " ?x " y: " ?y  crlf)
-		(assert (crea-f-cell (x ?x)(y ?y)))
-)
-(defrule nonoso2 (declare (salience 20))
-		(k-per-col (col ?y) (num ?num-col&:(> ?num-col 0)))
-		(status (step ?s)(currently running))
-		(test (eq (+ (+ (length$ (find-all-facts ((?f k-cell)) (eq ?f:y ?y))) (length$ (find-all-facts ((?f1 f-cell)) (eq ?f1:y ?y)))) ?num-col) 10))
-		(k-per-row (row ?x)(num ?num-row&:(> ?num-row 0)))
-		(not (k-cell (x ?x) (y ?y)))
-		(not (f-cell (x ?x) (y ?y)))
-	=>
-		;(printout t "Creo f-cell usando nonsocomechiamarla x: " ?x " y: " ?y  crlf)
-		(assert (crea-f-cell (x ?x)(y ?y)))
-)
-
-	; TODO => creare clasuole che salvano quanti barche ci sono e fare regole che quando trova 3 k cell o k cell + f cell circondate da mare -> decrementa valore e segna quelle f-cell come k-cell
-	; TODO => quando hai 4 caselle k-f cell allineate mettere water intorno
 		; TODO => mettere guess sulle b-cell con valori di k-row e k-col più alti
-
-; regole fire
-	; TODO => se ho una f-cell vicina a una b cell è molto probabile quella bcell sia barca <- opzione fire
-	; TODO => se ho una kcell estremo vicino a middle -> 2 casi: se la barca da 4 non è scoperta faccio fire
-	; TODO => sparo fire a caso nell'incrocio tra riga e col con valori più alti ( da qusare quando non so che pesci pijare)
-
 
 
 ;DOMANDE:
