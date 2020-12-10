@@ -75,6 +75,28 @@
 	(k-per-col-number-water (col 9) (num 0))
 )
 
+
+; // FUNCTIONS
+; (num barche da trovare riga / num caselle sconosciute riga ) * (num barche da trovare col / num caselle sconosciute col )
+(deffunction get-known-cell-for-row (?row)
+	(+
+		(length$ (find-all-facts ((?f k-cell)) (eq ?f:x ?row)))
+		(length$ (find-all-facts ((?f1 f-cell)) (eq ?f1:x ?row)))
+	)
+)
+(deffunction get-known-cell-for-col (?col)
+	(+
+		(length$ (find-all-facts ((?f k-cell)) (eq ?f:y ?col)))
+		(length$ (find-all-facts ((?f1 f-cell)) (eq ?f1:y ?col)))
+	)
+)
+
+(deffunction calculate-prob-x-y (?num-row ?num-col ?x ?y)
+	(*
+		(/ ?num-row (- 10 (get-known-cell-for-row ?x)))
+		(/ ?num-col (- 10 (get-known-cell-for-col ?y)))
+	)
+)
 ; TODO => - scegliere se dividere in moduli declaration - executation
 ;TODO => - scegliere euristiche da usare quando non abbiamo più k-cell
 
@@ -340,7 +362,7 @@
 (defrule create-f-cell-in-row-where-i-know-all-water-cells (declare (salience 20))
 		(k-per-row (row ?x) (num ?num-row&:(> ?num-row 0)))
 		(status (step ?s)(currently running))
-		(test (eq (+ (+ (length$ (find-all-facts ((?f k-cell)) (eq ?f:x ?x))) (length$ (find-all-facts ((?f1 f-cell)) (eq ?f1:x ?x)))) ?num-row) 10))
+		(test (eq (+ 	(+ (length$ (find-all-facts ((?f k-cell)) (eq ?f:x ?x))) (length$ (find-all-facts ((?f1 f-cell)) (eq ?f1:x ?x)))) ?num-row) 10))
 		(k-per-col (col ?y)(num ?num-col&:(> ?num-col 0))) ; (num...) velocizza perchè salta subito tutta la colonna ma funziona anche senza
 		(not (k-cell (x ?x) (y ?y)))
 		(not (f-cell (x ?x) (y ?y)))
@@ -481,8 +503,7 @@
 )
 
 ; // REGOLE FIRE
-;Regola Fire-two: sparo sulla f-cell che si trova dopo una kcell estrema e una kcell middle
-; se la barca da 4 non è scoperta
+;FIRE 2: sparo sulla f-cell che si trova dopo una kcell estrema e una kcell middle
 (defrule fire-two (declare (salience -55))
 		?fcell <- (f-cell (x ?x)(y ?y))
 		(barca (tipo 4)(num ?value&:(> ?value 0)))
@@ -500,7 +521,7 @@
 		(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
 	  	(pop-focus)
 )
-; fire 3: sparo sulla riga e colonna con la maggiore probabilità di avere una barca
+; FIRE 3: sparo sulla riga e colonna con la maggiore probabilità di avere una barca
 ; nota: nel caso in cui fa fire su water, k row max e k col max restano gli stessi e quindi sta regola si blocca e non fa altre fire
 (defrule fire-where-krow-kcol-have-max-value (declare (salience -999))
 		(k-per-row (row ?x) (num ?num-row))
@@ -515,7 +536,7 @@
 		(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
 	  (pop-focus)
 )
-; fire 1: sparo su b/f cell vicina ad una f cell
+; FIRE 1: sparo su b/f cell vicina ad una f cell
 (defrule fire1-bcell (declare (salience -55))
   (status (step ?s)(currently running))
   ?b<-(b-cell(x ?x) (y ?y))
@@ -546,6 +567,30 @@
  (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
       (pop-focus)
 )
+;FIRE PROB
+; probabilità calcolata come: prodotto tra
+;																	num-row diviso caselle sconosciute su quella riga
+;																	num-col diviso caselle sconosciute su quella colonna
+(defrule fire-probability (declare (salience -65))
+		(k-per-row (row ?x) (num ?num-row&:(> ?num-row 0)))
+		(k-per-col (col ?y) (num ?num-col&:(> ?num-col 0)))
+		(not (k-cell (x ?x) (y ?y)))
+		(not (exec  (action fire) (x ?x) (y ?y)))
+		(not (and
+						(k-per-row (row ?x1)(num ?num-row2&:(> ?num-row2 0)))
+						(k-per-col (col ?y1)(num ?num-col2&:(> ?num-col2 0)))
+						(not (k-cell (x ?x1) (y ?y1))) ; non serve ma magari riduce il numero di confronti
+						(test(> (calculate-prob-x-y ?num-row2 ?num-col2 ?x1 ?y1) (calculate-prob-x-y ?num-row ?num-col ?x ?y)))
+					)
+		)
+		(status (step ?s)(currently running))
+	=>
+		(printout t " FIRE sulla probabilità in x: " ?x " y: " ?y  crlf)
+		(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
+			(pop-focus)
+)
+
+
 (defrule add-k-cell-water-if-fire-fail (declare (salience 20))
 		(exec (step ?s) (action fire) (x ?x) (y ?y))
 		(status (step ?s1&:(> ?s1 ?s))(currently running))
@@ -554,12 +599,24 @@
 		(assert(k-cell(x ?x) (y ?y)(content water)))
 )
 
+
 		; TODO => mettere guess sulle b-cell con valori di k-row e k-col più alti
 
 
 ;DOMANDE:
 ; se facciamo la fire su una casella su cui abbiamo fatto la guess dobbiamo fare unguess?
 ; dovremmo fare guess sulle k-cell iniziali?
+(defrule print-k-col (declare (salience 1))
+	(k-per-col (col ?y)(num ?n))
+=>
+	(printout t "K-col: " ?y " num: " ?n crlf)
+)
+(defrule print-k-row (declare (salience 1))
+	(k-per-row (row ?x)(num ?n))
+=>
+	(printout t "K-row: " ?x " num: " ?n crlf)
+)
+
 (defrule print-what-i-know-first-to-fire-k (declare (salience 0))
 	(k-cell (x ?x) (y ?y)(content ?t) )
 =>
