@@ -172,6 +172,23 @@
 		(printout t "Ho trovato una K-cell di tipo sub in x " ?x " y: " ?y  crlf)
 )
 
+;Regola che non penso riuscirà mai ad attivarsi 
+(defrule fcell-with-waterframe (declare (salience 50))
+		?fcell <- (f-cell (x ?x)(y ?y))
+		(k-cell (x =(- 1 ?x)) (y ?y) (content water)) ;sopra
+		(k-cell (x =(+ ?x 1)) (y ?y) (content water)) ;sotto
+		(k-cell (x ?x) (y =(+ ?y 1)) (content water)) ;destra
+		(k-cell (x ?x) (y =(- 1 ?y)) (content water)) ;sinistra
+		(k-cell (x =(+ ?x 1)) (y =(+ ?y 1)) (content water)) ;basso-destra
+		(k-cell (x =(- 1 ?x)) (y =(+ ?y 1)) (content water)) ;alto-destra
+		(k-cell (x =(- 1 ?x)) (y =(- 1 ?y)) (content water)) ;alto-sinistra
+		(k-cell (x =(+ ?x 1)) (y =(- 1 ?y)) (content water)) ;basso-sinistra
+	=>
+		(retract ?fcell)
+		(assert (k-cell (x ?x) (y ?y) (content sub)))
+		
+)
+
 ; REGOLE ESTREMI
 (defrule k-cell-left (declare (salience 10))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
@@ -301,6 +318,24 @@
 		(assert (crea-b-cell  (x (+ ?x 1))(y ?y)))
 		(assert (crea-b-cell  (x ?x)(y (- ?y 1))))
 		(assert (crea-b-cell  (x ?x)(y (+ ?y 1))))
+)
+
+(defrule kmid-near-kmid-ver (declare (salience 50))
+		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
+		(k-cell (x =(+ ?x 1)) (y ?y) (content ?c&:(eq ?c middle)))
+	=>
+		(assert (k-cell (x (+ ?x 2)) (y ?y) (content bot)))
+		(assert (k-cell (x (- 1 ?x)) (y ?y) (content top)))
+		(printout t "Middle Near Middle in Vertical in x: " ?x " y: " ?y  crlf)
+)
+
+(defrule kmid-near-kmid-hor (declare (salience 50))
+		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
+		(k-cell (x ?x) (y =(+ ?y 1)) (content ?c&:(eq ?c middle)))
+	=>
+		(assert (k-cell (x ?x) (y (+ ?y 2)) (content right)))
+		(assert (k-cell (x ?x) (y (- ?y 1)) (content left)))
+		(printout t "Middle Near Middle in Horizzontal in x: " ?x " y: " ?y  crlf)
 )
 
 ; // REGOLE K-ROW/K-COL IS ZERO (metto tutte le caselle sconosciute come water) //
