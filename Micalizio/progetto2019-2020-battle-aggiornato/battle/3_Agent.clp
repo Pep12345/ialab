@@ -480,6 +480,7 @@
 ; // REGOLE FIRE
 ;FIRE 2: sparo sulla f-cell che si trova dopo una kcell estrema e una kcell middle
 (defrule fire-two (declare (salience -55))
+		(moves (fires ?fires&:(> ?fires 0)))
 		?fcell <- (f-cell (x ?x)(y ?y))
 		(barca (tipo 4)(num ?value&:(> ?value 0)))
 		(or
@@ -498,7 +499,8 @@
 )
 ; FIRE 3: sparo sulla riga e colonna con la maggiore probabilità di avere una barca
 ; nota: nel caso in cui fa fire su water, k row max e k col max restano gli stessi e quindi sta regola si blocca e non fa altre fire
-(defrule fire-where-krow-kcol-have-max-value (declare (salience -999))
+(defrule fire-where-krow-kcol-have-max-value (declare (salience -100))
+		(moves (fires ?fires&:(> ?fires 0)))
 		(k-per-row (row ?x) (num ?num-row))
 		(not (k-per-row (num ?num-row2&:(> ?num-row2 ?num-row))))
 		(k-per-col (col ?y) (num ?num-col))
@@ -513,6 +515,7 @@
 )
 ; FIRE 1: sparo su b/f cell vicina ad una f cell
 (defrule fire1-bcell (declare (salience -55))
+	(moves (fires ?fires&:(> ?fires 0)))
   (status (step ?s)(currently running))
   ?b<-(b-cell(x ?x) (y ?y))
   (or
@@ -528,6 +531,7 @@
      (pop-focus)
 )
 (defrule fire1-fcell (declare (salience -55))
+	(moves (fires ?fires&:(> ?fires 0)))
   (status (step ?s)(currently running))
   ?f<-(f-cell(x ?x) (y ?y))
   (or
@@ -558,6 +562,7 @@
 						(test(> (calculate-prob-x-y ?num-row2 ?num-col2 ?x1 ?y1) (calculate-prob-x-y ?num-row ?num-col ?x ?y)))
 					)
 		)
+		(moves (fires ?fires&:(> ?fires 0)))	; non capisco perchè se ste due righe le sposto sopra non mi funziona calculate-prob-x-y
 		(status (step ?s)(currently running))
 	=>
 		(printout t " FIRE sulla probabilità in x: " ?x " y: " ?y  crlf)
@@ -573,8 +578,6 @@
 	=>
 		(assert(k-cell(x ?x) (y ?y)(content water)))
 )
-
-
 
 ; // REGOLE PULIZIA FATTI //
 (defrule remove-crea-f-cell
@@ -608,6 +611,14 @@
 		(retract ?c)
 )
 
+; // Termina programma
+;Bisogna asserire (exec (step ?s) (action solve)) quando vogliamo concludere
+(defrule solve (declare (salience -999))
+		(moves (fires ?fires&:(<= ?fires 0)))	; provvisoria, bisogna decidere quando risolvere il problema
+		(status (step ?s)(currently running))
+	=>
+		(assert (exec (step ?s) (action solve)))
+)
 
 		; TODO => mettere guess sulle b-cell con valori di k-row e k-col più alti
 
