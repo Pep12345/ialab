@@ -44,36 +44,6 @@
 	(slot x)
 	(slot y)
 )
-(deftemplate k-per-row-number-water
-	(slot row)
-	(slot num)
-)
-(deftemplate k-per-col-number-water
-	(slot col)
-	(slot num)
-)
-(deffacts k-row-col-water
-	(k-per-row-number-water (row 0) (num 0))
-	(k-per-row-number-water (row 1) (num 0))
-	(k-per-row-number-water (row 2) (num 0))
-	(k-per-row-number-water (row 3) (num 0))
-	(k-per-row-number-water (row 4) (num 0))
-	(k-per-row-number-water (row 5) (num 0))
-	(k-per-row-number-water (row 6) (num 0))
-	(k-per-row-number-water (row 7) (num 0))
-	(k-per-row-number-water (row 8) (num 0))
-	(k-per-row-number-water (row 9) (num 0))
-	(k-per-col-number-water (col 0) (num 0))
-	(k-per-col-number-water (col 1) (num 0))
-	(k-per-col-number-water (col 2) (num 0))
-	(k-per-col-number-water (col 3) (num 0))
-	(k-per-col-number-water (col 4) (num 0))
-	(k-per-col-number-water (col 5) (num 0))
-	(k-per-col-number-water (col 6) (num 0))
-	(k-per-col-number-water (col 7) (num 0))
-	(k-per-col-number-water (col 8) (num 0))
-	(k-per-col-number-water (col 9) (num 0))
-)
 
 
 ; // FUNCTIONS
@@ -123,17 +93,6 @@
 		(assert (visto (x ?x) (y ?y)))
 )
 
-(defrule increase-k-row-col-water (declare (salience 50))
-		(k-cell (x ?x) (y ?y) (content water))
-		?kprnw <- (k-per-row-number-water (row ?x) (num ?num-row))
-  	?kpcnw <-(k-per-col-number-water (col ?y) (num ?num-col))
-		(not (visto(x ?x)(y ?y)))
-	=>
-		(modify ?kprnw (num (+ ?num-row 1)))
-		(modify ?kpcnw (num (+ ?num-col 1)))
-		(assert (visto (x ?x) (y ?y)))
-)
-
 
 ; // REGOLA PER CREARE CELLE WATER //
 (defrule k-cell-cretor-water (declare (salience 20))
@@ -172,7 +131,7 @@
 		(printout t "Ho trovato una K-cell di tipo sub in x " ?x " y: " ?y  crlf)
 )
 
-;Regola che non penso riuscirà mai ad attivarsi 
+;Regola che non penso riuscirà mai ad attivarsi
 (defrule fcell-with-waterframe (declare (salience 50))
 		?fcell <- (f-cell (x ?x)(y ?y))
 		(k-cell (x =(- 1 ?x)) (y ?y) (content water)) ;sopra
@@ -186,7 +145,7 @@
 	=>
 		(retract ?fcell)
 		(assert (k-cell (x ?x) (y ?y) (content sub)))
-		
+
 )
 
 ; REGOLE ESTREMI
@@ -632,6 +591,40 @@
 		(not (k-cell (x ?x) (y ?y)))
 	=>
 		(assert(k-cell(x ?x) (y ?y)(content water)))
+)
+
+
+
+; // REGOLE PULIZIA FATTI //
+(defrule remove-crea-f-cell
+		?c <- (crea-f-cell (x ?x)(y ?y))
+		(or (k-cell (x ?x) (y ?y))
+				(f-cell (x ?x) (y ?y))
+				(or (test(< ?x 0)) (test(>= ?x 10)) (test(< ?y 0)) (test(>= ?y 10)))
+		)
+		=>
+			(retract ?c)
+)
+(defrule remove-crea-b-cell
+		?c <- (crea-b-cell (x ?x)(y ?y))
+		(or (k-cell (x ?x) (y ?y))
+				(f-cell (x ?x) (y ?y))
+				(b-cell (x ?x) (y ?y))
+				(or (test(< ?x 0)) (test(>= ?x 10)) (test(< ?y 0)) (test(>= ?y 10)))
+		)
+	=>
+		(retract ?c)
+)
+(defrule remove-crea-k-cell-water
+		?c <- (crea-k-cell-water (x ?x)(y ?y))
+		(or (k-cell (x ?x) (y ?y))
+				(f-cell (x ?x) (y ?y))
+				(or (test(< ?x 0)) (test(>= ?x 10)) (test(< ?y 0)) (test(>= ?y 10)))
+		)
+				 ; controllo anche f-cell perchè c'è una regola che quando il contatore della riga si azzera
+				 ; fa crea-k-cell water su tutta la riga
+	=>
+		(retract ?c)
 )
 
 
