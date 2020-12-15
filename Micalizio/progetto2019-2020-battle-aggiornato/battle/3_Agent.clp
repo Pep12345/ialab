@@ -59,6 +59,7 @@
 	)
 )
 (deffunction calculate-prob-x-y (?num-row ?num-col ?x ?y)
+	;(printout t "x: " ?x " y: " ?y " ^num-row: " ?num-row " num-col: " ?num-col crlf)
 	(*
 		(/ ?num-row (- 10 (get-known-cell-for-row ?x)))
 		(/ ?num-col (- 10 (get-known-cell-for-col ?y)))
@@ -278,12 +279,13 @@
 		(assert (crea-b-cell  (x ?x)(y (+ ?y 1))))
 )
 ; quando abbiamo due k cell middle vicine
+; nota: dobbiamo anche mettere le bandierine in quelle k cell
 (defrule kmid-near-kmid-ver (declare (salience 50))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
 		(k-cell (x =(+ ?x 1)) (y ?y) (content ?c&:(eq ?c middle)))
 	=>
 		(assert (k-cell (x (+ ?x 2)) (y ?y) (content bot)))
-		(assert (k-cell (x (- 1 ?x)) (y ?y) (content top)))
+		(assert (k-cell (x (- ?x 1)) (y ?y) (content top)))
 		(printout t "Middle Near Middle in Vertical in x: " ?x " y: " ?y  crlf)
 )
 (defrule kmid-near-kmid-hor (declare (salience 50))
@@ -363,6 +365,63 @@
 		(retract ?fcell)
 		(assert (k-cell (x ?x) (y ?y) (content sub)))
 )
+;regole per convertire f cell se sono barche finite
+(defrule convert-f-to-k-if-battleship-type-three-horizontal (declare (salience 20))
+			(barca (tipo 4)(num ?t&:(eq ?t 0)))
+			(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
+			(or (k-cell (x ?x) (y =(- ?y 1)) (content ?c&:(neq ?c water)))
+					(f-cell (x ?x) (y =(- ?y 1))))
+			(or (k-cell (x ?x) (y =(+ ?y 1)) (content ?c1&:(neq ?c1 water)))
+					(f-cell (x ?x) (y =(+ ?y 1))))
+		=>
+			(assert (crea-k-cell-water (x ?x) (y (- ?y 2)) (c water)))
+			(assert (crea-k-cell-water (x ?x) (y (+ ?y 2)) (c water)))
+)
+(defrule convert-f-to-k-if-battleship-type-three-vertical (declare (salience 20))
+			(barca (tipo 4)(num ?t&:(eq ?t 0)))
+			(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
+			(or (k-cell (x =(- ?x 1)) (y ?y) (content ?c&:(neq ?c water)))
+					(f-cell (x =(- ?x 1)) (y ?y)))
+			(or (k-cell (x =(+ ?x 1)) (y ?y) (content ?c1&:(neq ?c1 water)))
+					(f-cell (x =(+ ?x 1)) (y ?y)))
+		=>
+			(assert (crea-k-cell-water (x (- ?x 2)) (y ?y) (c water)))
+			(assert (crea-k-cell-water (x (+ ?x 2)) (y ?y) (c water)))
+)
+(defrule convert-f-to-k-if-battleship-type-two-horizontal (declare (salience 20))
+			(barca (tipo 4)(num ?t&:(eq ?t 0)))
+			(barca (tipo 3)(num ?t1&:(eq ?t1 0)))
+			(or (k-cell (x ?x) (y ?y) (content ?c&:(neq ?c water)))
+					(f-cell (x ?x) (y ?y)))
+			(or (k-cell (x ?x) (y =(+ ?y 1)) (content ?c1&:(neq ?c1 water)))
+					(f-cell (x ?x) (y =(+ ?y 1))))
+		=>
+			(assert (crea-k-cell-water (x ?x) (y (- ?y 1)) (c water)))
+			(assert (crea-k-cell-water (x ?x) (y (+ ?y 2)) (c water)))
+)
+(defrule convert-f-to-k-if-battleship-type-two-vertical (declare (salience 20))
+			(barca (tipo 4)(num ?t&:(eq ?t 0)))
+			(barca (tipo 3)(num ?t1&:(eq ?t1 0)))
+			(or (k-cell (x ?x) (y ?y) (content ?c&:(neq ?c water)))
+					(f-cell (x ?x) (y ?y)))
+			(or (k-cell (x =(+ ?x 1)) (y ?y) (content ?c1&:(neq ?c1 water)))
+					(f-cell (x =(+ ?x 1)) (y ?y)))
+		=>
+			(assert (crea-k-cell-water (x (- ?x 1)) (y ?y) (c water)))
+			(assert (crea-k-cell-water (x (+ ?x 2)) (y ?y) (c water)))
+)
+(defrule convert-f-to-k-if-battleship-type-one (declare (salience 20))
+			(barca (tipo 4)(num ?t&:(eq ?t 0)))
+			(barca (tipo 3)(num ?t1&:(eq ?t1 0)))
+			(barca (tipo 2)(num ?t2&:(eq ?t2 0)))
+			(f-cell (x ?x) (y ?y))
+		=>
+			(assert (crea-k-cell-water (x (+ ?x 1)) (y ?y) (c water)))
+			(assert (crea-k-cell-water (x (- ?x 1)) (y ?y) (c water)))
+			(assert (crea-k-cell-water (x ?x) (y (- ?y 1)) (c water)))
+			(assert (crea-k-cell-water (x ?x) (y (+ ?y 1)) (c water)))
+)
+
 ; // regole per creare f cell
 ; se le restanti celle da scoprire lungo la riga = numer barche di quella riga => creo f cell
 (defrule create-f-cell-in-row-where-i-know-all-water-cells (declare (salience 20))
@@ -411,7 +470,7 @@
 ; TODO => scrivere euristiche per eliminare b-cell (usando il numero di barche)
 
 ; // REGOLE BARCHE TROVATE //
-(defrule found-battleship-type-two
+(defrule found-battleship-type-two(declare (salience 40))
 		(or
 			(and 	(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
 						(k-cell (x ?x) (y =(+ 1 ?y)) (content ?c1&:(eq ?c1 right))))
@@ -421,7 +480,7 @@
 	=>
 		(assert (decrement-double-counter))
 )
-(defrule found-battleship-type-three
+(defrule found-battleship-type-three(declare (salience 40))
 		(or
 			(and 	(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
 						(k-cell (x ?x) (y =(+ 1 ?y)) (content ?c1&:(eq ?c1 middle)))
@@ -433,7 +492,7 @@
 	=>
 		(assert (decrement-triple-counter))
 )
-(defrule found-battleship-type-four
+(defrule found-battleship-type-four(declare (salience 40))
 	(or
 		(and 	(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c left)))
 					(k-cell (x ?x) (y =(+ 1 ?y)) (content ?c1&:(eq ?c1 middle)))
@@ -448,33 +507,37 @@
 		(assert (decrement-fourth-counter))
 )
 ; regole per decrementare contatori
-(defrule decrement-battleship-sub-counter
+(defrule decrement-battleship-sub-counter(declare (salience 40))
 		?dsc <- (decrement-sub-counter)
 		?nb <- (barca (tipo 1)(num ?t))
 	=>
 		(modify ?nb (num (- ?t 1)))
 		(retract ?dsc)
+		(printout t "-Trovata barca sub-"  crlf)
 )
-(defrule decrement-battleship-type-two-counter
+(defrule decrement-battleship-type-two-counter(declare (salience 40))
 		?dsc <- (decrement-double-counter)
 		?nb <- (barca (tipo 2)(num ?t))
 	=>
 		(modify ?nb (num (- ?t 1)))
 		(retract ?dsc)
+		(printout t "-Trovata barca da due-"  crlf)
 )
-(defrule decrement-battleship-type-three-counter
+(defrule decrement-battleship-type-three-counter(declare (salience 40))
 		?dsc <- (decrement-triple-counter)
 		?nb <- (barca (tipo 3)(num ?t))
 	=>
 		(modify ?nb (num (- ?t 1)))
 		(retract ?dsc)
+		(printout t "-Trovata barca da tre-"  crlf)
 )
-(defrule decrement-battleship-type-four-counter
+(defrule decrement-battleship-type-four-counter(declare (salience 40))
 		?dsc <- (decrement-fourth-counter)
 		?nb <- (barca (tipo 4)(num ?t))
 	=>
 		(modify ?nb (num (- ?t 1)))
 		(retract ?dsc)
+		(printout t "-Trovata barca da quattro-"  crlf)
 )
 
 ; // REGOLE FIRE
