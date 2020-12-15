@@ -278,22 +278,22 @@
 		(assert (crea-b-cell  (x ?x)(y (- ?y 1))))
 		(assert (crea-b-cell  (x ?x)(y (+ ?y 1))))
 )
-; quando abbiamo due k cell middle vicine
-; nota: dobbiamo anche mettere le bandierine in quelle k cell
+
 (defrule kmid-near-kmid-ver (declare (salience 50))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
 		(k-cell (x =(+ ?x 1)) (y ?y) (content ?c&:(eq ?c middle)))
 	=>
-		(assert (k-cell (x (+ ?x 2)) (y ?y) (content bot)))
-		(assert (k-cell (x (- ?x 1)) (y ?y) (content top)))
+		(assert (crea-k-cell-water (x (+ ?x 3)) (y ?y) (c water)))
+		(assert (crea-k-cell-water (x (- ?x 2)) (y ?y) (c water)))
 		(printout t "Middle Near Middle in Vertical in x: " ?x " y: " ?y  crlf)
 )
+
 (defrule kmid-near-kmid-hor (declare (salience 50))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
 		(k-cell (x ?x) (y =(+ ?y 1)) (content ?c&:(eq ?c middle)))
 	=>
-		(assert (k-cell (x ?x) (y (+ ?y 2)) (content right)))
-		(assert (k-cell (x ?x) (y (- ?y 1)) (content left)))
+		(assert (crea-k-cell-water (x ?x) (y (+ ?y 3)) (c water)))
+		(assert (crea-k-cell-water (x ?x) (y (- ?y 2)) (c water)))
 		(printout t "Middle Near Middle in Horizzontal in x: " ?x " y: " ?y  crlf)
 )
 
