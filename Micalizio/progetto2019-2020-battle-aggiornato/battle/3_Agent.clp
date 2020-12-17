@@ -351,7 +351,7 @@
 		(printout t "Ho trovato una parte middle di una barca verticale x: " ?x " y: " ?y  crlf)
 )
 ;Regola che non penso riuscirà mai ad attivarsi
-(defrule convert-f-to-k-cell-sub-with-waterframe (declare (salience 50))
+(defrule convert-f-to-k-cell-sub-with-waterframe (declare (salience 20))
 		?fcell <- (f-cell (x ?x)(y ?y))
 		(k-cell (x =(- 1 ?x)) (y ?y) (content water)) ;sopra
 		(k-cell (x =(+ ?x 1)) (y ?y) (content water)) ;sotto
@@ -365,8 +365,20 @@
 		(retract ?fcell)
 		(assert (k-cell (x ?x) (y ?y) (content sub)))
 )
-;regole per convertire f cell se sono barche finite
-(defrule convert-f-to-k-if-battleship-type-three-horizontal (declare (salience 20))
+(defrule convert-f-to-k-middle-if-battleship-type-two-already-been-found (declare (salience 20))
+		(barca (tipo 2)(num ?t&:(eq ?t 0)))
+		?fcell <-(f-cell (x ?x) (y ?y))
+		(or
+			(k-cell (x =(+ ?x 1)) (y ?y) (content ?c&:(neq ?c water)))
+			(k-cell (x =(- ?x 1)) (y ?y) (content ?c1&:(neq ?c1 water)))
+			(k-cell (x ?x) (y  =(+ ?y 1)) (content ?c2&:(neq ?c2 water)))
+			(k-cell (x ?x) (y  =(- ?y 1)) (content ?c3&:(neq ?c3 water)))
+		)
+	=>
+		(retract ?fcell)
+		(assert (k-cell (x ?x) (y ?y) (content middle)))
+)
+(defrule add-water-if-battleship-type-three-horizontal (declare (salience 20))
 			(barca (tipo 4)(num ?t&:(eq ?t 0)))
 			(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
 			(or (k-cell (x ?x) (y =(- ?y 1)) (content ?c&:(neq ?c water)))
@@ -377,7 +389,7 @@
 			(assert (crea-k-cell-water (x ?x) (y (- ?y 2)) (c water)))
 			(assert (crea-k-cell-water (x ?x) (y (+ ?y 2)) (c water)))
 )
-(defrule convert-f-to-k-if-battleship-type-three-vertical (declare (salience 20))
+(defrule add-water-if-battleship-type-three-vertical (declare (salience 20))
 			(barca (tipo 4)(num ?t&:(eq ?t 0)))
 			(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
 			(or (k-cell (x =(- ?x 1)) (y ?y) (content ?c&:(neq ?c water)))
@@ -388,7 +400,7 @@
 			(assert (crea-k-cell-water (x (- ?x 2)) (y ?y) (c water)))
 			(assert (crea-k-cell-water (x (+ ?x 2)) (y ?y) (c water)))
 )
-(defrule convert-f-to-k-if-battleship-type-two-horizontal (declare (salience 20))
+(defrule add-water-if-battleship-type-two-horizontal (declare (salience 20))
 			(barca (tipo 4)(num ?t&:(eq ?t 0)))
 			(barca (tipo 3)(num ?t1&:(eq ?t1 0)))
 			(or (k-cell (x ?x) (y ?y) (content ?c&:(neq ?c water)))
@@ -399,7 +411,7 @@
 			(assert (crea-k-cell-water (x ?x) (y (- ?y 1)) (c water)))
 			(assert (crea-k-cell-water (x ?x) (y (+ ?y 2)) (c water)))
 )
-(defrule convert-f-to-k-if-battleship-type-two-vertical (declare (salience 20))
+(defrule add-water-if-battleship-type-two-vertical (declare (salience 20))
 			(barca (tipo 4)(num ?t&:(eq ?t 0)))
 			(barca (tipo 3)(num ?t1&:(eq ?t1 0)))
 			(or (k-cell (x ?x) (y ?y) (content ?c&:(neq ?c water)))
@@ -410,7 +422,7 @@
 			(assert (crea-k-cell-water (x (- ?x 1)) (y ?y) (c water)))
 			(assert (crea-k-cell-water (x (+ ?x 2)) (y ?y) (c water)))
 )
-(defrule convert-f-to-k-if-battleship-type-one (declare (salience 20))
+(defrule add-water-if-battleship-type-one (declare (salience 20))
 			(barca (tipo 4)(num ?t&:(eq ?t 0)))
 			(barca (tipo 3)(num ?t1&:(eq ?t1 0)))
 			(barca (tipo 2)(num ?t2&:(eq ?t2 0)))
@@ -692,26 +704,31 @@
 
 ; // STAMPE PRIMA DI FARE FIRE //
 (defrule print-k-col (declare (salience 1))
+		(status (step ?s)(currently running))
 		(k-per-col (col ?y)(num ?n))
 	=>
 		(printout t "K-col: " ?y " num: " ?n crlf)
 )
 (defrule print-k-row (declare (salience 1))
+		(status (step ?s)(currently running))
 		(k-per-row (row ?x)(num ?n))
 	=>
 		(printout t "K-row: " ?x " num: " ?n crlf)
 )
 (defrule print-what-i-know-first-to-fire-k (declare (salience 0))
+		(status (step ?s)(currently running))
 		(k-cell (x ?x) (y ?y)(content ?t) )
 	=>
 		(printout t "K cell  [" ?x ", " ?y "] type: " ?t crlf)
 )
 (defrule print-what-i-know-first-to-fire-f (declare (salience 0))
+		(status (step ?s)(currently running))
 		(f-cell (x ?x) (y ?y)(direzione ?t))
 	=>
 		(printout t "F cell [" ?x ", " ?y "] direzione " ?t  crlf)
 )
 (defrule print-what-i-know-first-to-fire-b (declare (salience 0))
+			(status (step ?s)(currently running))
 			(b-cell (x ?x)(y ?y))
 	=>
 		(printout t "B cell [" ?x ", " ?y "] " crlf)
