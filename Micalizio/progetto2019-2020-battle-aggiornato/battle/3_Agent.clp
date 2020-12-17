@@ -66,8 +66,8 @@
 	)
 )
 ; TODO => - scegliere se dividere in moduli declaration - executation
-;TODO => - scegliere euristiche da usare quando non abbiamo più k-cell
-
+; TODO => - scegliere euristiche da usare quando non abbiamo più k-cell
+; TODO => mettere guess sulle b-cell con valori di k-row e k-col più alti
 ; // DESCRIZIONE CELLE USATE //
 ;k-cell: cose che sappiamo per certo
 ;b-cell: cose che supponiamo: le usiamo quando troviamo un middle che non sappiamo se andare vertiale o orizzontale
@@ -89,7 +89,7 @@
 )
 
 ; // REGOLE PER CREARE CELL //
-(defrule crea-f-cell (declare (salience 10))
+(defrule crea-f-cell (declare (salience 20))
 		(status (step ?s)(currently running))
 		(crea-f-cell  (x ?x)(y ?y)(direzione ?c))
 		(not (k-cell (x ?x)(y ?y)))
@@ -100,7 +100,7 @@
 		(assert (exec (step ?s) (action guess) (x ?x)(y ?y)))
 		 	(pop-focus)
 )
-(defrule crea-b-cell (declare (salience 10))
+(defrule crea-b-cell (declare (salience 20))
 		(status (step ?s)(currently running))
 		(crea-b-cell  (x ?x)(y ?y))
 		(k-per-row (row ?x) (num ?num-row))
@@ -116,8 +116,6 @@
 	=>
 		(assert (b-cell (x ?x)(y ?y)))
 )
-
-; // REGOLA PER CREARE CELLE WATER //
 (defrule k-cell-cretor-water (declare (salience 20))
 		(crea-k-cell-water (x ?x) (y ?y) (c ?c&:(eq ?c water)))
 		(test(>= ?x 0))
@@ -130,7 +128,7 @@
 		(assert (k-cell (x ?x) (y ?y) (content ?c)))
 		;(printout t "CREATO K CELL water IN x: " ?x " y: " ?y  crlf)
 )
-(defrule create-k-cell-water-in-diagonal (declare (salience 30))
+(defrule create-k-cell-water-in-diagonal (declare (salience 20))
 		(or (k-cell (x ?x) (y ?y) (content ?c&:(neq ?c water)))
 				(f-cell (x ?x) (y ?y)))
 	=>
@@ -278,8 +276,8 @@
 		(assert (crea-b-cell  (x ?x)(y (- ?y 1))))
 		(assert (crea-b-cell  (x ?x)(y (+ ?y 1))))
 )
-
-(defrule kmid-near-kmid-ver (declare (salience 50))
+; due middle vicine
+(defrule kmid-near-kmid-ver (declare (salience 20))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
 		(k-cell (x =(+ ?x 1)) (y ?y) (content ?c&:(eq ?c middle)))
 	=>
@@ -287,8 +285,7 @@
 		(assert (crea-k-cell-water (x (- ?x 2)) (y ?y) (c water)))
 		(printout t "Middle Near Middle in Vertical in x: " ?x " y: " ?y  crlf)
 )
-
-(defrule kmid-near-kmid-hor (declare (salience 50))
+(defrule kmid-near-kmid-hor (declare (salience 20))
 		(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
 		(k-cell (x ?x) (y =(+ ?y 1)) (content ?c&:(eq ?c middle)))
 	=>
@@ -299,13 +296,13 @@
 
 ; // REGOLE K-ROW/K-COL IS ZERO  //
 ; metto tutte le caselle sconosciute come water
-(defrule create-k-cell-water-when-row-value-is-zero (declare (salience 50))
+(defrule create-k-cell-water-when-row-value-is-zero (declare (salience 30))
 		(k-per-row (row ?row) (num ?num-row&:(eq ?num-row 0)))
 	=>
 		(loop-for-count (?i 0 9) do
 			(assert (crea-k-cell-water (x ?row) (y ?i) (c water))))
 )
-(defrule create-k-cell-water-when-col-value-is-zero (declare (salience 50))
+(defrule create-k-cell-water-when-col-value-is-zero (declare (salience 30))
 		(k-per-col (col ?col) (num ?num-col&:(eq ?num-col 0)))
 	=>
 		(loop-for-count (?i 0 9) do
@@ -327,7 +324,7 @@
 		(retract ?fcell)
 		(printout t "trasformo la fcell in kcell: " ?x " " ?y crlf)
 )
-; Regola per trovare parti della barca middle affiancata da f-cell o k-cell
+; converto f in middle se compresa tra due k/f cell
 (defrule convert-f-to-k-cell-middle-if-between-ship-horizontal (declare (salience 20))
 		?fcell <- (f-cell (x ?x) (y ?y))
 		(or (f-cell (x ?x) (y =(- ?y 1)))
@@ -365,7 +362,7 @@
 		(retract ?fcell)
 		(assert (k-cell (x ?x) (y ?y) (content sub)))
 )
-(defrule convert-f-to-k-middle-if-battleship-type-two-already-been-found (declare (salience 20))
+(defrule convert-f-to-k-middle-when-battleship-type-two-already-been-found (declare (salience 20))
 		(barca (tipo 2)(num ?t&:(eq ?t 0)))
 		?fcell <-(f-cell (x ?x) (y ?y))
 		(or
@@ -378,6 +375,7 @@
 		(retract ?fcell)
 		(assert (k-cell (x ?x) (y ?y) (content middle)))
 )
+; limito le barche con cell water in base alle barche che conosco già
 (defrule add-water-if-battleship-type-three-horizontal (declare (salience 20))
 			(barca (tipo 4)(num ?t&:(eq ?t 0)))
 			(k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
@@ -479,7 +477,6 @@
 	=>
 		(retract ?bcell)
 )
-; TODO => scrivere euristiche per eliminare b-cell (usando il numero di barche)
 
 ; // REGOLE BARCHE TROVATE //
 (defrule found-battleship-type-two(declare (salience 40))
@@ -554,7 +551,7 @@
 
 ; // REGOLE FIRE
 ;FIRE 2: sparo sulla f-cell che si trova dopo una kcell estrema e una kcell middle
-(defrule fire-two (declare (salience -55))
+(defrule fire-two (declare (salience -45))
 		(moves (fires ?fires&:(> ?fires 0)))
 		?fcell <- (f-cell (x ?x)(y ?y))
 		(barca (tipo 4)(num ?value&:(> ?value 0)))
@@ -695,13 +692,6 @@
 		(assert (exec (step ?s) (action solve)))
 )
 
-		; TODO => mettere guess sulle b-cell con valori di k-row e k-col più alti
-
-
-;DOMANDE:
-; se facciamo la fire su una casella su cui abbiamo fatto la guess dobbiamo fare unguess?
-; dovremmo fare guess sulle k-cell iniziali?
-
 ; // STAMPE PRIMA DI FARE FIRE //
 (defrule print-k-col (declare (salience 1))
 		(status (step ?s)(currently running))
@@ -779,3 +769,10 @@
 ;         (retract ?f)
 ;         (assert(k-cell(x ?x) (y ?y)(content right)))
 ; )
+
+
+
+;DOMANDE:
+; se facciamo la fire su una casella su cui abbiamo fatto la guess dobbiamo fare unguess?
+; dovremmo fare guess sulle k-cell iniziali?
+; l'app per i risultati, conviene salvare i fatti su file e leggere per creare immagine o usare librerie e avviare clips da java?
