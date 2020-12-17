@@ -622,6 +622,7 @@
 ; probabilità calcolata come: prodotto tra
 ;																	num-row diviso caselle sconosciute su quella riga
 ;																	num-col diviso caselle sconosciute su quella colonna
+; alternativa - fare max nella funzione e trovare il candidato migliore direttamente nella funzione
 (defrule fire-probability (declare (salience -65))
 		(k-per-row (row ?x) (num ?num-row&:(> ?num-row 0)))
 		(k-per-col (col ?y) (num ?num-col&:(> ?num-col 0)))
