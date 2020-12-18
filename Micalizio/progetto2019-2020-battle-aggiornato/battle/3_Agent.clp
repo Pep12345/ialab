@@ -311,19 +311,64 @@
 
 ; // REGOLE F-CELL //
 ; // regole per convertire f cell
-(defrule convert-f-to-k-cell-when-is-extreme (declare (salience 20))
-		?fcell <- (f-cell (x ?x)(y ?y)(direzione ?d))
-		(or
-			(and (test(eq ?d right)) (or (k-cell (x ?x)(y =(+ 1 ?y))(content ?c&:(eq ?c water))) (test(>= ?y 9))))
-			(and (test(eq ?d left)) (or (k-cell (x ?x)(y =(- ?y 1))(content ?c&:(eq ?c water))) (test(<= ?y 0))))
-			(and (test(eq ?d top)) (or (k-cell (x =(- ?x 1))(y ?y)(content ?c&:(eq ?c water))) (test(<= ?x 0))))
-			(and (test(eq ?d bot)) (or (k-cell (x =(+ 1 ?x))(y ?y)(content ?c&:(eq ?c water))) (test(>= ?x 9))))
-		)
+;(defrule convert-f-to-k-cell-when-is-extreme (declare (salience 20))
+;		?fcell <- (f-cell (x ?x)(y ?y)(direzione ?d))
+;		(or
+;			(and (test(eq ?d right)) (or (k-cell (x ?x)(y =(+ 1 ?y))(content ?c&:(eq ?c water))) (test(>= ?y 9))))
+;			(and (test(eq ?d left)) (or (k-cell (x ?x)(y =(- ?y 1))(content ?c&:(eq ?c water))) (test(<= ?y 0))))
+;			(and (test(eq ?d top)) (or (k-cell (x =(- ?x 1))(y ?y)(content ?c&:(eq ?c water))) (test(<= ?x 0))))
+;			(and (test(eq ?d bot)) (or (k-cell (x =(+ 1 ?x))(y ?y)(content ?c&:(eq ?c water))) (test(>= ?x 9))))
+;		)
+;	=>
+;		(assert (k-cell (x ?x) (y ?y) (content ?d)))
+;		(retract ?fcell)
+;		(printout t "trasformo la fcell in kcell: " ?x " " ?y crlf)
+;)
+(defrule convert-f-to-k-cell-if-right (declare (salience 20))
+		?fcell <- (f-cell (x ?x)(y ?y))
+		(or (f-cell (x ?x) (y =(- ?y 1)))
+			(k-cell (x ?x) (y =(- ?y 1)) (content ?c1&:(neq ?c1 water))))
+		(or (k-cell (x ?x)(y =(+ 1 ?y))(content ?c&:(eq ?c water)))
+				(test(>= ?y 9)))
 	=>
-		(assert (k-cell (x ?x) (y ?y) (content ?d)))
+		(assert (k-cell (x ?x) (y ?y) (content right)))
 		(retract ?fcell)
-		(printout t "trasformo la fcell in kcell: " ?x " " ?y crlf)
+		(printout t "trasformo la fcell in kcell right: " ?x " " ?y crlf)
 )
+(defrule convert-f-to-k-cell-if-left (declare (salience 20))
+		?fcell <- (f-cell (x ?x)(y ?y))
+		(or (f-cell (x ?x) (y =(+ 1 ?y)))
+				(k-cell (x ?x) (y =(+ 1 ?y)) (content ?c&:(neq ?c water))))
+		(or (k-cell (x ?x)(y =(- ?y 1))(content ?c1&:(eq ?c1 water)))
+				(test(<= ?y 0)))
+	=>
+		(assert (k-cell (x ?x) (y ?y) (content left)))
+		(retract ?fcell)
+		(printout t "trasformo la fcell in kcell left: " ?x " " ?y crlf)
+)
+(defrule convert-f-to-k-cell-if-top (declare (salience 20))
+		?fcell <- (f-cell (x ?x)(y ?y))
+		(or (f-cell (x =(+ 1 ?x)) (y ?y))
+				(k-cell (x =(+ 1 ?x)) (y ?y) (content ?c&:(neq ?c water))))
+		(or (k-cell (x =(- ?x 1))(y ?y)(content ?c1&:(eq ?c1 water)))
+				(test(<= ?x 0)))
+	=>
+		(assert (k-cell (x ?x) (y ?y) (content top)))
+		(retract ?fcell)
+		(printout t "trasformo la fcell in kcell top: " ?x " " ?y crlf)
+)
+(defrule convert-f-to-k-cell-if-bot (declare (salience 20))
+		?fcell <- (f-cell (x ?x)(y ?y))
+		(or (f-cell (x =(- ?x 1)) (y ?y))
+				(k-cell (x =(- ?x 1)) (y ?y) (content ?c1&:(neq ?c1 water))))
+		(or (k-cell (x =(+ 1 ?x))(y ?y)(content ?c&:(eq ?c water)))
+				(test(>= ?x 9)))
+	=>
+		(assert (k-cell (x ?x) (y ?y) (content bot)))
+		(retract ?fcell)
+		(printout t "trasformo la fcell in kcell bot: " ?x " " ?y crlf)
+)
+
 ; converto f in middle se compresa tra due k/f cell
 (defrule convert-f-to-k-cell-middle-if-between-ship-horizontal (declare (salience 20))
 		?fcell <- (f-cell (x ?x) (y ?y))
@@ -350,16 +395,12 @@
 ;Regola che non penso riuscirà mai ad attivarsi
 (defrule convert-f-to-k-cell-sub-with-waterframe (declare (salience 20))
 		?fcell <- (f-cell (x ?x)(y ?y))
-		(k-cell (x =(- 1 ?x)) (y ?y) (content water)) ;sopra
-		(k-cell (x =(+ ?x 1)) (y ?y) (content water)) ;sotto
-		(k-cell (x ?x) (y =(+ ?y 1)) (content water)) ;destra
-		(k-cell (x ?x) (y =(- 1 ?y)) (content water)) ;sinistra
-		(k-cell (x =(+ ?x 1)) (y =(+ ?y 1)) (content water)) ;basso-destra
-		(k-cell (x =(- 1 ?x)) (y =(+ ?y 1)) (content water)) ;alto-destra
-		(k-cell (x =(- 1 ?x)) (y =(- 1 ?y)) (content water)) ;alto-sinistra
-		(k-cell (x =(+ ?x 1)) (y =(- 1 ?y)) (content water)) ;basso-sinistra
+		(or (k-cell (x =(- ?x 1)) (y ?y) (content water)) (test(<= ?x 0))) ;sopra
+		(or (k-cell (x =(+ ?x 1)) (y ?y) (content water)) (test(>= ?x 9))) ;sotto
+		(or (k-cell (x ?x) (y =(+ ?y 1)) (content water)) (test(>= ?y 9))) ;destra
+		(or (k-cell (x ?x) (y =(- ?y 1)) (content water)) (test(<= ?y 0)));sinistra
 	=>
-		(retract ?fcell)
+		(retract ?fcell) 
 		(assert (k-cell (x ?x) (y ?y) (content sub)))
 )
 (defrule convert-f-to-k-middle-when-battleship-type-two-already-been-found (declare (salience 20))
