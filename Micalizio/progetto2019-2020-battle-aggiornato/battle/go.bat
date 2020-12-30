@@ -1,6 +1,6 @@
 (load 0_Main.clp)
 (load 1_Env.clp)
-(load mappa5.clp)
+(load ..\..\..\..\..\..\Desktop\battle\mappa5.clp)
 (load 3_Agent_v2.clp)
 (reset)
 (set-break game-over)
