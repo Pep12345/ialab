@@ -58,7 +58,7 @@ def buildGrid():
 def loadMapButtonFunction():
     global mapPath
     dlg = QFileDialog()
-    path= QFileDialog.getOpenFileName(dlg,'Open file','',"File Clips (*.clp*)")[0]
+    path= QFileDialog.getOpenFileName(dlg,'Open file',os.getcwd(),"File Clips (*.clp*)")[0]
     if path:
         mapPath=os.path.relpath(path,os.getcwd()) 
         buildGrid()
@@ -111,21 +111,21 @@ def runButtonButtonFunction():
 def actionChange_mainFunction():
     global mainPath
     dlg = QFileDialog()
-    path= QFileDialog.getOpenFileName(dlg,'Open file','',"File Clips (*.clp*)")[0]
+    path= QFileDialog.getOpenFileName(dlg,'Open file',os.getcwd(),"File Clips (*.clp*)")[0]
     if path:
         mainPath=os.path.relpath(path,os.getcwd()) 
 
 def actionChange_AgentFunction():
     global agentPath
     dlg = QFileDialog()
-    path= QFileDialog.getOpenFileName(dlg,'Open file','',"File Clips (*.clp*)")[0]
+    path= QFileDialog.getOpenFileName(dlg,'Open file',os.getcwd(),"File Clips (*.clp*)")[0]
     if path:
         agentPath=os.path.relpath(path,os.getcwd()) 
     
 def actionChange_environmentFunction():
     global envPath
     dlg = QFileDialog()
-    path= QFileDialog.getOpenFileName(dlg,'Open file','',"File Clips (*.clp*)")[0]
+    path= QFileDialog.getOpenFileName(dlg,'Open file',os.getcwd(),"File Clips (*.clp*)")[0]
     if path:
         envPath=os.path.relpath(path,os.getcwd()) 
 
