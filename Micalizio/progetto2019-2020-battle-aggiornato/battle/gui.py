@@ -16,7 +16,7 @@ mapPath=None
 environment=None
 mainPath='0_Main.clp'
 envPath='1_Env.clp'
-agentPath='3_Agent_v2.clp'
+agentPath='3_Agent_incrocio.clp'
 
 grid=np.zeros((10,10))
 

@@ -49,27 +49,6 @@
 	(barca (tipo 1)(num 4))
 )
 
-; // FUNCTIONS
-; (num barche da trovare riga / num caselle sconosciute riga ) * (num barche da trovare col / num caselle sconosciute col )
-(deffunction get-known-cell-for-row (?row)
-	(+
-		(length$ (find-all-facts ((?f my-k-cell)) (eq ?f:x ?row)))
-		(length$ (find-all-facts ((?f1 f-cell)) (eq ?f1:x ?row)))
-	)
-)
-(deffunction get-known-cell-for-col (?col)
-	(+
-		(length$ (find-all-facts ((?f my-k-cell)) (eq ?f:y ?col)))
-		(length$ (find-all-facts ((?f1 f-cell)) (eq ?f1:y ?col)))
-	)
-)
-(deffunction calculate-prob-x-y (?num-row ?num-col ?x ?y)
-	;(printout t "x: " ?x " y: " ?y " ^num-row: " ?num-row " num-col: " ?num-col crlf)
-	(*
-		(/ ?num-row (- 10 (get-known-cell-for-row ?x)))
-		(/ ?num-col (- 10 (get-known-cell-for-col ?y)))
-	)
-)
 ; TODO => - scegliere se dividere in moduli declaration - executation
 ; TODO => - scegliere euristiche da usare quando non abbiamo più my-k-cell
 ; TODO => mettere guess sulle b-cell con valori di k-row e k-col più alti
@@ -322,19 +301,6 @@
 
 ; // REGOLE F-CELL //
 ; // regole per convertire f cell
-;(defrule convert-f-to-my-k-cell-when-is-extreme (declare (salience 20))
-;		?fcell <- (f-cell (x ?x)(y ?y)(direzione ?d))
-;		(or
-;			(and (test(eq ?d right)) (or (my-k-cell (x ?x)(y =(+ 1 ?y))(content ?c&:(eq ?c water))) (test(>= ?y 9))))
-;			(and (test(eq ?d left)) (or (my-k-cell (x ?x)(y =(- ?y 1))(content ?c&:(eq ?c water))) (test(<= ?y 0))))
-;			(and (test(eq ?d top)) (or (my-k-cell (x =(- ?x 1))(y ?y)(content ?c&:(eq ?c water))) (test(<= ?x 0))))
-;			(and (test(eq ?d bot)) (or (my-k-cell (x =(+ 1 ?x))(y ?y)(content ?c&:(eq ?c water))) (test(>= ?x 9))))
-;		)
-;	=>
-;		(assert (my-k-cell (x ?x) (y ?y) (content ?d)))
-;		(retract ?fcell)
-;		(printout t "trasformo la fcell in kcell: " ?x " " ?y crlf)
-;)
 (defrule convert-f-to-my-k-cell-if-right (declare (salience 20))
 		?fcell <- (f-cell (x ?x)(y ?y))
 		(or (f-cell (x ?x) (y =(- ?y 1)))
@@ -626,9 +592,12 @@
 (defrule fire-where-krow-kcol-have-max-value (declare (salience -100))
 		(moves (fires ?fires&:(> ?fires 0)))
 		(k-per-row (row ?x) (num ?num-row))
-		(not (k-per-row (num ?num-row2&:(> ?num-row2 ?num-row))))
 		(k-per-col (col ?y) (num ?num-col))
-		(not (k-per-col (num ?num-col2&:(> ?num-col2 ?num-col))))
+		(not (and
+			(k-per-row (num ?num-row2&:(> ?num-row2 ?num-row)))
+			(k-per-col (num ?num-col2&:(> ?num-col2 ?num-col)))
+			(not (exec  (action fire) (x ?num-row) (y ?num-col)))
+		))
 		(status (step ?s)(currently running))
 		(not (exec  (action fire) (x ?x) (y ?y))) ; non dovrebbe servire ma l'ha messa il prof
 		(not (my-k-cell (x ?x) (y ?y)))
@@ -670,31 +639,42 @@
  (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
       (pop-focus)
 )
-;FIRE PROB
-; probabilità calcolata come: prodotto tra
-;																	num-row diviso caselle sconosciute su quella riga
-;																	num-col diviso caselle sconosciute su quella colonna
-; alternativa - fare max nella funzione e trovare il candidato migliore direttamente nella funzione
-(defrule fire-probability (declare (salience -65))
-		(k-per-row (row ?x) (num ?num-row&:(> ?num-row 0)))
-		(k-per-col (col ?y) (num ?num-col&:(> ?num-col 0)))
-		(not (my-k-cell (x ?x) (y ?y)))
-		(not (exec  (action fire) (x ?x) (y ?y)))
+; //GUESS FINALI
+;(defrule guess-where-krow-kcol-have-max-value (declare (salience -65))
+;		(moves (fires 0) (guesses ?g&:(> ?g 0)))
+;		(k-per-row (row ?x) (num ?num-row))
+;		(k-per-col (col ?y) (num ?num-col))
+;		(not (and
+;			(k-per-row (num ?num-row2&:(> ?num-row2 ?num-row)))
+;			(k-per-col (num ?num-col2&:(> ?num-col2 ?num-col)))
+;			(not (my-k-cell (x ?num-row) (y ?num-col)))
+;			(not (f-cell (x ?num-row) (y ?num-col)))
+;		))
+;		(status (step ?s)(currently running))
+;		(not (f-cell (x ?x) (y ?y))) ; non dovrebbe servire ma l'ha messa il prof
+;		(not (my-k-cell (x ?x) (y ?y)))
+;	=>
+;		(printout t " guess finali in x: " ?x " y: " ?y  crlf)
+;		(assert (crea-f-cell (x ?x) (y ?y)))
+;)
+(defrule guess-where-krow-kcol-have-max-value (declare (salience -65))
+		(moves (fires 0) (guesses ?g&:(> ?g 0)))
+		(k-per-row (row ?x) (num ?num-row))
+		(k-per-col (col ?y) (num ?num-col))
 		(not (and
-						(k-per-row (row ?x1)(num ?num-row2&:(> ?num-row2 0)))
-						(k-per-col (col ?y1)(num ?num-col2&:(> ?num-col2 0)))
-						(not (my-k-cell (x ?x1) (y ?y1))) ; non serve ma magari riduce il numero di confronti
-						(test(> (calculate-prob-x-y ?num-row2 ?num-col2 ?x1 ?y1) (calculate-prob-x-y ?num-row ?num-col ?x ?y)))
-					)
-		)
-		(moves (fires ?fires&:(> ?fires 0)))	; non capisco perchè se ste due righe le sposto sopra non mi funziona calculate-prob-x-y
+			(k-per-row (num ?num-row2&:(> ?num-row2 ?num-row)))
+			(k-per-col (num ?num-col2&:(> ?num-col2 ?num-col)))
+			(not (exec  (action fire) (x ?num-row) (y ?num-col)))
+			(not (exec  (action guess) (x ?x)(y ?y)))
+		))
 		(status (step ?s)(currently running))
+		(not (exec  (action guess) (x ?x)(y ?y)))
+		(not (my-k-cell (x ?x) (y ?y)))
 	=>
-		(printout t " FIRE sulla probabilità in x: " ?x " y: " ?y  crlf)
-		(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
-			(pop-focus)
+		(printout t " guess finali in x: " ?x " y: " ?y  crlf)
+		(assert (exec (step ?s) (action guess) (x ?x)(y ?y)))
+		 	(pop-focus)
 )
-
 
 (defrule add-my-k-cell-water-if-fire-fail (declare (salience 20))
 		(exec (step ?s) (action fire) (x ?x) (y ?y))
@@ -785,47 +765,8 @@
 )
 
 
-;se f-cell è compresa tra acqua e f cell(okcell middle) allora è estremo
-; regole superflue
-; (defrule f-cell-is-my-k-cell-bot
-;         ?f<-(f-cell(x ?x) (y ?y))
-;         (or (f-cell(x =(- ?x 1))(y ?y))(my-k-cell(x =(- ?x 1))(y ?y)))
-;         (my-k-cell (x =(+ 1 ?x))(y ?y)(content ?c&:(eq ?c water)))
-;         =>
-;         (retract ?f)
-;         (assert(my-k-cell(x ?x) (y ?y)(content bot)))
-; )
-
-; (defrule f-cell-is-my-k-cell-top
-;         ?f<-(f-cell(x ?x) (y ?y))
-;         (or (f-cell(x =(+ 1 ?x))(y ?y))(my-k-cell(x =(+ 1 ?x))(y ?y)))
-;         (my-k-cell (x =(- ?x 1))(y ?y)(content ?c&:(eq ?c water)))
-;         =>
-;         (retract ?f)
-;         (assert(my-k-cell(x ?x) (y ?y)(content top)))
-; )
-
-; (defrule f-cell-is-my-k-cell-left
-;         ?f<-(f-cell(x ?x) (y ?y))
-;         (or (f-cell(x ?x)(y =(+ 1 ?y)))(my-k-cell(x ?x)(y =(+ 1 ?y))))
-;         (my-k-cell (x ?x)(y =(- ?y 1))(content ?c&:(eq ?c water)))
-;         =>
-;         (retract ?f)
-;         (assert(my-k-cell(x ?x) (y ?y)(content left)))
-; )
-
-; (defrule f-cell-is-my-k-cell-right
-;         ?f<-(f-cell(x ?x) (y ?y))
-;         (or (f-cell(x ?x)(y =(- ?y 1)))(my-k-cell(x ?x)(y =(- ?y 1))))
-;         (my-k-cell (x ?x)(y =(+ 1 ?y))(content ?c&:(eq ?c water)))
-;         =>
-;         (retract ?f)
-;         (assert(my-k-cell(x ?x) (y ?y)(content right)))
-; )
-
-
 
 ;DOMANDE:
 ; se facciamo la fire su una casella su cui abbiamo fatto la guess dobbiamo fare unguess?
 ; dovremmo fare guess sulle my-k-cell iniziali?
-; il numero di guess non decrementa con le k cell iniziali, come fare?
+; l'app per i risultati, conviene salvare i fatti su file e leggere per creare immagine o usare librerie e avviare clips da java?
