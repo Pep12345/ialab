@@ -667,7 +667,7 @@
 		(not (and
 			(k-per-row (row ?x1)(num ?num-row2&:(> ?num-row2 ?num-row)))
 			(k-per-col (col ?y1)(num ?num-col2&:(> ?num-col2 ?num-col)))
-			(not (exec  (action fire) (x ?x1) (y ?y1)))
+			(not (my-k-cell (x ?x1) (y ?y1)))
 			(not (exec  (action guess) (x ?x1)(y ?y1)))
 		))
 	=>
@@ -719,43 +719,11 @@
 ; // Termina programma
 ;Bisogna asserire (exec (step ?s) (action solve)) quando vogliamo concludere
 (defrule solve (declare (salience -999))
-		(moves (fires ?fires&:(<= ?fires 0)))	; provvisoria, bisogna decidere quando risolvere il problema
 		(status (step ?s)(currently running))
 	=>
 		(assert (exec (step ?s) (action solve)))
 )
 
-; // STAMPE PRIMA DI FARE FIRE //
-(defrule print-k-col (declare (salience 1))
-		(status (step ?s)(currently running))
-		(k-per-col (col ?y)(num ?n))
-	=>
-		(printout t "K-col: " ?y " num: " ?n crlf)
-)
-(defrule print-k-row (declare (salience 1))
-		(status (step ?s)(currently running))
-		(k-per-row (row ?x)(num ?n))
-	=>
-		(printout t "K-row: " ?x " num: " ?n crlf)
-)
-(defrule print-what-i-know-first-to-fire-k (declare (salience 0))
-		(status (step ?s)(currently running))
-		(my-k-cell (x ?x) (y ?y)(content ?t) )
-	=>
-		(printout t "myK cell  [" ?x ", " ?y "] type: " ?t crlf)
-)
-(defrule print-what-i-know-first-to-fire-f (declare (salience 0))
-		(status (step ?s)(currently running))
-		(f-cell (x ?x) (y ?y)(direzione ?t))
-	=>
-		(printout t "F cell [" ?x ", " ?y "] direzione " ?t  crlf)
-)
-(defrule print-what-i-know-first-to-fire-b (declare (salience 0))
-			(status (step ?s)(currently running))
-			(b-cell (x ?x)(y ?y))
-	=>
-		(printout t "B cell [" ?x ", " ?y "] " crlf)
-)
 
 ; stampa generale
 (defrule print-what-i-know-since-the-beginning (declare (salience 50))
