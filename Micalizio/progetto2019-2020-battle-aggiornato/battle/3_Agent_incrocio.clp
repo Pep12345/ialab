@@ -672,8 +672,11 @@
 		))
 	=>
 		(printout t " guess finali in x: " ?x " y: " ?y  crlf)
+		;opzione 1
 		(assert (exec (step ?s) (action guess) (x ?x)(y ?y)))
-		 	(pop-focus)
+		 	(pop-focus) ;nell'opzione 2 il focus non serve, c'è in crea-f-cell
+		;opzione2
+		;(assert (crea-f-cell (x ?x) (y ?y)))
 )
 
 (defrule add-my-k-cell-water-if-fire-fail (declare (salience 20))

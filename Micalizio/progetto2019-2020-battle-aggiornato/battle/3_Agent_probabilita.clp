@@ -89,10 +89,6 @@
          (bind ?max (create$ ?kr ?kc))))
     (return ?max)
 )
-
-; TODO => - scegliere se dividere in moduli declaration - executation
-; TODO => - scegliere euristiche da usare quando non abbiamo più my-k-cell
-; TODO => mettere guess sulle b-cell con valori di k-row e k-col più alti
 ; // DESCRIZIONE CELLE USATE //
 ;my-k-cell: cose che sappiamo per certo
 ;b-cell: cose che supponiamo: le usiamo quando troviamo un middle che non sappiamo se andare vertiale o orizzontale
@@ -342,19 +338,6 @@
 
 ; // REGOLE F-CELL //
 ; // regole per convertire f cell
-;(defrule convert-f-to-my-k-cell-when-is-extreme (declare (salience 20))
-;		?fcell <- (f-cell (x ?x)(y ?y)(direzione ?d))
-;		(or
-;			(and (test(eq ?d right)) (or (my-k-cell (x ?x)(y =(+ 1 ?y))(content ?c&:(eq ?c water))) (test(>= ?y 9))))
-;			(and (test(eq ?d left)) (or (my-k-cell (x ?x)(y =(- ?y 1))(content ?c&:(eq ?c water))) (test(<= ?y 0))))
-;			(and (test(eq ?d top)) (or (my-k-cell (x =(- ?x 1))(y ?y)(content ?c&:(eq ?c water))) (test(<= ?x 0))))
-;			(and (test(eq ?d bot)) (or (my-k-cell (x =(+ 1 ?x))(y ?y)(content ?c&:(eq ?c water))) (test(>= ?x 9))))
-;		)
-;	=>
-;		(assert (my-k-cell (x ?x) (y ?y) (content ?d)))
-;		(retract ?fcell)
-;		(printout t "trasformo la fcell in kcell: " ?x " " ?y crlf)
-;)
 (defrule convert-f-to-my-k-cell-if-right (declare (salience 20))
 		?fcell <- (f-cell (x ?x)(y ?y))
 		(or (f-cell (x ?x) (y =(- ?y 1)))
@@ -698,6 +681,7 @@
 (defrule fire-probability (declare (salience -65))
 		(moves (fires ?fires&:(> ?fires 0)))
 		(status (step ?s)(currently running))
+		(test (find-max))
 	=>
 		;(printout t " FIRE sulla probabilità in row: " (fact-slot-value (nth$ 1 (find-max)) row)  " num: " (fact-slot-value (nth$ 1 (find-max)) num)  crlf)
 		;(printout t " FIRE sulla probabilità in col: " (fact-slot-value (nth$ 2 (find-max)) col)  " num: " (fact-slot-value (nth$ 2 (find-max)) num)  crlf)
@@ -709,6 +693,7 @@
 (defrule guess-probability (declare (salience -65))
 		(moves (fires 0) (guesses ?g&:(> ?g 0)))
 		(status (step ?s)(currently running))
+		(test (find-max)) ; perchè se non trova un max torna false
 	=>
 		;(printout t " guess sulla probabilità in row: " (fact-slot-value (nth$ 1 (find-max)) row)  " num: " (fact-slot-value (nth$ 1 (find-max)) num)  crlf)
 		;(printout t " guess sulla probabilità in col: " (fact-slot-value (nth$ 2 (find-max)) col)  " num: " (fact-slot-value (nth$ 2 (find-max)) num)  crlf)
@@ -719,28 +704,6 @@
 		;opzione2
 		;(assert (crea-f-cell (x (fact-slot-value (nth$ 1 (find-max)) row)) (y (fact-slot-value (nth$ 2 (find-max)) col))))
 )
-
-
-;(defrule final-guess-probability (declare (salience -65))
-;		(k-per-row (row ?x) (num ?num-row&:(> ?num-row 0)))
-;		(k-per-col (col ?y) (num ?num-col&:(> ?num-col 0)))
-;		(not (exec  (action guess) (x ?x)(y ?y)))
-;		(not (my-k-cell (x ?x) (y ?y)))
-;		(not (and
-;						(k-per-row (row ?x1)(num ?num-row2&:(> ?num-row2 0)))
-;						(k-per-col (col ?y1)(num ?num-col2&:(> ?num-col2 0)))
-;						(not (my-k-cell (x ?x1) (y ?y1))) ; non serve ma magari riduce il numero di confronti
-;						(not (exec  (action guess) (x ?x1)(y ?y1)))
-;						(test(> (calculate-prob-x-y ?num-row2 ?num-col2 ?x1 ?y1) (calculate-prob-x-y ?num-row ?num-col ?x ?y)))
-;					)
-;		)
-;		(moves (fires 0) (guesses ?g&:(> ?g 0)))
-;		(status (step ?s)(currently running))
-;	=>
-;		(printout t " GUESS probabilità in x: " ?x " y: " ?y  crlf)
-;		(assert (exec (step ?s) (action guess) (x ?x)(y ?y)))
-;			(pop-focus)
-;)
 
 (defrule add-my-k-cell-water-if-fire-fail (declare (salience 20))
 		(exec (step ?s) (action fire) (x ?x) (y ?y))
@@ -783,29 +746,27 @@
 )
 
 ; // Termina programma
-;Bisogna asserire (exec (step ?s) (action solve)) quando vogliamo concludere
 (defrule solve (declare (salience -999))
-		(moves (fires ?fires&:(<= ?fires 0)))	; provvisoria, bisogna decidere quando risolvere il problema
 		(status (step ?s)(currently running))
 	=>
 		(assert (exec (step ?s) (action solve)))
 )
 
-; // STAMPE PRIMA DI FARE FIRE //
-(defrule print-k-col (declare (salience 1))
-		(status (step ?s)(currently running))
-		(k-per-col (col ?y)(num ?n))
-	=>
-		(printout t "K-col: " ?y " num: " ?n crlf)
-		(printout t "unknow cell for this col: " (- 10 (get-known-cell-for-col ?y)) crlf)
-)
-(defrule print-k-row (declare (salience 1))
-		(status (step ?s)(currently running))
-		(k-per-row (row ?x)(num ?n))
-	=>
-		(printout t "K-row: " ?x " num: " ?n crlf)
-		(printout t "unknow cell for this row: " (- 10 (get-known-cell-for-row ?x) )crlf)
-)
+; // STAMPE DEBUG //
+;(defrule print-k-col (declare (salience 1))
+;		(status (step ?s)(currently running))
+;		(k-per-col (col ?y)(num ?n))
+;	=>
+;		(printout t "K-col: " ?y " num: " ?n crlf)
+;		(printout t "unknow cell for this col: " (- 10 (get-known-cell-for-col ?y)) crlf)
+;)
+;(defrule print-k-row (declare (salience 1))
+;		(status (step ?s)(currently running))
+;		(k-per-row (row ?x)(num ?n))
+;	=>
+;		(printout t "K-row: " ?x " num: " ?n crlf)
+;		(printout t "unknow cell for this row: " (- 10 (get-known-cell-for-row ?x) )crlf)
+;)
 ;(defrule print-what-i-know-first-to-fire-k (declare (salience 0))
 ;		(status (step ?s)(currently running))
 ;		(my-k-cell (x ?x) (y ?y)(content ?t) )
@@ -831,49 +792,3 @@
 	=>
 		(printout t "I know that cell [" ?x ", " ?y "] contains " ?t "." crlf)
 )
-
-
-;se f-cell è compresa tra acqua e f cell(okcell middle) allora è estremo
-; regole superflue
-; (defrule f-cell-is-my-k-cell-bot
-;         ?f<-(f-cell(x ?x) (y ?y))
-;         (or (f-cell(x =(- ?x 1))(y ?y))(my-k-cell(x =(- ?x 1))(y ?y)))
-;         (my-k-cell (x =(+ 1 ?x))(y ?y)(content ?c&:(eq ?c water)))
-;         =>
-;         (retract ?f)
-;         (assert(my-k-cell(x ?x) (y ?y)(content bot)))
-; )
-
-; (defrule f-cell-is-my-k-cell-top
-;         ?f<-(f-cell(x ?x) (y ?y))
-;         (or (f-cell(x =(+ 1 ?x))(y ?y))(my-k-cell(x =(+ 1 ?x))(y ?y)))
-;         (my-k-cell (x =(- ?x 1))(y ?y)(content ?c&:(eq ?c water)))
-;         =>
-;         (retract ?f)
-;         (assert(my-k-cell(x ?x) (y ?y)(content top)))
-; )
-
-; (defrule f-cell-is-my-k-cell-left
-;         ?f<-(f-cell(x ?x) (y ?y))
-;         (or (f-cell(x ?x)(y =(+ 1 ?y)))(my-k-cell(x ?x)(y =(+ 1 ?y))))
-;         (my-k-cell (x ?x)(y =(- ?y 1))(content ?c&:(eq ?c water)))
-;         =>
-;         (retract ?f)
-;         (assert(my-k-cell(x ?x) (y ?y)(content left)))
-; )
-
-; (defrule f-cell-is-my-k-cell-right
-;         ?f<-(f-cell(x ?x) (y ?y))
-;         (or (f-cell(x ?x)(y =(- ?y 1)))(my-k-cell(x ?x)(y =(- ?y 1))))
-;         (my-k-cell (x ?x)(y =(+ 1 ?y))(content ?c&:(eq ?c water)))
-;         =>
-;         (retract ?f)
-;         (assert(my-k-cell(x ?x) (y ?y)(content right)))
-; )
-
-
-
-;DOMANDE:
-; se facciamo la fire su una casella su cui abbiamo fatto la guess dobbiamo fare unguess?
-; dovremmo fare guess sulle my-k-cell iniziali?
-; il numero di guess non decrementa con le k cell iniziali, come fare?
