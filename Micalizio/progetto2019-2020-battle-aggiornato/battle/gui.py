@@ -16,7 +16,7 @@ mapPath=None
 environment=None
 mainPath='0_Main.clp'
 envPath='1_Env.clp'
-agentPath='3_Agent_incrocio.clp'
+agentPath='3_Agent_probabilita.clp'
 
 grid=np.zeros((10,10))
 
@@ -103,6 +103,7 @@ def runButtonButtonFunction():
     else:
         writeDat()
         environment=clips.Environment()
+        environment.clear()
         environment.batch_star('go.bat')
         environment.run()
         for fact in environment.facts():
