@@ -95,7 +95,7 @@ insegnamento_successivo(elementi_di_fotografia_digitale,acquisizione_ed_elaboraz
 insegnamento_successivo(acquisizione_ed_elaborazione_di_sequenze_di_immagini_digitali,elementi_di_fotografia_digitale).
 insegnamento_successivo(grafica_3D,acquisizione_ed_elaborazione_di_immagini_statiche_grafica).
 
-insegnamento_successivo_4ore(progettazione_di_basi_di_dati,fondamenti_di_ICT_e_Paradigmi_di_Programmazione).
+%insegnamento_successivo_4ore(progettazione_di_basi_di_dati,fondamenti_di_ICT_e_Paradigmi_di_Programmazione).
 %insegnamento_successivo_4ore(introduzione_al_social_media_management,tecniche_e_strumenti_di_Marketing_digitale).
 %insegnamento_successivo_4ore(la_gestione_delle_risorse_umane,comunicazione_pubblicitaria_e_comunicazione_pubblica).
 %insegnamento_successivo_4ore(progettazione_e_sviluppo_di_applicazioni_web_su_dispositivi_mobile_I,tecnologie_server_side_per_il_web).
@@ -113,9 +113,11 @@ insegnamento_successivo_4ore(progettazione_di_basi_di_dati,fondamenti_di_ICT_e_P
 4{inizio_ora_giorno_settimana(S,G,O):inizio_ora(O)}5:-giorno_in_settimana(S,G),G==sabato.
 
 %per ogni ora di ogni giorno di ogni settimana associo uno ed un solo insegnamento
-1{lezione(S,G,O,I):insegnamenti(I)}1:-inizio_ora_giorno_settimana(S,G,O).
+1{lezione(S,G,O,I):insegnamenti(I)}1:-inizio_ora_giorno_settimana(S,G,O),not presentazione(S,G,O,_).
 
-:-lezione(S,G,O,I),lezione(S,G,O,I2),I!=I2.
+
+presentazione(S,G,O,I):-S==1,G==venerdi,O=8,insegnamenti(I).
+presentazione(S,G,O,I):-S==1,G==venerdi,O=9,insegnamenti(I).
 
 %un professore non può tenere corsi diversi nello stesso slot(inutile)
 %:-lezione(S,G,O,I),lezione(S,G,O,I2),I!=I2, professori_Insegnamento(I,P),professori_Insegnamento(I2,P).
@@ -194,8 +196,8 @@ ultima_lezione(S,G,O,I):- not y3(S,G,O,I),ultimo_giorno(S,G,O,I).
 
 %se un corso è successivo_4ore ad un altro, la prima lezione del corso deve essere successiva ad almeno 4 ore
 %di insegnamento dell'altro.
-conteggioOrePrecedente(I,I1,Conteggio):-#count{S,G,O: lezione(S,G,O,I),prima_lezione(S1,G1,O1,I1),S<=S1,numero_giorno(G,X),numero_giorno(G1,X1),X<=X1,O<O1}=Conteggio,insegnamenti(I),insegnamenti(I1).
-:-insegnamento_successivo_4ore(I,I1),conteggioOrePrecedente(I,I1,Conteggio),Conteggio<4.
+%conteggioOrePrecedente(I,I1,Conteggio):-#count{S,G,O: lezione(S,G,O,I),prima_lezione(S1,G1,O1,I1),S<=S1,numero_giorno(G,X),numero_giorno(G1,X1),X<=X1,O<O1}=Conteggio,insegnamenti(I),insegnamenti(I1).
+%:-insegnamento_successivo_4ore(I,I1),conteggioOrePrecedente(I,I1,Conteggio),Conteggio<4.
 
 
 #show lezione/4.
