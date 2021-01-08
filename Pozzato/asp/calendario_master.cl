@@ -115,6 +115,8 @@ insegnamento_successivo_4ore(progettazione_di_basi_di_dati,fondamenti_di_ICT_e_P
 %per ogni ora di ogni giorno di ogni settimana associo uno ed un solo insegnamento
 1{lezione(S,G,O,I):insegnamenti(I)}1:-inizio_ora_giorno_settimana(S,G,O).
 
+:-lezione(S,G,O,I),lezione(S,G,O,I2),I!=I2.
+
 %un professore non può tenere corsi diversi nello stesso slot(inutile)
 %:-lezione(S,G,O,I),lezione(S,G,O,I2),I!=I2, professori_Insegnamento(I,P),professori_Insegnamento(I2,P).
 
