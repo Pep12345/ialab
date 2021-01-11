@@ -589,7 +589,7 @@
 )
 ; FIRE 3: sparo sulla riga e colonna con la maggiore probabilità di avere una barca
 ; nota: nel caso in cui fa fire su water, k row max e k col max restano gli stessi e quindi sta regola si blocca e non fa altre fire
-(defrule fire-where-krow-kcol-have-max-value (declare (salience -100))
+(defrule fire-where-krow-kcol-have-max-value (declare (salience -65))
 		(moves (fires ?fires&:(> ?fires 0)))
 		(k-per-row (row ?x) (num ?num-row))
 		(k-per-col (col ?y) (num ?num-col))
@@ -599,10 +599,10 @@
 			(not (exec  (action fire) (x ?num-row) (y ?num-col)))
 		))
 		(status (step ?s)(currently running))
-		(not (exec  (action fire) (x ?x) (y ?y))) ; non dovrebbe servire ma l'ha messa il prof
+		(not (exec  (action fire) (x ?x) (y ?y)))
 		(not (my-k-cell (x ?x) (y ?y)))
 	=>
-		(printout t " FIRE di tipo 3 in x: " ?x " y: " ?y  crlf)
+		(printout t " FIRE incrocio in x: " ?x " y: " ?y  crlf)
 		(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
 	  (pop-focus)
 )
@@ -674,7 +674,7 @@
 		(printout t " guess finali in x: " ?x " y: " ?y  crlf)
 		;opzione 1
 		(assert (exec (step ?s) (action guess) (x ?x)(y ?y)))
-		 	(pop-focus) ;nell'opzione 2 il focus non serve, c'è in crea-f-cell
+		 	(pop-focus)
 		;opzione2
 		;(assert (crea-f-cell (x ?x) (y ?y)))
 )

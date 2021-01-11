@@ -64,7 +64,6 @@
 	)
 )
 (deffunction calculate-prob-x-y (?num-row ?num-col ?x ?y)
-	;(printout t "x: " ?x " y: " ?y " ^num-row: " ?num-row " num-col: " ?num-col crlf)
 	(*
 		(/ ?num-row (- 10 (get-known-cell-for-row ?x)))
 		(/ ?num-col (- 10 (get-known-cell-for-col ?y)))
@@ -189,7 +188,7 @@
 		(assert (crea-my-k-cell-water (x (- ?x 1)) (y ?y) (c water)))
 		(assert (crea-my-k-cell-water (x ?x) (y (- ?y 1)) (c water)))
 
-		(assert (crea-f-cell (x ?x) (y (+ ?y 1)) (direzione right)))
+		(assert (crea-f-cell (x ?x) (y (+ ?y 1))))
 		(assert (crea-b-cell (x ?x)(y (+ ?y 2))))
 		(printout t "Ho trovato una my-k-cell di tipo left in x: " ?x " y: " ?y  crlf)
 )
@@ -238,11 +237,10 @@
 		(my-k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
 		(or (test(eq ?y 0)) (test(eq ?y 9)))
 	=>
-		(assert (crea-f-cell  (x (- ?x 1))(y ?y)(direzione top)))
+		(assert (crea-f-cell  (x (- ?x 1))(y ?y)))
 		(assert (crea-b-cell (x (- ?x 2))(y ?y)))
-		(assert (crea-f-cell  (x (+ ?x 1))(y ?y)(direzione bot)))
+		(assert (crea-f-cell  (x (+ ?x 1))(y ?y)))
 		(assert (crea-b-cell (x (+ ?x 2))(y ?y)))
-		(printout t "Ho trovato una my-k-cell di tipo middle vicino al bordo in x: " ?x " y: " ?y  crlf)
 )
 (defrule my-k-cell-middle-near-horizontal-border (declare (salience 30))
 		(my-k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
@@ -262,14 +260,13 @@
 	=>
 		(assert (crea-f-cell  (x ?x)(y (+ ?y 1))(direzione right)))
 		(assert (crea-b-cell (x ?x)(y (+ ?y 2))))
-		(printout t "Ho trovato una my-k-cell di tipo middle vicino ad una left in x: " ?x " y: " ?y  crlf)
 )
 (defrule my-k-cell-middle-near-right-or-middle (declare (salience 10))
 		(my-k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
 		(or (my-k-cell (x ?x) (y =(+ 1 ?y)) (content ?c1&:(neq ?c1 water)))
 				(f-cell (x ?x) (y =(+ 1 ?y))))
 	=>
-		(assert (crea-f-cell  (x ?x)(y (- ?y 1))(direzione  left)))
+		(assert (crea-f-cell  (x ?x)(y (- ?y 1))))
 		(assert (crea-b-cell (x ?x)(y (- ?y 2))))
 )
 (defrule my-k-cell-middle-near-top-or-middle (declare (salience 10))
@@ -310,7 +307,6 @@
 	=>
 		(assert (crea-my-k-cell-water (x (+ ?x 3)) (y ?y) (c water)))
 		(assert (crea-my-k-cell-water (x (- ?x 2)) (y ?y) (c water)))
-		(printout t "Middle Near Middle in Vertical in x: " ?x " y: " ?y  crlf)
 )
 (defrule kmid-near-kmid-hor (declare (salience 20))
 		(my-k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
@@ -421,10 +417,10 @@
 		(barca (tipo 2)(num ?t&:(eq ?t 0)))
 		?fcell <-(f-cell (x ?x) (y ?y))
 		(or
-			(my-k-cell (x =(+ ?x 1)) (y ?y) (content ?c&:(neq ?c water)))
-			(my-k-cell (x =(- ?x 1)) (y ?y) (content ?c1&:(neq ?c1 water)))
-			(my-k-cell (x ?x) (y  =(+ ?y 1)) (content ?c2&:(neq ?c2 water)))
-			(my-k-cell (x ?x) (y  =(- ?y 1)) (content ?c3&:(neq ?c3 water)))
+			(my-k-cell (x =(+ ?x 1)) (y ?y) (content ?c&:(eq ?c bot)))
+			(my-k-cell (x =(- ?x 1)) (y ?y) (content ?c1&:(eq ?c1 top)))
+			(my-k-cell (x ?x) (y  =(+ ?y 1)) (content ?c2&:(eq ?c2 right)))
+			(my-k-cell (x ?x) (y  =(- ?y 1)) (content ?c3&:(eq ?c3 left)))
 		)
 	=>
 		(retract ?fcell)
@@ -492,12 +488,11 @@
 (defrule create-f-cell-in-row-where-i-know-all-water-cells (declare (salience 20))
 		(k-per-row (row ?x) (num ?num-row&:(> ?num-row 0)))
 		(status (step ?s)(currently running))
-		(test (eq (+ 	(+ (length$ (find-all-facts ((?f my-k-cell)) (eq ?f:x ?x))) (length$ (find-all-facts ((?f1 f-cell)) (eq ?f1:x ?x)))) ?num-row) 10))
-		(k-per-col (col ?y)(num ?num-col&:(> ?num-col 0))) ; (num...) velocizza perchè salta subito tutta la colonna ma funziona anche senza
+		(test (eq (+ 	(+ (length$ (find-all-facts ((?f my-k-cell)) (eq ?f:x ?x)))
+											(length$ (find-all-facts ((?f1 f-cell)) (eq ?f1:x ?x)))) ?num-row) 10))
 		(not (my-k-cell (x ?x) (y ?y)))
 		(not (f-cell (x ?x) (y ?y)))
 	=>
-		;(printout t "Creo f-cell usando nonsocomechiamarla x: " ?x " y: " ?y  crlf)
 		(assert (crea-f-cell (x ?x)(y ?y)))
 )
 (defrule create-f-cell-in-col-where-i-know-all-water-cells (declare (salience 20))
@@ -526,7 +521,7 @@
 	=>
 		(retract ?bcell)
 )
-(defrule delete-b-cell-if-my-k-cell-water (declare (salience 20))
+(defrule delete-b-cell-if-my-k-cell (declare (salience 20))
 		(my-k-cell (x ?x) (y ?y))
 		?bcell <- (b-cell (x ?x)(y ?y))
 	=>
@@ -606,7 +601,7 @@
 
 ; // REGOLE FIRE
 ;FIRE 2: sparo sulla f-cell che si trova dopo una kcell estrema e una kcell middle
-(defrule fire-two (declare (salience -45))
+(defrule fire-for-search-battleship-type-four (declare (salience -45))
 		(moves (fires ?fires&:(> ?fires 0)))
 		?fcell <- (f-cell (x ?x)(y ?y))
 		(barca (tipo 4)(num ?value&:(> ?value 0)))
@@ -619,7 +614,7 @@
 		(status (step ?s)(currently running))
 		(not (exec  (action fire) (x ?x) (y ?y)))
 	=>
-		(printout t "Sto per eseguire Fire-two in x: " ?x " y: " ?y  crlf)
+		(printout t "Sto per eseguire Fire per cercare barca da quattro in x: " ?x " y: " ?y  crlf)
 		(retract ?fcell)
 		(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
 	  	(pop-focus)
@@ -641,7 +636,7 @@
 	  (pop-focus)
 )
 ; FIRE 1: sparo su b/f cell vicina ad una f cell
-(defrule fire1-bcell (declare (salience -55))
+(defrule fire-bcell-near-fcell (declare (salience -55))
 	(moves (fires ?fires&:(> ?fires 0)))
   (status (step ?s)(currently running))
   ?b<-(b-cell(x ?x) (y ?y))
@@ -653,7 +648,7 @@
    )
  =>
  (retract ?b)
- (printout t " FIRE di tipo 1 - b in x: " ?x " y: " ?y  crlf)
+ (printout t " Sto per eseguire Fire su b cell vicino f cell in x: " ?x " y: " ?y  crlf)
  (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
      (pop-focus)
 )
@@ -683,27 +678,29 @@
 		(status (step ?s)(currently running))
 		(test (find-max))
 	=>
-		;(printout t " FIRE sulla probabilità in row: " (fact-slot-value (nth$ 1 (find-max)) row)  " num: " (fact-slot-value (nth$ 1 (find-max)) num)  crlf)
-		;(printout t " FIRE sulla probabilità in col: " (fact-slot-value (nth$ 2 (find-max)) col)  " num: " (fact-slot-value (nth$ 2 (find-max)) num)  crlf)
-		(printout t " FIRE sulla probabilità in x: " (fact-slot-value (nth$ 1 (find-max)) row)  " y: " (fact-slot-value (nth$ 2 (find-max)) col)  crlf)
-		(assert (exec (step ?s) (action fire) (x (fact-slot-value (nth$ 1 (find-max)) row)) (y (fact-slot-value (nth$ 2 (find-max)) col))))
+		(printout t " FIRE sulla probabilità in x: " (fact-slot-value (nth$ 1 (find-max)) row)
+																					" y: " (fact-slot-value (nth$ 2 (find-max)) col)  crlf)
+		(assert (exec (step ?s) (action fire) (x (fact-slot-value (nth$ 1 (find-max)) row))
+		 																			(y (fact-slot-value (nth$ 2 (find-max)) col))))
 			(pop-focus)
 )
 
 (defrule guess-probability (declare (salience -65))
 		(moves (fires 0) (guesses ?g&:(> ?g 0)))
 		(status (step ?s)(currently running))
-		(test (find-max)) ; perchè se non trova un max torna false
+		(test (find-max))
 	=>
-		;(printout t " guess sulla probabilità in row: " (fact-slot-value (nth$ 1 (find-max)) row)  " num: " (fact-slot-value (nth$ 1 (find-max)) num)  crlf)
-		;(printout t " guess sulla probabilità in col: " (fact-slot-value (nth$ 2 (find-max)) col)  " num: " (fact-slot-value (nth$ 2 (find-max)) num)  crlf)
-		(printout t " guess sulla probabilità in x: " (fact-slot-value (nth$ 1 (find-max)) row)  " y: " (fact-slot-value (nth$ 2 (find-max)) col)  crlf)
-		;opzione1
-		(assert (exec (step ?s) (action guess) (x (fact-slot-value (nth$ 1 (find-max)) row)) (y (fact-slot-value (nth$ 2 (find-max)) col))))
-			(pop-focus) ;nell'opzione 2 il focus non serve, c'è in crea-f-cell
-		;opzione2
-		;(assert (crea-f-cell (x (fact-slot-value (nth$ 1 (find-max)) row)) (y (fact-slot-value (nth$ 2 (find-max)) col))))
+		(printout t " guess sulla probabilità in x: " (fact-slot-value (nth$ 1 (find-max)) row)
+																						" y: " (fact-slot-value (nth$ 2 (find-max)) col)  crlf)
+		;opzione 1
+		(assert (exec (step ?s) (action guess) (x (fact-slot-value (nth$ 1 (find-max)) row))
+																						(y (fact-slot-value (nth$ 2 (find-max)) col))))
+			(pop-focus)
+	 	;opzione2
+	 	;(assert (crea-f-cell (x (fact-slot-value (nth$ 1 (find-max)) row)) (y (fact-slot-value (nth$ 2 (find-max)) col))))
+
 )
+
 
 (defrule add-my-k-cell-water-if-fire-fail (declare (salience 20))
 		(exec (step ?s) (action fire) (x ?x) (y ?y))
