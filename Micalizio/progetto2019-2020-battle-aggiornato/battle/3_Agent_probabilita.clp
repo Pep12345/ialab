@@ -490,6 +490,7 @@
 		(status (step ?s)(currently running))
 		(test (eq (+ 	(+ (length$ (find-all-facts ((?f my-k-cell)) (eq ?f:x ?x)))
 											(length$ (find-all-facts ((?f1 f-cell)) (eq ?f1:x ?x)))) ?num-row) 10))
+		(k-per-col (col ?y)(num ?num-col&:(> ?num-col 0)))
 		(not (my-k-cell (x ?x) (y ?y)))
 		(not (f-cell (x ?x) (y ?y)))
 	=>
@@ -601,40 +602,21 @@
 
 ; // REGOLE FIRE
 ;FIRE 2: sparo sulla f-cell che si trova dopo una kcell estrema e una kcell middle
-(defrule fire-for-search-battleship-type-four (declare (salience -45))
-		(moves (fires ?fires&:(> ?fires 0)))
-		?fcell <- (f-cell (x ?x)(y ?y))
-		(barca (tipo 4)(num ?value&:(> ?value 0)))
-		(or
-		(and (my-k-cell (x =(+ ?x 1)) (y ?y) (content ?c&:(eq ?c middle))) (my-k-cell (x =(+ ?x 2)) (y ?y) (content ?c1&:(eq ?c1 bot))))
-		(and (my-k-cell (x =(- 1 ?x)) (y ?y) (content ?c&:(eq ?c middle))) (my-k-cell (x =(- 2 ?x)) (y ?y) (content ?c2&:(eq ?c2 top))))
-		(and (my-k-cell (x ?x) (y =(+ ?y 1)) (content ?c&:(eq ?c middle))) (my-k-cell (x ?x) (y =(+ ?y 2)) (content ?c3&:(eq ?c3 right))))
-		(and (my-k-cell (x ?x) (y =(- 1 ?y)) (content ?c&:(eq ?c middle))) (my-k-cell (x ?x) (y =(- 2 ?y)) (content ?c4&:(eq ?c4 left))))
-		)
-		(status (step ?s)(currently running))
-		(not (exec  (action fire) (x ?x) (y ?y)))
-	=>
-		(printout t "Sto per eseguire Fire per cercare barca da quattro in x: " ?x " y: " ?y  crlf)
-		(retract ?fcell)
-		(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
-	  	(pop-focus)
-)
-; FIRE 3: sparo sulla riga e colonna con la maggiore probabilità di avere una barca
-; nota: nel caso in cui fa fire su water, k row max e k col max restano gli stessi e quindi sta regola si blocca e non fa altre fire
-(defrule fire-where-krow-kcol-have-max-value (declare (salience -100))
-		(moves (fires ?fires&:(> ?fires 0)))
-		(k-per-row (row ?x) (num ?num-row))
-		(not (k-per-row (num ?num-row2&:(> ?num-row2 ?num-row))))
-		(k-per-col (col ?y) (num ?num-col))
-		(not (k-per-col (num ?num-col2&:(> ?num-col2 ?num-col))))
-		(status (step ?s)(currently running))
-		(not (exec  (action fire) (x ?x) (y ?y))) ; non dovrebbe servire ma l'ha messa il prof
-		(not (my-k-cell (x ?x) (y ?y)))
-	=>
-		(printout t " FIRE di tipo 3 in x: " ?x " y: " ?y  crlf)
-		(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
-	  (pop-focus)
-)
+
+;(defrule fire-where-krow-kcol-have-max-value (declare (salience -100))
+;		(moves (fires ?fires&:(> ?fires 0)))
+;		(k-per-row (row ?x) (num ?num-row))
+;		(not (k-per-row (num ?num-row2&:(> ?num-row2 ?num-row))))
+;		(k-per-col (col ?y) (num ?num-col))
+;		(not (k-per-col (num ?num-col2&:(> ?num-col2 ?num-col))))
+;		(status (step ?s)(currently running))
+;		(not (exec  (action fire) (x ?x) (y ?y))) ; non dovrebbe servire ma l'ha messa il prof
+;		(not (my-k-cell (x ?x) (y ?y)))
+;	=>
+;		(printout t " FIRE di tipo 3 in x: " ?x " y: " ?y  crlf)
+;		(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
+;	  (pop-focus)
+;)
 ; FIRE 1: sparo su b/f cell vicina ad una f cell
 (defrule fire-bcell-near-fcell (declare (salience -55))
 	(moves (fires ?fires&:(> ?fires 0)))
@@ -676,7 +658,7 @@
 (defrule fire-probability (declare (salience -65))
 		(moves (fires ?fires&:(> ?fires 0)))
 		(status (step ?s)(currently running))
-		(test (find-max))
+		;(test (find-max))
 	=>
 		(printout t " FIRE sulla probabilità in x: " (fact-slot-value (nth$ 1 (find-max)) row)
 																					" y: " (fact-slot-value (nth$ 2 (find-max)) col)  crlf)
