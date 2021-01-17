@@ -71,13 +71,12 @@ public class esInfApprossimata {
         HashSet<RandomVariable> hs = new HashSet();
         getAncestors(query, hs);
         FullCPTNode n = null;
-        List<Node> roots = getRoots(bn);
         List<Node> newRoots = new ArrayList();
         
         List<Node> nodeToVisit = new ArrayList();
         HashMap<String,Node> giaAggiunti = new HashMap();
         
-        for( Node root : roots){
+        for( Node root : getRoots(bn)){
             if(hs.contains(root.getRandomVariable())){   // se la radice fa parte degli antenati
                 n = new FullCPTNode( root.getRandomVariable(), ((CPT)root.getCPD()).getValues());
                 newRoots.add(n);
@@ -88,21 +87,23 @@ public class esInfApprossimata {
         
         for( int j=0; j<nodeToVisit.size(); j++ ){
             Node i = nodeToVisit.get(j);
-            if(hs.contains(i.getRandomVariable()) || i.getRandomVariable().getName() == query.getRandomVariable().getName()) {   // se fa parte degli antenati
-                
-                System.out.println(i.getRandomVariable());
-                List<Node> parents = new ArrayList();
-                for (Node p : i.getParents()){
-                    parents.add(giaAggiunti.get(p.getRandomVariable().getName()));
+            if(!giaAggiunti.containsKey(i.getRandomVariable().getName())){ // per evitare di ripassarci
+                if(hs.contains(i.getRandomVariable()) || i.getRandomVariable().getName() == query.getRandomVariable().getName()) {   // se fa parte degli antenati
                     
+                    System.out.println(i.getRandomVariable());
+                    // estraiamo padri mettendo i nodi nuovi della rete al loro posto
+                    List<Node> parents = new ArrayList();
+                    for (Node p : i.getParents()){
+                        parents.add(giaAggiunti.get(p.getRandomVariable().getName()));
+                    }
+                    
+                    n = new FullCPTNode( i.getRandomVariable(), ((CPT)i.getCPD()).getValues(), parents.toArray(new Node[0]));
+                    giaAggiunti.put(n.getRandomVariable().getName(), n);
+                    nodeToVisit.addAll(i.getChildren());
                 }
-                n = new FullCPTNode( i.getRandomVariable(), ((CPT)i.getCPD()).getValues(), parents.toArray(new Node[0]));
-                giaAggiunti.put(n.getRandomVariable().getName(), n);
-                nodeToVisit.addAll(i.getChildren());
             }
-            
         }
-        
+        System.out.println(giaAggiunti);
         BayesNet bayNet = new BayesNet(newRoots.toArray(new Node[0]));
         System.out.println(bayNet.getVariablesInTopologicalOrder());
         
