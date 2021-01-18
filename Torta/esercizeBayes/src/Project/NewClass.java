@@ -18,15 +18,16 @@ import bnparser.BifReader;
  */
 public class NewClass {
     public static void main(String[] args) throws CloneNotSupportedException {
-        BayesianNetwork bn = BifReader.readBIF("earthquake.xml");
+        BayesianNetwork bn = BifReader.readBIF("Sprinkler.xml");
         
         // example th 1
-        RandomVariable[] query = {new RandVar("JohnCalls", new BooleanDomain())};
-        RandVar ev = new RandVar("Alarm", new BooleanDomain());
+        RandomVariable[] query = {new RandVar("Road", new BooleanDomain())};
+        RandVar ev = new RandVar("Rain", new BooleanDomain());
         AssignmentProposition[] as = {new AssignmentProposition(ev, Boolean.TRUE)};
         Prunning p = new Prunning(query, as, bn);
         
-        p.prunningNodeMSeparated();
-        //p.prunningNodeAncestors();
+        BayesianNetwork bn2 = p.prunningNodeMSeparated();
+        //BayesianNetwork bn2 = p.prunningNodeAncestors();
+        System.out.println(bn2.getVariablesInTopologicalOrder());
     }
 }

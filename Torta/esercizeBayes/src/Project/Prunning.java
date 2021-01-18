@@ -5,6 +5,7 @@
  */
 package Project;
 
+import aima.core.probability.Factor;
 import aima.core.probability.RandomVariable;
 import aima.core.probability.bayes.BayesianNetwork;
 import aima.core.probability.bayes.Node;
@@ -13,6 +14,7 @@ import aima.core.probability.bayes.impl.CPT;
 import aima.core.probability.bayes.impl.FullCPTNode;
 import aima.core.probability.proposition.AssignmentProposition;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -59,25 +61,51 @@ public class Prunning {
 
      // ricorsivamente per ogni nodo prendo i figli e i parent dei figli e poi chiamo ricorisvamente
     // su parent nodo e parent figli
-    public void prunningNodeMSeparated(){
+    public BayesNet prunningNodeMSeparated(){
         HashSet<RandomVariable> nodeToSave = new HashSet();
         for( RandomVariable q : qrv ){ 
             visitaNodo(bn.getNode(q), nodeToSave);
-
         }
-        System.out.println(nodeToSave);
-        //creare la nuova rete b
+        return createBayNet(nodeToSave);
+    }
+        
+    public BayesianNetwork prunningNodeAncestors(){
+         // aggiungo anche query e evidence nella lista ancestor perchè poi 
+         // la uso come lista dei nodi che voglio tenere
+        HashSet<RandomVariable> ancestor = new HashSet();
+        for( RandomVariable q : qrv ){ 
+            getAncestors(bn.getNode(q), ancestor);
+            ancestor.add(q);
+        }
+        for ( AssignmentProposition e1 : e){
+            getAncestors(bn.getNode(e1.getTermVariable()), ancestor);
+            ancestor.add(e1.getTermVariable());
+        }
+        return createBayNet(ancestor);
+    }
+    
+    public void prunningEdge(){
+        //estraggo radici
+        //per ogni radice creo nuovo nodo e aggiungo figli in visitare
+        //per ogni nodo da visitare:
+            // cerco i padri nei nuovi nodi creati
+            // se il padre è evidenza non lo aggiungo e ricalcolo la cpt
+            // else aggiungo i padri e creo nuovo nodo
+            // se non ci sono padri => aggiungere alle radici
+            // creo nuovo nodo
+            
+         // creo la rete con le radici
+        
         
     }
+    
     
     private void visitaNodo(Node nodo, HashSet<RandomVariable> nodeToSave){
         if(!checkEvidence(nodo) && !nodeToSave.contains(nodo.getRandomVariable())){ // non evidenza e non già visitato
             nodeToSave.add(nodo.getRandomVariable()); //segno come visitato
-            System.out.println("visitato: " + nodo.getRandomVariable());
             // ricorsione sui fratelli
             for (Node son: nodo.getChildren()){
                 for(Node sibling: son.getParents()){
-                    System.out.println("vado nel sibling: " + sibling.getRandomVariable());
                     visitaNodo(sibling, nodeToSave);
                 }
             }
@@ -89,24 +117,97 @@ public class Prunning {
         }
     }    
     
-    public BayesianNetwork prunningNodeAncestors(){
-        // estraggo ancestor
-        HashSet<RandomVariable> ancestor = new HashSet();
-        HashSet<RandomVariable> queries = new HashSet();
-        HashSet<RandomVariable> evidence = new HashSet();
-        
-        for( RandomVariable q : qrv ){ //per ogni randomvariable in query
-            getAncestors(bn.getNode(q), ancestor);
-            queries.add(q);
-        }
-        // aggiunto evidenze in ancestor - TODO: modificare libreria per estrarne la randomvariable
-        for ( AssignmentProposition e1 : e){
-            getAncestors(bn.getNode(e1.getTermVariable()), ancestor); // aggiunge i padri dell'evidenza
-            evidence.add(e1.getTermVariable()); // aggiunge l'evidenza
-        }
-        
-        
+    private BayesNet createBayNet(HashSet<RandomVariable> acceptedNodeInNewNetwork){
         List<Node> newRoots = new ArrayList();
+        HashMap<String,Node> newAddedNode = new HashMap();
+        
+        for(RandomVariable rv : bn.getVariablesInTopologicalOrder()){
+            Node i =bn.getNode(rv);
+            if(acceptedNodeInNewNetwork.contains(i.getRandomVariable()) ) {
+                if(i.isRoot()){
+                    FullCPTNode n = new FullCPTNode( i.getRandomVariable(), ((CPT)i.getCPD()).getFactorFor(new AssignmentProposition[0]).getValues());
+                    newRoots.add(n);
+                    newAddedNode.put(n.getRandomVariable().getName(), n);
+                }else{
+                    List<Node> parents = new ArrayList();
+                    List<RandomVariable> lostParents = new ArrayList();
+                    for (Node p : i.getParents()){
+                        if(newAddedNode.containsKey(p.getRandomVariable().getName()))
+                            parents.add(newAddedNode.get(p.getRandomVariable().getName()));
+                        else
+                            lostParents.add(p.getRandomVariable());
+                    }
+
+                    //estraggo e riduco tabella
+                    Factor f = ((CPT)i.getCPD()).getFactorFor(new AssignmentProposition[0]);
+                    f = f.sumOut(lostParents.toArray(new RandomVariable[0]));
+                    
+                    //normalizzo l'array finale
+                    double[] normalizedArray = normalizeFactorArray(f,i.getRandomVariable().getDomain().size());
+                    
+                    //creo nuovo nodo
+                    FullCPTNode n;
+                    if(parents.size()>0)
+                        n = new FullCPTNode( i.getRandomVariable(), normalizedArray, parents.toArray(new Node[0]));
+                    else{
+                        n = new FullCPTNode( i.getRandomVariable(), normalizedArray);
+                        newRoots.add(n);
+                    }
+                    newAddedNode.put(n.getRandomVariable().getName(), n);
+                }
+            }
+        }
+        return new BayesNet(newRoots.toArray(new Node[0]));
+    }
+    
+    private boolean checkEvidence(Node nodo){
+        boolean result = false; 
+        for( AssignmentProposition a: e){
+            if(a.getTermVariable().equals(nodo.getRandomVariable()))
+                result = true; 
+        }
+        return result;
+    }
+    
+    private void getAncestors(Node n, HashSet<RandomVariable> hs){
+        for( Node father : n.getParents()){
+            hs.add(father.getRandomVariable());
+            getAncestors(father,hs);
+        } 
+    }      
+    
+    private List<Node> getRoots(BayesianNetwork bn){  // modificare libreria per aggiungere get roots nella classe bayesnet
+        List<Node> roots = new ArrayList();
+        for (RandomVariable rv : bn.getVariablesInTopologicalOrder()) {           
+            Node node =bn.getNode(rv);
+            if(node.isRoot()) // ancestors.contains(node.getRandomVariable())
+                roots.add(node);
+        }
+        return roots;
+    }
+    
+    //mi fa un po' cagare ma non so come altro farlo
+    private double[] normalizeFactorArray(Factor f, int n){
+        double[] result = new double[f.getValues().length];
+        for(int i=0; i< f.getValues().length; i += n){
+            double sum = 0;
+            for(int j=i; j< i+n; j++)
+                sum += f.getValues()[j];
+            for(int j=i; j< i+n; j++)
+                result[j] = f.getValues()[j] / sum;
+        }
+        return result;
+    }
+}
+
+
+
+
+
+
+
+ //creo rete bayesiana
+        /*List<Node> newRoots = new ArrayList();
         List<Node> nodeToVisit = new ArrayList();
         HashMap<String,Node> newNodeAdded = new HashMap();  // mappa coi nuovi fullcpt node da usare come parent
         
@@ -143,33 +244,4 @@ public class Prunning {
         BayesNet bayNet = new BayesNet(newRoots.toArray(new Node[0]));
         System.out.println(bayNet.getVariablesInTopologicalOrder());
         
-        return bayNet;
-    }
-    
-    private boolean checkEvidence(Node nodo){
-        boolean result = false; 
-        for( AssignmentProposition a: e){
-            if(a.getTermVariable().equals(nodo.getRandomVariable()))
-                result = true; 
-        }
-        return result;
-    }
-    
-    
-    private void getAncestors(Node n, HashSet<RandomVariable> hs){
-        for( Node father : n.getParents()){
-            hs.add(father.getRandomVariable());
-            getAncestors(father,hs);
-        } 
-    }      
-    
-    private List<Node> getRoots(BayesianNetwork bn){  // modificare libreria per aggiungere get roots nella classe bayesnet
-        List<Node> roots = new ArrayList();
-        for (RandomVariable rv : bn.getVariablesInTopologicalOrder()) {           
-            Node node =bn.getNode(rv);
-            if(node.isRoot()) // ancestors.contains(node.getRandomVariable())
-                roots.add(node);
-        }
-        return roots;
-    }
-}
+        return bayNet;*/
