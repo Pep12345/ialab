@@ -5,6 +5,7 @@
  */
 package esercizebayes;
 
+import aima.core.probability.Factor;
 import aima.core.probability.RandomVariable;
 import aima.core.probability.bayes.BayesianNetwork;
 import aima.core.probability.bayes.FiniteNode;
@@ -13,6 +14,7 @@ import aima.core.probability.bayes.impl.BayesNet;
 import aima.core.probability.bayes.impl.CPT;
 import aima.core.probability.bayes.impl.FullCPTNode;
 import aima.core.probability.domain.BooleanDomain;
+import aima.core.probability.proposition.AssignmentProposition;
 import aima.core.probability.util.RandVar;
 import bnparser.BifReader;
 import java.util.ArrayList;
@@ -30,6 +32,23 @@ import java.util.Set;
 public class esInfApprossimata {
         public static void main(String[] args) throws CloneNotSupportedException {
         BayesianNetwork bn = BifReader.readBIF("Sprinkler.xml");
+        Node node = bn.getNode(new RandVar("Rain",new BooleanDomain()));
+        CPT cpt = (CPT)node.getCPD();
+       
+        System.out.println(cpt.getFor());
+        RandVar ev = new RandVar("Cloudy", new BooleanDomain());
+        System.out.println(bn.getNode(ev).getRandomVariable().getDomain());
+        AssignmentProposition[] as = {};
+        Factor f = cpt.getFactorFor(new AssignmentProposition[0]);
+        System.out.println(f);
+        for(double d : cpt.getValues())
+            System.out.print(" " +d);
+        RandomVariable[] query = {new RandVar("Cloudy", new BooleanDomain())};
+        Factor sumOut = f.sumOut(query);
+        System.out.println(sumOut.getArgumentVariables());
+        for(double d : sumOut.getValues())
+            System.out.print(" " +d);
+        return;
         /*List<RandomVariable> rvs = bn.getVariablesInTopologicalOrder();
         List<FullCPTNode> roots = new ArrayList();
         for (RandomVariable rv :rvs) {           
