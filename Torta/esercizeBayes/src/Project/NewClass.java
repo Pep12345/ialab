@@ -25,6 +25,7 @@ public class NewClass {
         RandVar ev = new RandVar("Alarm", new BooleanDomain());
         AssignmentProposition[] as = {new AssignmentProposition(ev, Boolean.TRUE)};
         Prunning p = new Prunning(query, as, bn);
+        
         p.prunningNodeMSeparated();
         //p.prunningNodeAncestors();
     }

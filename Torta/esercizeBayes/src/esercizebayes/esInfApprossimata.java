@@ -31,16 +31,41 @@ import java.util.Set;
  */
 public class esInfApprossimata {
         public static void main(String[] args) throws CloneNotSupportedException {
+        
         BayesianNetwork bn = BifReader.readBIF("Sprinkler.xml");
-        Node node = bn.getNode(new RandVar("Rain",new BooleanDomain()));
+        
+        Node node = bn.getNode(new RandVar("Grass",new BooleanDomain()));
         CPT cpt = (CPT)node.getCPD();
        
-        System.out.println(cpt.getFor());
-        RandVar ev = new RandVar("Cloudy", new BooleanDomain());
-        System.out.println(bn.getNode(ev).getRandomVariable().getDomain());
-        AssignmentProposition[] as = {};
-        Factor f = cpt.getFactorFor(new AssignmentProposition[0]);
+        //System.out.println(cpt.getFor());
+        //System.out.println(bn.getNode(ev).getRandomVariable().getDomain());
+        // creo evidenza 
+        RandVar ev = new RandVar("Rain", new BooleanDomain());
+        RandVar ev2 = new RandVar("Sprinkler", new BooleanDomain());
+        
+        AssignmentProposition[] as = {new AssignmentProposition(ev2,"off"), new AssignmentProposition(ev,"no")};
+        Factor f = cpt.getFactorFor(as);
         System.out.println(f);
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        return;
         for(double d : cpt.getValues())
             System.out.print(" " +d);
         RandomVariable[] query = {new RandVar("Cloudy", new BooleanDomain())};
@@ -48,7 +73,6 @@ public class esInfApprossimata {
         System.out.println(sumOut.getArgumentVariables());
         for(double d : sumOut.getValues())
             System.out.print(" " +d);
-        return;
         /*List<RandomVariable> rvs = bn.getVariablesInTopologicalOrder();
         List<FullCPTNode> roots = new ArrayList();
         for (RandomVariable rv :rvs) {           

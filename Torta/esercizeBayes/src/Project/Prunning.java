@@ -56,34 +56,7 @@ public class Prunning {
         this.e = e;
         this.bn = bn;
     }
-    
-    /*public BayesianNetwork prunningNodeTh1(){
-        BayesianNetwork bn1 = null;
-        HashSet<Node> ancestor = new HashSet();
-        FullCPTNode s;
-        
-        for( RandomVariable q : qrv ){ //per ogni randomvariable in query
-            getAncestors(bn.getNode(q), ancestor);
-        }
-        
-        /*for ( AssignmentProposition e1 : e){
-            ancestor.add(bn.getNode(e1.getRandomVariable));
-        }*/
-        
-        /*for (RandomVariable i : bn.getVariablesInTopologicalOrder()){
-            if(!ancestor.contains(i))
-                bn.getNode(i); //elimina nodo[ bn.getNode(i)]            
-        }*/
-    /*    return bn1;
-    }
-    
-    private void getAncestors(Node n, HashSet<Node> hs){
-        for( Node father : n.getParents()){
-            hs.add(father);
-            father.
-            getAncestors(father,hs);
-        } 
-    }*/
+
      // ricorsivamente per ogni nodo prendo i figli e i parent dei figli e poi chiamo ricorisvamente
     // su parent nodo e parent figli
     public void prunningNodeMSeparated(){
@@ -114,17 +87,7 @@ public class Prunning {
         }else if(checkEvidence(nodo) && !nodeToSave.contains(nodo.getRandomVariable())){ //segno evidenza come visitata
             nodeToSave.add(nodo.getRandomVariable() ); //segno evidenza come visitata
         }
-    }
-    public boolean checkEvidence(Node nodo){
-        boolean result = false; 
-        for( AssignmentProposition a: e){
-            if(a.getTermVariable().equals(nodo.getRandomVariable()))
-                result = true; 
-        }
-        return result;
-    }
-    
-    
+    }    
     
     public BayesianNetwork prunningNodeAncestors(){
         // estraggo ancestor
@@ -150,7 +113,8 @@ public class Prunning {
         // creo i nuovi nodi delle radici e aggiungo i figli in nodetovisit
         for( Node root : getRoots(bn)){
             if(ancestor.contains(root.getRandomVariable())){   // se la radice fa parte degli antenati
-                FullCPTNode n = new FullCPTNode( root.getRandomVariable(), ((CPT)root.getCPD()).getValues());
+                //FullCPTNode n = new FullCPTNode( root.getRandomVariable(), ((CPT)root.getCPD()).getValues());
+                FullCPTNode n = new FullCPTNode( root.getRandomVariable(), ((CPT)root.getCPD()).getFactorFor(new AssignmentProposition[0]).getValues());
                 newRoots.add(n); //salvo la radice per creare la nuova rete
                 nodeToVisit.addAll(root.getChildren()); // aggiungo i figli da visitare
                 newNodeAdded.put(n.getRandomVariable().getName(), n); // aggiungo la radice nei nuovi nodi 
@@ -181,6 +145,16 @@ public class Prunning {
         
         return bayNet;
     }
+    
+    private boolean checkEvidence(Node nodo){
+        boolean result = false; 
+        for( AssignmentProposition a: e){
+            if(a.getTermVariable().equals(nodo.getRandomVariable()))
+                result = true; 
+        }
+        return result;
+    }
+    
     
     private void getAncestors(Node n, HashSet<RandomVariable> hs){
         for( Node father : n.getParents()){
