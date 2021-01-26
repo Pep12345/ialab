@@ -21,13 +21,13 @@ public class NewClass {
         BayesianNetwork bn = BifReader.readBIF("Sprinkler.xml");
         
         // example th 1
-        RandomVariable[] query = {new RandVar("Road", new BooleanDomain())};
+        RandomVariable[] query = {new RandVar("Grass", new BooleanDomain())};
         RandVar ev = new RandVar("Rain", new BooleanDomain());
         AssignmentProposition[] as = {new AssignmentProposition(ev, Boolean.TRUE)};
         Prunning p = new Prunning(query, as, bn);
         
-        BayesianNetwork bn2 = p.prunningNodeMSeparated();
+        BayesianNetwork bn2 = p.prunningEdge();
         //BayesianNetwork bn2 = p.prunningNodeAncestors();
-        System.out.println(bn2.getVariablesInTopologicalOrder());
+        System.out.println(bn2.getNode(ev).getChildren());
     }
 }
