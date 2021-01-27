@@ -13,6 +13,7 @@ import aima.core.probability.bayes.impl.BayesNet;
 import aima.core.probability.bayes.impl.CPT;
 import aima.core.probability.bayes.impl.FullCPTNode;
 import aima.core.probability.proposition.AssignmentProposition;
+import aima.core.probability.util.ProbabilityTable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -84,19 +85,45 @@ public class Prunning {
         return createBayNet(ancestor);
     }
     
-    public void prunningEdge(){
-        //estraggo radici
-        //per ogni radice creo nuovo nodo e aggiungo figli in visitare
-        //per ogni nodo da visitare:
-            // cerco i padri nei nuovi nodi creati
-            // se il padre è evidenza non lo aggiungo e ricalcolo la cpt
-            // else aggiungo i padri e creo nuovo nodo
-            // se non ci sono padri => aggiungere alle radici
-            // creo nuovo nodo
-            
-         // creo la rete con le radici
+    public BayesNet prunningEdge(){
+        List<Node> newRoots = new ArrayList();
+        HashMap<String,Node> newAddedNode = new HashMap();
         
-        
+        for(RandomVariable rv : bn.getVariablesInTopologicalOrder()){
+            Node i =bn.getNode(rv);
+            if(i.isRoot()){
+                FullCPTNode n = new FullCPTNode( i.getRandomVariable(), ((CPT)i.getCPD()).getFactorFor(new AssignmentProposition[0]).getValues());
+                newRoots.add(n);
+                newAddedNode.put(n.getRandomVariable().getName(), n);
+            }else{
+                List<Node> parents = new ArrayList();
+                List<RandomVariable> lostParents = new ArrayList();
+                for (Node p : i.getParents()){
+                    if(!checkEvidence(p))
+                        parents.add(newAddedNode.get(p.getRandomVariable().getName()));
+                    else
+                        lostParents.add(p.getRandomVariable());
+                }
+
+                //estraggo e riduco tabella
+                Factor f = ((CPT)i.getCPD()).getFactorFor(new AssignmentProposition[0]);
+                f = f.sumOut(lostParents.toArray(new RandomVariable[0]));
+
+                //normalizzo l'array finale
+                double[] normalizedArray = normalizeFactorArray(f,i.getRandomVariable().getDomain().size());
+
+                //creo nuovo nodo
+                FullCPTNode n;
+                if(parents.size()>0)
+                    n = new FullCPTNode( i.getRandomVariable(), normalizedArray, parents.toArray(new Node[0]));
+                else{
+                    n = new FullCPTNode( i.getRandomVariable(), normalizedArray);
+                    newRoots.add(n);
+                }
+                newAddedNode.put(n.getRandomVariable().getName(), n);
+            }
+        }
+        return new BayesNet(newRoots.toArray(new Node[0])); 
     }
     
     
