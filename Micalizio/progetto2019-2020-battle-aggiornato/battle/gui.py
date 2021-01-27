@@ -35,7 +35,7 @@ def writeDat():
     f.write("(load "+envPath+")\n")
     f.write("(load "+mapPath+")\n")
     f.write("(load "+agentPath+")\n")
-    f.write("(reset)\n(set-break game-over)\n(run)\n(run 2)\n(focus AGENT)")
+    f.write("(reset)\n(set-break game-over)\n(run)\n(run 2)\n(focus AGENT)\n(facts)")
     f.close()
 
 def buildGrid():
