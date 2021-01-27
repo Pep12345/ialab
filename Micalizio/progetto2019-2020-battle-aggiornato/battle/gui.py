@@ -26,17 +26,20 @@ win = uic.loadUi("GuiUi.ui")
 table=win.tableWidget
 win.textEdit.setReadOnly(True)
 
+guessOK, guessFAIL, fireOK, fireFAIL, kCell = 0,0,0,0,0
+
+
 def writeDat():
     f = open("go.bat", "w")
     f.write("(load "+mainPath+")\n")
     f.write("(load "+envPath+")\n")
     f.write("(load "+mapPath+")\n")
     f.write("(load "+agentPath+")\n")
-    f.write("(reset)\n(set-break game-over)\n(run)\n(run 2)\n(focus AGENT)\n(facts)")
+    f.write("(reset)\n(set-break game-over)\n(run)\n(run 2)\n(focus AGENT)")
     f.close()
 
 def buildGrid():
-    global mapPath,table,grid
+    global mapPath,table,grid, kCell
     with open(mapPath, 'r') as file:
         for line in file:
             if '(' in line:
@@ -54,6 +57,7 @@ def buildGrid():
                 if fact.replace(" ","")=='k-cell':
                     table.item(x,y).setForeground(QColor(0,170,0))
                     table.item(x,y).setText('K')
+                    kCell += 1
 
 def loadMapButtonFunction():
     global mapPath
@@ -64,6 +68,7 @@ def loadMapButtonFunction():
         buildGrid()
 
 def analyze_fact(fact):
+    global guessOK, guessFAIL, fireOK, fireFAIL, kCell
     if fact.template.name=='exec':
         QtTest.QTest.qWait(1000)
         x=fact['x']
@@ -72,29 +77,29 @@ def analyze_fact(fact):
             if grid[x,y]==1:
                 table.item(x,y).setForeground(QColor(0,170,0))
                 win.textEdit.append('Fire('+str(x)+','+str(y)+'): ✔️')
+                fireOK += 1
             else:
                 table.item(x,y).setForeground(QColor(255,0,0))
                 win.textEdit.append('Fire('+str(x)+','+str(y)+'): ❌')
+                fireFAIL += 1
             table.item(x,y).setText('Fire')
         elif fact['action']=='guess':
             if grid[x,y]==1:
                 table.item(x,y).setForeground(QColor(0,170,0))
                 win.textEdit.append('Guess('+str(x)+','+str(y)+'): ✔️')
+                guessOK += 1
             else:
                 table.item(x,y).setForeground(QColor(255,0,0))
                 win.textEdit.append('Guess('+str(x)+','+str(y)+'): ❌')
+                guessFAIL += 1
             table.item(x,y).setText('Guess')
     elif fact.template.name=='score':
-        msgBox=QMessageBox()
-        msgBox.setWindowTitle("Score!")
-        msgBox.setText("Your score is")
-        msgBox.exec()
-        win.textEdit.append('Score: ')
+        win.textEdit.append('Score: '+ str(fact[0]))
         
         
     
 def runButtonButtonFunction():
-    global environment
+    global environment, guessOK, guessFAIL, fireOK, fireFAIL, kCell
     if not mapPath:
         msgBox=QMessageBox()
         msgBox.setWindowTitle("Error!")
@@ -108,6 +113,12 @@ def runButtonButtonFunction():
         environment.run()
         for fact in environment.facts():
             analyze_fact(fact)
+        win.textEdit.append('Guess: '+ str(round((guessOK / (guessOK + guessFAIL)*100),1)) + '% '
+                            + ' ('+ str(guessOK) + ' su '+ str(guessOK+guessFAIL)+ ')')
+        win.textEdit.append('Fire: ' + str(round((fireOK / (fireOK + fireFAIL) * 100),1)) + '% '
+                            + ' (' + str(fireOK) + ' su ' + str(fireOK + fireFAIL) + ')')
+        win.textEdit.append('Found: ' + str(round(((guessOK + fireOK) / (20 - kCell) * 100),1)) + '% '
+                            + ' (' + str(guessOK+fireOK) + ' su ' + str(20 - kCell) + ')')
         
 def actionChange_mainFunction():
     global mainPath
