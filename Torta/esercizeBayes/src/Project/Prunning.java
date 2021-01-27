@@ -105,13 +105,7 @@ public class Prunning {
                         lostParents.add(p.getRandomVariable());
                 }
 
-                //estraggo e riduco tabella
-                Factor f = ((CPT)i.getCPD()).getFactorFor(new AssignmentProposition[0]);
-                f = f.sumOut(lostParents.toArray(new RandomVariable[0]));
-
-                //normalizzo l'array finale
-                double[] normalizedArray = normalizeFactorArray(f,i.getRandomVariable().getDomain().size());
-
+                double[] normalizedArray = extractNormalizedProbability(i, lostParents);
                 //creo nuovo nodo
                 FullCPTNode n;
                 if(parents.size()>0)
@@ -166,11 +160,7 @@ public class Prunning {
                     }
 
                     //estraggo e riduco tabella
-                    Factor f = ((CPT)i.getCPD()).getFactorFor(new AssignmentProposition[0]);
-                    f = f.sumOut(lostParents.toArray(new RandomVariable[0]));
-                    
-                    //normalizzo l'array finale
-                    double[] normalizedArray = normalizeFactorArray(f,i.getRandomVariable().getDomain().size());
+                    double[] normalizedArray = extractNormalizedProbability(i, lostParents);
                     
                     //creo nuovo nodo
                     FullCPTNode n;
@@ -203,7 +193,8 @@ public class Prunning {
         } 
     }      
     
-    private List<Node> getRoots(BayesianNetwork bn){  // modificare libreria per aggiungere get roots nella classe bayesnet
+    // modificare libreria per aggiungere get roots nella classe bayesnet
+    private List<Node> getRoots(BayesianNetwork bn){  
         List<Node> roots = new ArrayList();
         for (RandomVariable rv : bn.getVariablesInTopologicalOrder()) {           
             Node node =bn.getNode(rv);
@@ -212,8 +203,17 @@ public class Prunning {
         }
         return roots;
     }
+   
+    // ricalcolo tabella togliendo lost parents e restituisco array di probabilità
+    private double[] extractNormalizedProbability(Node i, List<RandomVariable> lostParents) {
+        Factor f = ((CPT)i.getCPD()).getFactorFor(new AssignmentProposition[0]);
+        f = f.sumOut(lostParents.toArray(new RandomVariable[0]));
+
+        return normalizeFactorArray(f,i.getRandomVariable().getDomain().size());
+    }
     
-    //mi fa un po' cagare ma non so come altro farlo
+    // dato un array lo normalizza ogni n valori
+    // es. n = 2 -> [2,2,4,8] -> [0.5,0.5,0.33,0.66]
     private double[] normalizeFactorArray(Factor f, int n){
         double[] result = new double[f.getValues().length];
         for(int i=0; i< f.getValues().length; i += n){
