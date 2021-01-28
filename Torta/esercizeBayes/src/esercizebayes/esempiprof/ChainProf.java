@@ -5,6 +5,8 @@
  */
 package esercizebayes.esempiprof;
 
+import Project.EliminationDarwiche;
+import Project.Order;
 import aima.core.probability.CategoricalDistribution;
 import aima.core.probability.RandomVariable;
 import aima.core.probability.bayes.BayesInference;
@@ -16,9 +18,13 @@ import aima.core.probability.bayes.exact.EnumerationAsk;
 import aima.core.probability.bayes.impl.BayesNet;
 import aima.core.probability.bayes.impl.FullCPTNode;
 import aima.core.probability.domain.BooleanDomain;
+import aima.core.probability.domain.FiniteIntegerDomain;
 import aima.core.probability.proposition.AssignmentProposition;
 import aima.core.probability.util.RandVar;
+import bnparser.BifReader;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  *
@@ -26,7 +32,7 @@ import java.util.HashSet;
  */
 public class ChainProf {
     public static void main(String[] args) {
-        int n = Integer.parseInt("10");
+        /*int n = Integer.parseInt("10");
         
         System.out.println("Creo chain di " + n + " nodi");
         RandomVariable[] allrv = new RandomVariable[n];
@@ -46,7 +52,20 @@ public class ChainProf {
         RandomVariable[] qrv = new RandomVariable[1];
         qrv[0] = allrv[0]; // P(x0)
         AssignmentProposition[] ap = new AssignmentProposition[1]; 
-        ap[0] = new AssignmentProposition(allrv[n-1], Boolean.TRUE); //e = x9 = TRUE
+        ap[0] = new AssignmentProposition(allrv[n-1], Boolean.TRUE); //e = x9 = TRUE*/
+        BayesianNetwork bn = BifReader.readBIF("Sprinkler.xml");
+        
+        HashMap<String,RandomVariable> mm = new HashMap();
+        bn.getVariablesInTopologicalOrder().forEach(var -> mm.put(var.getName(), var));
+        
+        MyEliminationAsk ed = new MyEliminationAsk();
+        
+        RandomVariable[] query = {mm.get("Grass")};
+        RandomVariable ev = mm.get("Sprinkler");
+        AssignmentProposition[] as = {new AssignmentProposition(ev, "on")};
+        
+        System.out.println(bn.getNode(query[0]).getRandomVariable().getDomain());
+        System.out.println(ed.eliminationAsk(query, as, bn));
         
         /*CategoricalDistribution cd;
         BayesInference[] allbi = new BayesInference[] {new EnumerationAsk(), new EliminationAsk(), new MyEliminationAsk()};
@@ -66,7 +85,7 @@ public class ChainProf {
             }
         }     */
         
-        System.out.println(bn.getNode(allrv[0]).getChildren());
+        //System.out.println(bn.getNode(allrv[0]).getChildren());
     }
     
 

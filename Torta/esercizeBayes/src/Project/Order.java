@@ -53,22 +53,12 @@ public class Order {
         Iterator<RandomVariable> it = bnGraph.iterator();
         RandomVariable minNode = it.next();
         int minEdge = bnGraph.numberOfPossibleMarryEdge(minNode);
-        /*System.out.println("next: "+minNode+" minEdge: "+bnGraph.numberOfPossibleMarryEdge(minNode));
-        System.out.println(bnGraph);
-        System.out.println();
-        System.out.println();
-        System.out.println();*/
         while(it.hasNext()){
             RandomVariable rv = it.next();
             if(minEdge > bnGraph.numberOfPossibleMarryEdge(rv)){
                 minNode = rv;
                 minEdge = bnGraph.numberOfPossibleMarryEdge(rv);
             }
-            /*System.out.println("next: "+rv+" minEdge: "+bnGraph.numberOfPossibleMarryEdge(rv));
-            System.out.println(minNode);
-            System.out.println(minEdge);
-            System.out.println(bnGraph);
-            System.out.println();*/
         }
         return minNode;
     }
@@ -79,7 +69,7 @@ public class Order {
         int minEdge = bnGraph.getNumEdges(minNode);
         while(it.hasNext()){
             RandomVariable rv = it.next();
-            if(minEdge < bnGraph.getNumEdges(rv)){
+            if(minEdge > bnGraph.getNumEdges(rv)){
                 minNode = rv;
                 minEdge = bnGraph.getNumEdges(rv);
             }
