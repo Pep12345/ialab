@@ -27,7 +27,7 @@
 )
 
 
-(deftemplate k-cell 
+(deftemplate k-cell
 	(slot x)
 	(slot y)
 	(slot content (allowed-values water left right middle top bot sub))
@@ -44,7 +44,7 @@
 )
 
 
-(defrule action-fire 
+(defrule action-fire
         ?us <- (status (step ?s) (currently running))
 	(exec (step ?s) (action fire) (x ?x) (y ?y))
 	?mvs <- (moves (fires ?nf &:(> ?nf 0)))
@@ -71,7 +71,7 @@
 	(exec (step ?s) (action unguess) (x ?x) (y ?y))
 	?gu <- (guess ?x ?y)
 	?mvs <- (moves (guesses ?ng &:(< ?ng 20)))
-=>	
+=>
 	(retract ?gu)
         (modify ?us (step (+ ?s 1)) )
 	(modify ?mvs (guesses (+ ?ng 1)))
@@ -132,8 +132,8 @@
 
 	(cell (x ?x) (y ?y) (content hit-boat))
 	(boat-hor (name ?n) (x ?x) (ys $? ?y $?) (size ?s) (status $?ss))
-        
-	(or 
+
+	(or
 		(and (test (eq ?s 1))
 		     (test (subsetp $?ss (create$ hit)))
                 )
@@ -161,8 +161,8 @@
 
 	(cell (x ?x) (y ?y) (content hit-boat))
 	(boat-ver (name ?n) (xs $? ?x $?) (y ?y) (size ?s) (status $?ss))
-        
-	(or 
+
+	(or
 		(and (test (eq ?s 1))
 		     (test (subsetp $?ss (create$ hit)))
                 )
@@ -195,7 +195,7 @@
 	(modify ?c (content hit-boat) (status guessed))
 )
 
-(defrule solve-count-guessed-ko 
+(defrule solve-count-guessed-ko
 	(solve)
 	(guess ?x ?y)
 	?c <- (cell (x ?x) (y ?y) (content water) (status none))
@@ -205,7 +205,7 @@
 	(modify ?c (status missed))
 )
 
-(defrule solve-count-safe 
+(defrule solve-count-safe
 	(solve)
 	?c <-(cell (x ?x) (y ?y) (content boat) (status none))
 	(not (guess ?x ?y))
@@ -232,15 +232,16 @@
 	(- (+ (* ?fok 10) (* ?gok 10) (* ?sink 15) )  (+ (* ?fko 25) (* ?gko 15) (* ?saf 10)))
 )
 
-	
+
 
 (defrule solve-scoring (declare (salience -10))
 	(solve)
 	(statistics (num_fire_ok ?fok) (num_fire_ko ?fko) (num_guess_ok ?gok) (num_guess_ko ?gko) (num_safe ?saf) (num_sink ?sink))
 =>
 	(printout t "Your score is " (scoring ?fok ?fko ?gok ?gko ?saf ?sink) crlf)
+	(assert (score (scoring ?fok ?fko ?gok ?gko ?saf ?sink)))
 )
-	
+
 
 (defrule reset-map
 	(k-cell (x ?x) (y ?y) (content ?c&:(neq ?c water)))
@@ -292,7 +293,7 @@
 	(assert (k-cell (x ?x) (y ?y) (content top)))
 	(assert (resetted ?x ?y))
 )
-	
+
 
 (defrule make-visible-bot (declare (salience 5))
 	(fire ?x ?y)
@@ -312,5 +313,3 @@
 	(assert (k-cell (x ?x) (y ?y) (content middle)))
 	(assert (resetted ?x ?y))
 )
-
-
