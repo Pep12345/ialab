@@ -1,6 +1,6 @@
 (load 0_Main.clp)
 (load 1_Env.clp)
-(load ..\mappe\mappa1.clp)
+(load ..\mappe\mappa2.clp)
 (load 3_Agent_incrocio.clp)
 (reset)
 (set-break game-over)
