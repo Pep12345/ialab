@@ -57,7 +57,9 @@ def buildGrid():
                 if fact.replace(" ","")=='k-cell':
                     table.item(x,y).setForeground(QColor(0,170,0))
                     table.item(x,y).setText('K')
-                    kCell += 1
+                    if line.split('(')[4]!='content water))\n':
+                        kCell += 1
+
 
 def loadMapButtonFunction():
     global mapPath
@@ -119,7 +121,19 @@ def runButtonButtonFunction():
                             + ' (' + str(fireOK) + ' su ' + str(fireOK + fireFAIL) + ')')
         win.textEdit.append('Found: ' + str(round(((guessOK + fireOK) / (20 - kCell) * 100),1)) + '% '
                             + ' (' + str(guessOK+fireOK) + ' su ' + str(20 - kCell) + ')')
-        
+        win.textEdit.append('Precision: ' + calculate_precision()+
+                            '          ' + 'Recall: ' + calculate_recall())
+
+def calculate_recall():
+    tp = guessOK + fireOK
+    fn = (20 - kCell) - tp
+    return str(round(tp/(tp+fn),2))
+
+def calculate_precision():
+    tp = guessOK + fireOK
+    fp = guessFAIL + fireFAIL
+    return str(round(tp / (tp + fp),2))
+
 def actionChange_mainFunction():
     global mainPath
     dlg = QFileDialog()

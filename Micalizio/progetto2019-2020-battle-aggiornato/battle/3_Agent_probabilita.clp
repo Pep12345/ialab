@@ -120,7 +120,7 @@
 		(crea-f-cell  (x ?x)(y ?y)(direzione ?c))
 		(not (my-k-cell (x ?x)(y ?y)))
 		(not (f-cell (x ?x)(y ?y)))
-		(not (exec (step ?s) (action guess) (x ?x)(y ?y))) ; non dovrebbe servire ma l'ha messa il prof nelle fire
+		(not (exec (action guess) (x ?x)(y ?y))) ; non dovrebbe servire ma l'ha messa il prof nelle fire
 	=>
 		(assert (f-cell (x ?x)(y ?y)(direzione ?c)))
 		(assert (exec (step ?s) (action guess) (x ?x)(y ?y)))
@@ -634,22 +634,7 @@
  (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
      (pop-focus)
 )
-(defrule fire1-fcell (declare (salience -55))
-	(moves (fires ?fires&:(> ?fires 0)))
-  (status (step ?s)(currently running))
-  ?f<-(f-cell(x ?x) (y ?y))
-  (or
-     (b-cell (x ?x)(y =(- ?y 1)))
-     (b-cell(x ?x)(y =(+ 1 ?y)))
-     (b-cell(x =(+ 1 ?x))(y ?y))
-     (b-cell(x =(- ?x 1))(y ?y))
-   )
- =>
- (retract ?f)
- (printout t " FIRE di tipo 1 - f in x: " ?x " y: " ?y  crlf)
- (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
-      (pop-focus)
-)
+
 ;FIRE PROB
 ; probabilità calcolata come: prodotto tra
 ;																	num-row diviso caselle sconosciute su quella riga

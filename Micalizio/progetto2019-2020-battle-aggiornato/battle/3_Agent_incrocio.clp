@@ -84,7 +84,7 @@
 		(crea-f-cell  (x ?x)(y ?y)(direzione ?c))
 		(not (my-k-cell (x ?x)(y ?y)))
 		(not (f-cell (x ?x)(y ?y)))
-		(not (exec (step ?s) (action guess) (x ?x)(y ?y))) ; non dovrebbe servire ma l'ha messa il prof nelle fire
+		(not (exec (action guess) (x ?x)(y ?y))) ; non dovrebbe servire ma l'ha messa il prof nelle fire
 	=>
 		(assert (f-cell (x ?x)(y ?y)(direzione ?c)))
 		(assert (exec (step ?s) (action guess) (x ?x)(y ?y)))
@@ -456,7 +456,7 @@
 		(k-per-row (row ?x) (num ?num-row&:(> ?num-row 0)))
 		(status (step ?s)(currently running))
 		(test (eq (+ 	(+ (length$ (find-all-facts ((?f my-k-cell)) (eq ?f:x ?x))) (length$ (find-all-facts ((?f1 f-cell)) (eq ?f1:x ?x)))) ?num-row) 10))
-		(k-per-col (col ?y)(num ?num-col&:(> ?num-col 0))) 
+		(k-per-col (col ?y)(num ?num-col&:(> ?num-col 0)))
 		(not (my-k-cell (x ?x) (y ?y)))
 		(not (f-cell (x ?x) (y ?y)))
 	=>
