@@ -23,6 +23,13 @@ public class Order {
         this.bn = bn;     
     }
     
+    public List<RandomVariable> reverseTopologicalOrder(){
+        List<RandomVariable> o = new ArrayList();
+        bn.getVariablesInTopologicalOrder().forEach(n-> o.add(n));
+        return o;
+    }
+    
+    
     public List<RandomVariable> minDegreeOrder(){
         return order(0);
     }

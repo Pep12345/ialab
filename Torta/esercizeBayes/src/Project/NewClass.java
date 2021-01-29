@@ -5,6 +5,7 @@
  */
 package Project;
 
+import aima.core.probability.CategoricalDistribution;
 import aima.core.probability.RandomVariable;
 import aima.core.probability.bayes.BayesianNetwork;
 import aima.core.probability.domain.BooleanDomain;
@@ -20,11 +21,8 @@ import java.util.List;
  */
 public class NewClass {
     public static void main(String[] args) throws CloneNotSupportedException {
-        BayesianNetwork bn = BifReader.readBIF("Sprinkler.xml");
         
-        Order or = new Order(bn);
-        List<RandomVariable> order = or.minDegreeOrder();
-        EliminationDarwiche ed = new EliminationDarwiche(order);
+        BayesianNetwork bn = BifReader.readBIF("../reti/0to20nodi/Sprinkler.xml");
         
         HashMap<String,RandomVariable> mm = new HashMap();
         bn.getVariablesInTopologicalOrder().forEach(var -> mm.put(var.getName(), var));
@@ -32,8 +30,40 @@ public class NewClass {
         RandomVariable[] query = {mm.get("Grass")};
         RandomVariable ev = mm.get("Sprinkler");
         AssignmentProposition[] as = {new AssignmentProposition(ev, "on")};
-
-        System.out.println(ed.eliminationAsk(query, as, bn));
+        
+        Prunning p = new Prunning(query, as, bn);
+        
+        bn = p.prunningNodeAncestors();
+        p.setBn(bn);
+        bn = p.prunningEdge();
+        
+        Order or = new Order(bn);
+        List<RandomVariable> order = or.minFillOrder();
+        EliminationDarwiche ed = new EliminationDarwiche(order);
+        
+        long startTime = System.nanoTime();
+        CategoricalDistribution eliminationAsk = ed.eliminationAsk(query, as, bn);
+        long endTime = System.nanoTime();
+        System.out.println(eliminationAsk);
+        System.out.println(endTime-startTime);
+        
+        ed.setOrder(or.reverseTopologicalOrder());
+        
+        startTime = System.nanoTime();
+        eliminationAsk = ed.eliminationAsk(query, as, bn);
+        endTime = System.nanoTime();
+        System.out.println(eliminationAsk);
+        System.out.println(endTime-startTime);
+        
+        ed.setOrder(or.minDegreeOrder());
+        
+        startTime = System.nanoTime();
+        eliminationAsk = ed.eliminationAsk(query, as, bn);
+        endTime = System.nanoTime();
+        System.out.println(eliminationAsk);
+        System.out.println(endTime-startTime);
+        
+        
         // example th 1
         /*RandomVariable[] query = {new RandVar("Grass", new BooleanDomain())};
         RandVar ev = new RandVar("Rain", new BooleanDomain());

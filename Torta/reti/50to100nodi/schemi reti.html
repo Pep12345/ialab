@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0067)https://www.bnlearn.com/bnrepository/discrete-large.html#hailfinder -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>bnlearn - Bayesian Network Repository</title>
+  
+  <meta name="description" content="Bayesian Network Repository: Large Discrete Bayesian Networks.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="./schemi reti_files/style.css">
+<style type="text/css">.backpack.dropzone {
+  font-family: 'SF UI Display', 'Segoe UI';
+  font-size: 15px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 250px;
+  height: 150px;
+  font-weight: lighter;
+  color: white;
+  will-change: right;
+  z-index: 2147483647;
+  bottom: 20%;
+  background: #333;
+  position: fixed;
+  user-select: none;
+  transition: left .5s, right .5s;
+  right: 0px; }
+  .backpack.dropzone .animation {
+    height: 80px;
+    width: 250px;
+    background: url("chrome-extension://lifbcibllhkdhoafpjfnlhfpfgnpldfl/assets/backpack/dropzone/hoverstate.png") left center; }
+  .backpack.dropzone .title::before {
+    content: 'Save to'; }
+  .backpack.dropzone.closed {
+    right: -250px; }
+  .backpack.dropzone.hover .animation {
+    animation: sxt-play-anim-hover 0.91s steps(21);
+    animation-fill-mode: forwards;
+    background: url("chrome-extension://lifbcibllhkdhoafpjfnlhfpfgnpldfl/assets/backpack/dropzone/hoverstate.png") left center; }
+
+@keyframes sxt-play-anim-hover {
+  from {
+    background-position: 0px; }
+  to {
+    background-position: -5250px; } }
+  .backpack.dropzone.saving .title::before {
+    content: 'Saving to'; }
+  .backpack.dropzone.saving .animation {
+    background: url("chrome-extension://lifbcibllhkdhoafpjfnlhfpfgnpldfl/assets/backpack/dropzone/saving_loop.png") left center;
+    animation: sxt-play-anim-saving steps(59) 2.46s infinite; }
+
+@keyframes sxt-play-anim-saving {
+  100% {
+    background-position: -14750px; } }
+  .backpack.dropzone.saved .title::before {
+    content: 'Saved to'; }
+  .backpack.dropzone.saved .animation {
+    background: url("chrome-extension://lifbcibllhkdhoafpjfnlhfpfgnpldfl/assets/backpack/dropzone/saved.png") left center;
+    animation: sxt-play-anim-saved steps(20) 0.83s forwards; }
+
+@keyframes sxt-play-anim-saved {
+  100% {
+    background-position: -5000px; } }
+</style></head>
+<body>
+
+  <!-- header -->
+
+  <div id="header" class="blocks">
+  bnlearn - an R package for Bayesian network learning and inference
+  </div>
+
+  <div id="container">
+
+    <!-- navigation menu (left side) -->
+
+    <div id="menu">
+      <div id="inner" class="blocks">
+
+      <ul class="menulist">
+        <li> <a href="https://www.bnlearn.com/">Home Page</a> </li>
+        <li> <a href="https://www.bnlearn.com/documentation">Documentation</a></li>
+        <li> <a href="https://www.bnlearn.com/examples">Examples</a> </li>
+        <li> <a href="https://www.bnlearn.com/research">Research Notes</a> </li>
+        <li> <a href="https://www.bnlearn.com/bnrepository">Bayesian Network Repository</a> </li>
+      </ul>
+      <br>
+      <ul class="menulist">
+        <li> <a href="https://www.bnlearn.com/about">About the Author</a> </li>
+      </ul>
+      <br>
+      <div class="booklink">
+        <a href="https://www.bnlearn.com/book-useR">
+          <img src="./schemi reti_files/useR.jpg" alt="Bayesian Networks in R: with Applications in Systems Biology" class="photo"><br>
+          data &amp; R code
+        </a>
+        <br>
+        <a href="https://www.bnlearn.com/book-crc">
+          <img src="./schemi reti_files/crc.jpg" alt="Bayesian Networks: with Examples in R" class="photo"><br>
+          data &amp; R code
+        </a>
+        <br>
+        (<a href="https://www.bnlearn.com/book-crc-2ed">2nd edition coming soon!</a>)
+        <br>
+      </div>
+
+      </div>
+    </div>
+
+    <!-- main -->
+
+    <div id="main">
+      <div id="inner2" class="blocks">
+
+      <h2>Large Networks (50–100 nodes)</h2>
+
+      <div class="about-box">
+        <div class="bnrep-left">
+          <img src="./schemi reti_files/hailfinder.png" alt="network" id="hailfinder">
+        </div>
+        <div class="bnrep-right">
+          <h3>HAILFINDER</h3>
+          Number of nodes:&nbsp;56<br>
+          Number of arcs:&nbsp;66<br>
+          Number of parameters:&nbsp;2656<br>
+          Average Markov blanket size:&nbsp;3.54<br>
+          Average degree:&nbsp;2.36<br>
+          Maximum in-degree:&nbsp;4<br>
+          <br>
+          <a href="https://www.bnlearn.com/bnrepository/hailfinder/hailfinder.bif.gz">BIF</a> (8.9kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/hailfinder/hailfinder.dsc.gz">DSC</a> (7.8kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/hailfinder/hailfinder.net.gz">NET</a> (5.6kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/hailfinder/hailfinder.rda">RDA (bn.fit)</a> (7.9kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/hailfinder/hailfinder.rds">RDS (bn.fit)</a> (7.9kB)<br>
+          <br>
+          B. Abramson, J. Brown, W. Edwards, A. Murphy, and R. L. Winkler.
+          Hailfinder: A Bayesian system for forecasting severe weather.
+          International Journal of Forecasting, 12(1):57-71, 1996.
+        </div>
+      </div>
+      <div class="about-box">
+        <div class="bnrep-left">
+          <img src="./schemi reti_files/hepar2.png" alt="network" id="hepar2">
+        </div>
+        <div class="bnrep-right">
+          <h3>HEPAR2</h3>
+          Number of nodes:&nbsp;70<br>
+          Number of arcs:&nbsp;123<br>
+          Number of parameters:&nbsp;1453<br>
+          Average Markov blanket size:&nbsp;4.51<br>
+          Average degree:&nbsp;3.51<br>
+          Maximum in-degree:&nbsp;6<br>
+          <br>
+          <a href="https://www.bnlearn.com/bnrepository/hepar2/hepar2.bif.gz">BIF</a> (12kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/hepar2/hepar2.dsc.gz">DSC</a> (11kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/hepar2/hepar2.net.gz">NET</a> (9.7kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/hepar2/hepar2.rda">RDA (bn.fit)</a> (15.7kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/hepar2/hepar2.rds">RDS (bn.fit)</a> (15.7kB)<br>
+          <br>
+          A. Onisko. Probabilistic Causal Models in Medicine: Application to
+          Diagnosis of Liver Disorders. Ph.D. Dissertation, Institute of
+          Biocybernetics and Biomedical Engineering, Polish Academy of
+          Science, Warsaw, March 2003.
+        </div>
+      </div>
+      <div class="about-box">
+        <div class="bnrep-left">
+          <img src="./schemi reti_files/win95pts.png" alt="network" id="win95pts">
+        </div>
+        <div class="bnrep-right">
+          <h3>WIN95PTS</h3>
+          Number of nodes:&nbsp;76<br>
+          Number of arcs:&nbsp;112<br>
+          Number of parameters:&nbsp;574<br>
+          Average Markov blanket size:&nbsp;5.92<br>
+          Average degree:&nbsp;2.95<br>
+          Maximum in-degree:&nbsp;7<br>
+          <br>
+          <a href="https://www.bnlearn.com/bnrepository/win95pts/win95pts.bif.gz">BIF</a> (4.2kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/win95pts/win95pts.dsc.gz">DSC</a> (3.2kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/win95pts/win95pts.net.gz">NET</a> (2.2kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/win95pts/win95pts.rda">RDA (bn.fit)</a> (3.9kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/win95pts/win95pts.rds">RDS (bn.fit)</a> (3.9kB)<br>
+          <br>
+        </div>
+      </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- footer -->
+
+  <div id="footer" class="blocks">
+
+    <div id="licence">
+
+      <a rel="license" href="https://creativecommons.org/licenses/by-sa/3.0/">
+        <img alt="Creative Commons License" src="./schemi reti_files/cc-sa.png">
+      </a>
+
+    </div>
+
+    <div id="validate">
+
+      <a href="https://validatore.w3.org/check?uri=referer">
+      <img src="./schemi reti_files/valid-xhtml10.png" alt="Valid XHTML 1.0 Strict"></a>
+
+    </div>
+
+  <p>© 2021 Marco Scutari.
+  The contents of this page are licensed under the <a rel="license" href="https://creativecommons.org/licenses/by-sa/3.0/">
+  Creative Commons Attribution-Share Alike License</a>.
+  </p>
+
+  </div>
+
+
+
+</body></html>

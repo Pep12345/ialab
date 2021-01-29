@@ -1,0 +1,297 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0063)https://www.bnlearn.com/bnrepository/discrete-medium.html#alarm -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>bnlearn - Bayesian Network Repository</title>
+  
+  <meta name="description" content="Bayesian Network Repository: Medium Discrete Bayesian Networks.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="./schemi reti_files/style.css">
+<style type="text/css">.backpack.dropzone {
+  font-family: 'SF UI Display', 'Segoe UI';
+  font-size: 15px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 250px;
+  height: 150px;
+  font-weight: lighter;
+  color: white;
+  will-change: right;
+  z-index: 2147483647;
+  bottom: 20%;
+  background: #333;
+  position: fixed;
+  user-select: none;
+  transition: left .5s, right .5s;
+  right: 0px; }
+  .backpack.dropzone .animation {
+    height: 80px;
+    width: 250px;
+    background: url("chrome-extension://lifbcibllhkdhoafpjfnlhfpfgnpldfl/assets/backpack/dropzone/hoverstate.png") left center; }
+  .backpack.dropzone .title::before {
+    content: 'Save to'; }
+  .backpack.dropzone.closed {
+    right: -250px; }
+  .backpack.dropzone.hover .animation {
+    animation: sxt-play-anim-hover 0.91s steps(21);
+    animation-fill-mode: forwards;
+    background: url("chrome-extension://lifbcibllhkdhoafpjfnlhfpfgnpldfl/assets/backpack/dropzone/hoverstate.png") left center; }
+
+@keyframes sxt-play-anim-hover {
+  from {
+    background-position: 0px; }
+  to {
+    background-position: -5250px; } }
+  .backpack.dropzone.saving .title::before {
+    content: 'Saving to'; }
+  .backpack.dropzone.saving .animation {
+    background: url("chrome-extension://lifbcibllhkdhoafpjfnlhfpfgnpldfl/assets/backpack/dropzone/saving_loop.png") left center;
+    animation: sxt-play-anim-saving steps(59) 2.46s infinite; }
+
+@keyframes sxt-play-anim-saving {
+  100% {
+    background-position: -14750px; } }
+  .backpack.dropzone.saved .title::before {
+    content: 'Saved to'; }
+  .backpack.dropzone.saved .animation {
+    background: url("chrome-extension://lifbcibllhkdhoafpjfnlhfpfgnpldfl/assets/backpack/dropzone/saved.png") left center;
+    animation: sxt-play-anim-saved steps(20) 0.83s forwards; }
+
+@keyframes sxt-play-anim-saved {
+  100% {
+    background-position: -5000px; } }
+</style></head>
+<body>
+
+  <!-- header -->
+
+  <div id="header" class="blocks">
+  bnlearn - an R package for Bayesian network learning and inference
+  </div>
+
+  <div id="container">
+
+    <!-- navigation menu (left side) -->
+
+    <div id="menu">
+      <div id="inner" class="blocks">
+
+      <ul class="menulist">
+        <li> <a href="https://www.bnlearn.com/">Home Page</a> </li>
+        <li> <a href="https://www.bnlearn.com/documentation">Documentation</a></li>
+        <li> <a href="https://www.bnlearn.com/examples">Examples</a> </li>
+        <li> <a href="https://www.bnlearn.com/research">Research Notes</a> </li>
+        <li> <a href="https://www.bnlearn.com/bnrepository">Bayesian Network Repository</a> </li>
+      </ul>
+      <br>
+      <ul class="menulist">
+        <li> <a href="https://www.bnlearn.com/about">About the Author</a> </li>
+      </ul>
+      <br>
+      <div class="booklink">
+        <a href="https://www.bnlearn.com/book-useR">
+          <img src="./schemi reti_files/useR.jpg" alt="Bayesian Networks in R: with Applications in Systems Biology" class="photo"><br>
+          data &amp; R code
+        </a>
+        <br>
+        <a href="https://www.bnlearn.com/book-crc">
+          <img src="./schemi reti_files/crc.jpg" alt="Bayesian Networks: with Examples in R" class="photo"><br>
+          data &amp; R code
+        </a>
+        <br>
+        (<a href="https://www.bnlearn.com/book-crc-2ed">2nd edition coming soon!</a>)
+        <br>
+      </div>
+
+      </div>
+    </div>
+
+    <!-- main -->
+
+    <div id="main">
+      <div id="inner2" class="blocks">
+
+      <h2>Medium Networks (20–50 nodes)</h2>
+
+      <div class="about-box">
+        <div class="bnrep-left">
+          <img src="./schemi reti_files/alarm.png" alt="network" id="alarm">
+        </div>
+        <div class="bnrep-right">
+          <h3>ALARM</h3>
+          Number of nodes:&nbsp;37<br>
+          Number of arcs:&nbsp;46<br>
+          Number of parameters:&nbsp;509<br>
+          Average Markov blanket size:&nbsp;3.51<br>
+          Average degree:&nbsp;2.49<br>
+          Maximum in-degree:&nbsp;4<br>
+          <br>
+          <a href="https://www.bnlearn.com/bnrepository/alarm/alarm.bif.gz">BIF</a> (1.8kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/alarm/alarm.dsc.gz">DSC</a> (1.7kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/alarm/alarm.net.gz">NET</a> (1.3kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/alarm/alarm.rda">RDA (bn.fit)</a> (2.1kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/alarm/alarm.rds">RDS (bn.fit)</a> (1.1kB)<br>
+          <br>
+          I. A. Beinlich, H. J. Suermondt, R. M. Chavez, and G. F. Cooper.
+          The ALARM Monitoring System: A Case Study with Two Probabilistic
+          Inference Techniques for Belief Networks. In Proceedings of the
+          2nd European Conference on Artificial Intelligence in Medicine,
+          pages 247-256. Springer-Verlag, 1989.
+        </div>
+      </div>
+      <div class="about-box">
+        <div class="bnrep-left">
+          <img src="./schemi reti_files/barley.png" alt="network" id="barley">
+        </div>
+        <div class="bnrep-right">
+          <h3>BARLEY</h3>
+          Number of nodes:&nbsp;48<br>
+          Number of arcs:&nbsp;84<br>
+          Number of parameters:&nbsp;114005<br>
+          Average Markov blanket size:&nbsp;5.25<br>
+          Average degree:&nbsp;3.5<br>
+          Maximum in-degree:&nbsp;4<br>
+          <br>
+          <a href="https://www.bnlearn.com/bnrepository/barley/barley.bif.gz">BIF</a> (369kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/barley/barley.dsc.gz">DSC</a> (351kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/barley/barley.net.gz">NET</a> (292kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/barley/barley.rda">RDA (bn.fit)</a> (410kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/barley/barley.rds">RDS (bn.fit)</a> (410kB)<br>
+          <br>
+          Preliminary model for barley developed under the project: "Production
+          of beer from Danish malting barley grown without the use of pesticides"
+          by Kristian Kristensen , Ilse A. Rasmussen and others.
+        </div>
+      </div>
+      <div class="about-box">
+        <div class="bnrep-left">
+          <img src="./schemi reti_files/child.png" alt="network" id="child">
+        </div>
+        <div class="bnrep-right">
+          <h3>CHILD</h3>
+          Number of nodes:&nbsp;20<br>
+          Number of arcs:&nbsp;25<br>
+          Number of parameters:&nbsp;230<br>
+          Average Markov blanket size:&nbsp;3.00<br>
+          Average degree:&nbsp;1.25<br>
+          Maximum in-degree:&nbsp;2<br>
+          <br>
+          <a href="https://www.bnlearn.com/bnrepository/child/child.bif.gz">BIF</a> (1.4kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/child/child.dsc.gz">DSC</a> (1.3kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/child/child.net.gz">NET</a> (1.1kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/child/child.rda">RDA (bn.fit)</a> (1.8kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/child/child.rds">RDS (bn.fit)</a> (1.8kB)<br>
+          <br>
+          D. J. Spiegelhalter, R. G. Coewll (1992). Learning in probabilistic expert systems.
+          In Bayesian Statistics 4 (J. M. Bernardo, J. 0. Berger, A. P. Dawid and A. F. M.
+          Smith, eds.) 447-466. Clarendon Press, Oxford.
+        </div>
+      </div>
+      <div class="about-box">
+        <div class="bnrep-left">
+          <img src="./schemi reti_files/insurance.png" alt="network" id="insurance">
+        </div>
+        <div class="bnrep-right">
+          <h3>INSURANCE</h3>
+          Number of nodes:&nbsp;27<br>
+          Number of arcs:&nbsp;52<br>
+          Number of parameters:&nbsp;984<br>
+          Average Markov blanket size:&nbsp;5.19<br>
+          Average degree:&nbsp;3.85<br>
+          Maximum in-degree:&nbsp;3<br>
+          <br>
+          <a href="https://www.bnlearn.com/bnrepository/insurance/insurance.bif.gz">BIF</a> (3.7kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/insurance/insurance.dsc.gz">DSC</a> (3.1kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/insurance/insurance.net.gz">NET</a> (2.4kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/insurance/insurance.rda">RDA (bn.fit)</a> (3.7kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/insurance/insurance.rds">RDS (bn.fit)</a> (3.7kB)<br>
+          <br>
+          J. Binder, D. Koller, S. Russell, and K. Kanazawa. Adaptive
+          Probabilistic Networks with Hidden Variables. Machine Learning,
+          29(2-3):213-244, 1997.
+        </div>
+      </div>
+      <div class="about-box">
+        <div class="bnrep-left">
+          <img src="./schemi reti_files/mildew.png" alt="network" id="mildew">
+        </div>
+        <div class="bnrep-right">
+          <h3>MILDEW</h3>
+          Number of nodes:&nbsp;35<br>
+          Number of arcs:&nbsp;46<br>
+          Number of parameters:&nbsp;540150<br>
+          Average Markov blanket size:&nbsp;4.57<br>
+          Average degree:&nbsp;2.63<br>
+          Maximum in-degree:&nbsp;3<br>
+          <br>
+          <a href="https://www.bnlearn.com/bnrepository/mildew/mildew.bif.gz">BIF</a> (191kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/mildew/mildew.dsc.gz">DSC</a> (187kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/mildew/mildew.net.gz">NET</a> (164kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/mildew/mildew.rda">RDA (bn.fit)</a> (234kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/mildew/mildew.rds">RDS (bn.fit)</a> (234kB)<br>
+          <br>
+        </div>
+      </div>
+      <div class="about-box">
+        <div class="bnrep-left">
+          <img src="./schemi reti_files/water.png" alt="network" id="water">
+        </div>
+        <div class="bnrep-right">
+          <h3>WATER</h3>
+          Number of nodes:&nbsp;32<br>
+          Number of arcs:&nbsp;66<br>
+          Number of parameters:&nbsp;10083<br>
+          Average Markov blanket size:&nbsp;7.69<br>
+          Average degree:&nbsp;4.12<br>
+          Maximum in-degree:&nbsp;5<br>
+          <br>
+          <a href="https://www.bnlearn.com/bnrepository/water/water.bif.gz">BIF</a> (25kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/water/water.dsc.gz">DSC</a> (23kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/water/water.net.gz">NET</a> (6kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/water/water.rda">RDA (bn.fit)</a> (18kB)<br>
+          <a href="https://www.bnlearn.com/bnrepository/water/water.rds">RDS (bn.fit)</a> (18kB)<br>
+          <br>
+          F. V. Jensen, U. Kjærulff, K. G. Olesen and J. Pedersen.
+          Et Forprojekt Til et Ekspertsystem for Drift af Spildevandsrensning
+          (An Expert System for Control of Waste Water Treatment - A Pilot
+          Project). Technical Report, Judex Datasystemer A/S, Aalborg, 1989. In
+          Danish.
+        </div>
+      </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- footer -->
+
+  <div id="footer" class="blocks">
+
+    <div id="licence">
+
+      <a rel="license" href="https://creativecommons.org/licenses/by-sa/3.0/">
+        <img alt="Creative Commons License" src="./schemi reti_files/cc-sa.png">
+      </a>
+
+    </div>
+
+    <div id="validate">
+
+      <a href="https://validatore.w3.org/check?uri=referer">
+      <img src="./schemi reti_files/valid-xhtml10.png" alt="Valid XHTML 1.0 Strict"></a>
+
+    </div>
+
+  <p>© 2021 Marco Scutari.
+  The contents of this page are licensed under the <a rel="license" href="https://creativecommons.org/licenses/by-sa/3.0/">
+  Creative Commons Attribution-Share Alike License</a>.
+  </p>
+
+  </div>
+
+
+
+</body></html>
