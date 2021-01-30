@@ -24,8 +24,8 @@ public class Order {
     }
     
     public List<RandomVariable> reverseTopologicalOrder(){
-        List<RandomVariable> o = new ArrayList();
-        bn.getVariablesInTopologicalOrder().forEach(n-> o.add(n));
+        List<RandomVariable> o = new ArrayList(bn.getVariablesInTopologicalOrder());
+        Collections.reverse(o);
         return o;
     }
     

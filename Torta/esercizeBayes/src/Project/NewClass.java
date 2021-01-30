@@ -8,69 +8,74 @@ package Project;
 import aima.core.probability.CategoricalDistribution;
 import aima.core.probability.RandomVariable;
 import aima.core.probability.bayes.BayesianNetwork;
-import aima.core.probability.domain.BooleanDomain;
 import aima.core.probability.proposition.AssignmentProposition;
-import aima.core.probability.util.RandVar;
 import bnparser.BifReader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
  * @author Biondi Giuseppe
  */
 public class NewClass {
+    static HashMap<String,RandomVariable> mm = new HashMap();
+    static BayesianNetwork bn;
+    
     public static void main(String[] args) throws CloneNotSupportedException {
         
-        BayesianNetwork bn = BifReader.readBIF("../reti/0to20nodi/Sprinkler.xml");
+        chooseMap("../reti/20to50nodi/child.xml");
         
-        HashMap<String,RandomVariable> mm = new HashMap();
+        RandomVariable[] query = {mm.get("CO2")};
+        AssignmentProposition[] as = {new AssignmentProposition(mm.get("Age"), "0-3_days")};
+        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
+        
+        bn = Prunning.prunningNodeAncestors(query, as, bn);
+        System.out.println("-Added prunning of ancestors");
+        bn = Prunning.prunningEdge(query, as, bn);
+        System.out.println("-Added prunning of edge");
+        
+        testQuery(query, as, bn);
+        
+        chooseMap("../reti/0to20nodi/Sprinkler.xml");
+        query = new RandomVariable[]{mm.get("Rain")};
+        as = new AssignmentProposition[]{new AssignmentProposition(mm.get("Season"), "winter")};
+        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
+        testQuery(query,as,bn);
+        
+    }
+    
+    private static void chooseMap(String path){
+        bn = BifReader.readBIF(path);
         bn.getVariablesInTopologicalOrder().forEach(var -> mm.put(var.getName(), var));
-        
-        RandomVariable[] query = {mm.get("Grass")};
-        RandomVariable ev = mm.get("Sprinkler");
-        AssignmentProposition[] as = {new AssignmentProposition(ev, "on")};
-        
-        Prunning p = new Prunning(query, as, bn);
-        
-        bn = p.prunningNodeAncestors();
-        p.setBn(bn);
-        bn = p.prunningEdge();
-        
+    }
+    
+    private static void testQuery(RandomVariable[] query, AssignmentProposition[] as, BayesianNetwork bn){
         Order or = new Order(bn);
-        List<RandomVariable> order = or.minFillOrder();
-        EliminationDarwiche ed = new EliminationDarwiche(order);
         
+        System.out.println("\nResult using reverse topological order:");
+        List<RandomVariable> order = or.reverseTopologicalOrder();
+        EliminationDarwiche ed = new EliminationDarwiche(order);
+        printResult(ed,query,as,bn);
+        
+        System.out.println("\nResult using reverse min fill order:");
+        ed.setOrder(or.minFillOrder());
+        printResult(ed,query,as,bn);
+        
+        System.out.println("\nResult using reverse min degree order:");
+        ed.setOrder(or.minDegreeOrder());
+        printResult(ed,query,as,bn);
+        
+        System.out.println("\n\n\n");
+    }
+    
+    
+    private static void printResult(EliminationDarwiche ed, RandomVariable[] query, AssignmentProposition[] as, BayesianNetwork bn){
         long startTime = System.nanoTime();
         CategoricalDistribution eliminationAsk = ed.eliminationAsk(query, as, bn);
         long endTime = System.nanoTime();
         System.out.println(eliminationAsk);
-        System.out.println(endTime-startTime);
-        
-        ed.setOrder(or.reverseTopologicalOrder());
-        
-        startTime = System.nanoTime();
-        eliminationAsk = ed.eliminationAsk(query, as, bn);
-        endTime = System.nanoTime();
-        System.out.println(eliminationAsk);
-        System.out.println(endTime-startTime);
-        
-        ed.setOrder(or.minDegreeOrder());
-        
-        startTime = System.nanoTime();
-        eliminationAsk = ed.eliminationAsk(query, as, bn);
-        endTime = System.nanoTime();
-        System.out.println(eliminationAsk);
-        System.out.println(endTime-startTime);
-        
-        
-        // example th 1
-        /*RandomVariable[] query = {new RandVar("Grass", new BooleanDomain())};
-        RandVar ev = new RandVar("Rain", new BooleanDomain());
-        AssignmentProposition[] as = {new AssignmentProposition(ev, Boolean.TRUE)};
-        Prunning p = new Prunning(query, as, bn);
-        BayesianNetwork bn2 = p.prunningEdge();
-        //BayesianNetwork bn2 = p.prunningNodeAncestors();
-        System.out.println(bn2.getNode(ev).getChildren());*/
+        System.out.println("Time in seconds: "+(endTime-startTime)/(Math.pow(10, 9)));
     }
 }

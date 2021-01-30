@@ -13,64 +13,28 @@ import aima.core.probability.bayes.impl.BayesNet;
 import aima.core.probability.bayes.impl.CPT;
 import aima.core.probability.bayes.impl.FullCPTNode;
 import aima.core.probability.proposition.AssignmentProposition;
-import aima.core.probability.util.ProbabilityTable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  *
  * @author Biondi Giuseppe
  */
 public class Prunning {
-    private RandomVariable[] qrv;
-    private AssignmentProposition[] e;
-    private BayesianNetwork bn;
-
-    public RandomVariable[] getQrv() {
-        return qrv;
-    }
-
-    public void setQrv(RandomVariable[] qrv) {
-        this.qrv = qrv;
-    }
-
-    public AssignmentProposition[] getE() {
-        return e;
-    }
-
-    public void setE(AssignmentProposition[] e) {
-        this.e = e;
-    }
-
-    public BayesianNetwork getBn() {
-        return bn;
-    }
-
-    public void setBn(BayesianNetwork bn) {
-        this.bn = bn;
-    }
-    
-    public Prunning(final RandomVariable[] qrv, final AssignmentProposition[] e, final BayesianNetwork bn){
-        this.qrv = qrv;
-        this.e = e;
-        this.bn = bn;
-    }
 
      // ricorsivamente per ogni nodo prendo i figli e i parent dei figli e poi chiamo ricorisvamente
     // su parent nodo e parent figli
-    public BayesNet prunningNodeMSeparated(){
+    public static BayesNet prunningNodeMSeparated(final RandomVariable[] qrv, final AssignmentProposition[] e, final BayesianNetwork bn){
         HashSet<RandomVariable> nodeToSave = new HashSet();
         for( RandomVariable q : qrv ){ 
-            visitaNodo(bn.getNode(q), nodeToSave);
+            visitaNodo(bn.getNode(q), nodeToSave, e);
         }
-        return createBayNet(nodeToSave);
+        return createBayNet(nodeToSave, bn);
     }
         
-    public BayesianNetwork prunningNodeAncestors(){
+    public static BayesianNetwork prunningNodeAncestors(final RandomVariable[] qrv, final AssignmentProposition[] e, final BayesianNetwork bn){
          // aggiungo anche query e evidence nella lista ancestor perchè poi 
          // la uso come lista dei nodi che voglio tenere
         HashSet<RandomVariable> ancestor = new HashSet();
@@ -82,10 +46,10 @@ public class Prunning {
             getAncestors(bn.getNode(e1.getTermVariable()), ancestor);
             ancestor.add(e1.getTermVariable());
         }
-        return createBayNet(ancestor);
+        return createBayNet(ancestor, bn);
     }
     
-    public BayesNet prunningEdge(){
+    public static BayesNet prunningEdge(final RandomVariable[] qrv, final AssignmentProposition[] e, final BayesianNetwork bn){
         List<Node> newRoots = new ArrayList();
         HashMap<String,Node> newAddedNode = new HashMap();
         
@@ -99,7 +63,7 @@ public class Prunning {
                 List<Node> parents = new ArrayList();
                 List<RandomVariable> lostParents = new ArrayList();
                 for (Node p : i.getParents()){
-                    if(!checkEvidence(p))
+                    if(!checkEvidence(p, e))
                         parents.add(newAddedNode.get(p.getRandomVariable().getName()));
                     else
                         lostParents.add(p.getRandomVariable());
@@ -121,24 +85,25 @@ public class Prunning {
     }
     
     
-    private void visitaNodo(Node nodo, HashSet<RandomVariable> nodeToSave){
-        if(!checkEvidence(nodo) && !nodeToSave.contains(nodo.getRandomVariable())){ // non evidenza e non già visitato
+    private static void visitaNodo(Node nodo, HashSet<RandomVariable> nodeToSave, AssignmentProposition[] e){
+        if(!checkEvidence(nodo, e) && !nodeToSave.contains(nodo.getRandomVariable())){ // non evidenza e non già visitato
             nodeToSave.add(nodo.getRandomVariable()); //segno come visitato
             // ricorsione sui fratelli
             for (Node son: nodo.getChildren()){
                 for(Node sibling: son.getParents()){
-                    visitaNodo(sibling, nodeToSave);
+                    visitaNodo(sibling, nodeToSave, e);
                 }
             }
             //ricorsione sui genitori
             for (Node parent: nodo.getParents())
-                visitaNodo(parent, nodeToSave);
-        }else if(checkEvidence(nodo) && !nodeToSave.contains(nodo.getRandomVariable())){ //segno evidenza come visitata
+                visitaNodo(parent, nodeToSave, e
+                );
+        }else if(checkEvidence(nodo, e) && !nodeToSave.contains(nodo.getRandomVariable())){ //segno evidenza come visitata
             nodeToSave.add(nodo.getRandomVariable() ); //segno evidenza come visitata
         }
     }    
     
-    private BayesNet createBayNet(HashSet<RandomVariable> acceptedNodeInNewNetwork){
+    private static BayesNet createBayNet(HashSet<RandomVariable> acceptedNodeInNewNetwork, BayesianNetwork bn){
         List<Node> newRoots = new ArrayList();
         HashMap<String,Node> newAddedNode = new HashMap();
         
@@ -177,7 +142,7 @@ public class Prunning {
         return new BayesNet(newRoots.toArray(new Node[0]));
     }
     
-    private boolean checkEvidence(Node nodo){
+    private static boolean checkEvidence(Node nodo, AssignmentProposition[] e){
         boolean result = false; 
         for( AssignmentProposition a: e){
             if(a.getTermVariable().equals(nodo.getRandomVariable()))
@@ -186,7 +151,7 @@ public class Prunning {
         return result;
     }
     
-    private void getAncestors(Node n, HashSet<RandomVariable> hs){
+    private static void getAncestors(Node n, HashSet<RandomVariable> hs){
         for( Node father : n.getParents()){
             hs.add(father.getRandomVariable());
             getAncestors(father,hs);
@@ -194,7 +159,7 @@ public class Prunning {
     }      
     
     // modificare libreria per aggiungere get roots nella classe bayesnet
-    private List<Node> getRoots(BayesianNetwork bn){  
+    private static List<Node> getRoots(BayesianNetwork bn){  
         List<Node> roots = new ArrayList();
         for (RandomVariable rv : bn.getVariablesInTopologicalOrder()) {           
             Node node =bn.getNode(rv);
@@ -205,7 +170,7 @@ public class Prunning {
     }
    
     // ricalcolo tabella togliendo lost parents e restituisco array di probabilità
-    private double[] extractNormalizedProbability(Node i, List<RandomVariable> lostParents) {
+    private static double[] extractNormalizedProbability(Node i, List<RandomVariable> lostParents) {
         Factor f = ((CPT)i.getCPD()).getFactorFor(new AssignmentProposition[0]);
         f = f.sumOut(lostParents.toArray(new RandomVariable[0]));
 
@@ -214,7 +179,7 @@ public class Prunning {
     
     // dato un array lo normalizza ogni n valori
     // es. n = 2 -> [2,2,4,8] -> [0.5,0.5,0.33,0.66]
-    private double[] normalizeFactorArray(Factor f, int n){
+    private static double[] normalizeFactorArray(Factor f, int n){
         double[] result = new double[f.getValues().length];
         for(int i=0; i< f.getValues().length; i += n){
             double sum = 0;
