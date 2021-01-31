@@ -3,36 +3,34 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Project;
+package Project2;
 
+import Project.*;
 import aima.core.probability.CategoricalDistribution;
 import aima.core.probability.Factor;
 import aima.core.probability.RandomVariable;
+import aima.core.probability.bayes.BayesInference;
 import aima.core.probability.bayes.BayesianNetwork;
 import aima.core.probability.bayes.ConditionalProbabilityDistribution;
 import aima.core.probability.bayes.FiniteNode;
 import aima.core.probability.bayes.Node;
 import aima.core.probability.bayes.exact.EliminationAsk;
-import aima.core.probability.bayes.impl.BayesNet;
-import aima.core.probability.bayes.impl.CPT;
-import aima.core.probability.bayes.impl.FullCPTNode;
 import aima.core.probability.proposition.AssignmentProposition;
 import aima.core.probability.util.ProbabilityTable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 /**
  *
  * @author Biondi Giuseppe
  */
-public class EliminationDarwiche extends EliminationAsk {
+public class EliminationDarwicheDynamic implements BayesInference  {
     private static final ProbabilityTable _identity = new ProbabilityTable(
 			new double[] { 1.0 });
     List<RandomVariable> order = new ArrayList();
     
-    public EliminationDarwiche(List<RandomVariable> order){
+    public EliminationDarwicheDynamic(List<RandomVariable> order){
         super();
         this.order = order;
     }
@@ -45,13 +43,15 @@ public class EliminationDarwiche extends EliminationAsk {
         this.order = order;
     }
     
-    @Override 
-    public CategoricalDistribution eliminationAsk(final RandomVariable[] Query,
-			final AssignmentProposition[] e, final BayesianNetwork bn) {
+    
+    public List<Factor> myeliminationAsk(final RandomVariable[] Query,
+			final AssignmentProposition[] e, final BayesianNetwork bn,
+                        List<Factor> prevStep) {
         
         // creo S
         List<Factor> factors = new ArrayList();
         bn.getVariablesInTopologicalOrder().forEach(var -> factors.add(makeFactor(var,e,bn)));
+        factors.addAll(prevStep);
         
         //rimuovo query da order list
         for(RandomVariable q: Query)
@@ -72,13 +72,12 @@ public class EliminationDarwiche extends EliminationAsk {
                 factors.add(f);
             }
         }
-        
-        Factor product = pointwiseProduct(factors);
-        return ((ProbabilityTable) product.pointwiseProductPOS(_identity, Query)).normalize();
+
+        return factors;
     }
 
     
-    private Factor makeFactor(RandomVariable var, AssignmentProposition[] e,
+    public Factor makeFactor(RandomVariable var, AssignmentProposition[] e,
                 BayesianNetwork bn) {
 
         Node n = bn.getNode(var);
@@ -126,5 +125,9 @@ public class EliminationDarwiche extends EliminationAsk {
 
             return product;
     }
-    
+
+    @Override
+    public CategoricalDistribution ask(RandomVariable[] rvs, AssignmentProposition[] aps, BayesianNetwork bn) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

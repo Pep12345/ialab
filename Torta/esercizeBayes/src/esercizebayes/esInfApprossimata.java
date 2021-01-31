@@ -5,6 +5,7 @@
  */
 package esercizebayes;
 
+import aima.core.probability.CategoricalDistribution;
 import aima.core.probability.Factor;
 import aima.core.probability.RandomVariable;
 import aima.core.probability.bayes.BayesianNetwork;
@@ -14,7 +15,11 @@ import aima.core.probability.bayes.impl.BayesNet;
 import aima.core.probability.bayes.impl.CPT;
 import aima.core.probability.bayes.impl.FullCPTNode;
 import aima.core.probability.domain.BooleanDomain;
+import aima.core.probability.example.ExampleRV;
+import aima.core.probability.example.HMMExampleFactory;
+import aima.core.probability.hmm.exact.HMMForwardBackward;
 import aima.core.probability.proposition.AssignmentProposition;
+import aima.core.probability.util.ProbabilityTable;
 import aima.core.probability.util.RandVar;
 import bnparser.BifReader;
 import java.util.ArrayList;
@@ -31,7 +36,21 @@ import java.util.Set;
  */
 public class esInfApprossimata {
         public static void main(String[] args) throws CloneNotSupportedException {
+        HMMForwardBackward hmmfb = new HMMForwardBackward(HMMExampleFactory.getUmbrellaWorldModel());
         
+        
+        CategoricalDistribution f = new ProbabilityTable(new double[] {
+				0.5, 0.5 }, ExampleRV.RAIN_t_RV);
+        
+        List<AssignmentProposition> e = new ArrayList<AssignmentProposition>();
+        e.add(new AssignmentProposition(ExampleRV.UMBREALLA_t_RV, Boolean.TRUE));
+        f = hmmfb.forward(f, e);
+        f = hmmfb.forward(f, e);
+        
+        System.out.println(f);
+        
+        
+        return;
         BayesianNetwork bn = BifReader.readBIF("Sprinkler.xml");
         
         Node node = bn.getNode(new RandVar("Grass",new BooleanDomain()));

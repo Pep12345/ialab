@@ -29,7 +29,7 @@ public class NewClass {
         
         RandomVariable[] query = {mm.get("CO2")};
         AssignmentProposition[] as = {new AssignmentProposition(mm.get("Age"), "0-3_days")};
-        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
+        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));                    
         
         bn = Prunning.prunningNodeAncestors(query, as, bn);
         System.out.println("-Added prunning of ancestors");
