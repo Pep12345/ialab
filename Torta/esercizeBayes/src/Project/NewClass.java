@@ -79,3 +79,7 @@ public class NewClass {
         System.out.println("Time in seconds: "+(endTime-startTime)/(Math.pow(10, 9)));
     }
 }
+
+/* creare tabelle e grafici per reti statiche, fattori più grandi o piccoli
+per reti dinamiche servono reti più complesse da una decina di per stato
+*/

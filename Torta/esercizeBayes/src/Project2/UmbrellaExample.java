@@ -6,15 +6,18 @@
 package Project2;
 
 import Project.Order;
+import aima.core.probability.CategoricalDistribution;
 import aima.core.probability.Factor;
 import aima.core.probability.RandomVariable;
 import aima.core.probability.bayes.BayesianNetwork;
+import Project2.DynamicBayesNet;
 import aima.core.probability.bayes.DynamicBayesianNetwork;
 import aima.core.probability.bayes.FiniteNode;
 import aima.core.probability.bayes.Node;
+import aima.core.probability.bayes.approx.BayesSampleInference;
+import aima.core.probability.bayes.approx.RejectionSampling;
 import aima.core.probability.bayes.impl.BayesNet;
 import aima.core.probability.bayes.impl.CPT;
-import aima.core.probability.bayes.impl.DynamicBayesNet;
 import aima.core.probability.bayes.impl.FullCPTNode;
 import aima.core.probability.domain.BooleanDomain;
 import aima.core.probability.example.ExampleRV;
@@ -36,7 +39,7 @@ import java.util.Set;
  */
 public class UmbrellaExample {
     
-    public static DynamicBayesianNetwork getExample(){
+    public static DynamicBayesNet getExample(){
 FiniteNode prior_rain_tm1 = new FullCPTNode(ExampleRV.RAIN_tm1_RV,
                 new double[] { 0.5, 0.5 });
 
@@ -48,7 +51,7 @@ FiniteNode prior_rain_tm1 = new FullCPTNode(ExampleRV.RAIN_tm1_RV,
         FiniteNode rain_tm1 = new FullCPTNode(ExampleRV.RAIN_tm1_RV,
                 new double[] { 0.5, 0.5 });
         // Transition Model
-        FiniteNode rain_t = new FullCPTNode(ExampleRV.RAIN_t_RV, new double[] {
+            FiniteNode rain_t = new FullCPTNode(ExampleRV.RAIN_t_RV, new double[] {
                 // R_t-1 = true, R_t = true
                 0.7,
                 // R_t-1 = true, R_t = false
@@ -70,9 +73,11 @@ FiniteNode prior_rain_tm1 = new FullCPTNode(ExampleRV.RAIN_tm1_RV,
                         // R_t = false, U_t = false
                         0.8 }, rain_t);
 
-        Map<RandomVariable, RandomVariable> X_0_to_X_1 = new HashMap<RandomVariable, RandomVariable>();
+        Map<RandomVariable, Set<RandomVariable>> X_0_to_X_1 = new HashMap<RandomVariable, Set<RandomVariable>>();
         Map<RandomVariable, RandomVariable> X_1_to_X_0 = new HashMap<RandomVariable, RandomVariable>();
-        X_0_to_X_1.put(ExampleRV.RAIN_tm1_RV, ExampleRV.RAIN_t_RV);
+        if(!X_0_to_X_1.keySet().contains(ExampleRV.RAIN_tm1_RV))
+            X_0_to_X_1.put(ExampleRV.RAIN_tm1_RV, new HashSet<>());
+        X_0_to_X_1.get(ExampleRV.RAIN_tm1_RV).add(ExampleRV.RAIN_t_RV);
         X_1_to_X_0.put(ExampleRV.RAIN_t_RV, ExampleRV.RAIN_tm1_RV);
         Set<RandomVariable> E_1 = new HashSet<RandomVariable>();
         E_1.add(ExampleRV.UMBREALLA_t_RV);
@@ -101,7 +106,9 @@ FiniteNode prior_rain_tm1 = new FullCPTNode(ExampleRV.RAIN_tm1_RV,
                         0.2,
                         // R_t = false, U_t = false
                         0.8 }, rain_t1);
-        X_0_to_X_1.put(ExampleRV.RAIN_t_RV, RAIN_t1_RV);
+        if(!X_0_to_X_1.keySet().contains(ExampleRV.RAIN_t_RV))
+            X_0_to_X_1.put(ExampleRV.RAIN_t_RV, new HashSet<>());
+        X_0_to_X_1.get(ExampleRV.RAIN_t_RV).add(RAIN_t1_RV);
         X_1_to_X_0.put(RAIN_t1_RV, ExampleRV.RAIN_t_RV);
         E_1.add(UMBREALLA_t1_RV);
 
@@ -129,23 +136,25 @@ RandVar RAIN_t2_RV = new RandVar("Rain_t2",new BooleanDomain());
                         0.2,
                         // R_t = false, U_t = false
                         0.8 }, rain_t2);
-        X_0_to_X_1.put(RAIN_t1_RV, RAIN_t2_RV);
+        if(!X_0_to_X_1.keySet().contains(RAIN_t1_RV))
+            X_0_to_X_1.put(RAIN_t1_RV, new HashSet<>());
+        X_0_to_X_1.get(RAIN_t1_RV).add(RAIN_t2_RV);
         X_1_to_X_0.put(RAIN_t2_RV, RAIN_t1_RV);
         E_1.add(UMBREALLA_t2_RV);
 
         return new DynamicBayesNet(priorNetwork, X_0_to_X_1, E_1, rain_tm1);
     }
     
-    public static List<RandomVariable> getNext(DynamicBayesianNetwork dbn, List<RandomVariable> previous){
+    public static List<RandomVariable> getNext(DynamicBayesNet dbn, List<RandomVariable> previous){
         List<RandomVariable> nextNodes = new ArrayList();
         for(RandomVariable rn: previous){
             Node n = dbn.getNode(rn);
             for(Node child : n.getChildren()){
-                if(dbn.getX_0_to_X_1().get(rn).equals(child.getRandomVariable()))
+                if(dbn.getX_0_to_X_1list().get(rn).contains(child.getRandomVariable()))
                     nextNodes.add(child.getRandomVariable());
                 for(Node nepewh : child.getChildren()){
-                    if(dbn.getX_0_to_X_1().containsKey(child.getRandomVariable())){
-                        if(!dbn.getX_0_to_X_1().get(child.getRandomVariable()).equals(nepewh.getRandomVariable())){
+                    if(dbn.getX_0_to_X_1list().containsKey(child.getRandomVariable())){
+                        if(!dbn.getX_0_to_X_1list().get(child.getRandomVariable()).contains(nepewh.getRandomVariable())){
                             nextNodes.add(nepewh.getRandomVariable());
                             nextNodes.addAll(getNext(dbn, Arrays.asList(nepewh.getRandomVariable())));
                         }
@@ -161,7 +170,7 @@ RandVar RAIN_t2_RV = new RandVar("Rain_t2",new BooleanDomain());
 
     private static final ProbabilityTable _identity = new ProbabilityTable(
 			new double[] { 1.0 });    
-    public static ProbabilityTable rollUp(DynamicBayesianNetwork dbn, RandomVariable[] query,
+    public static ProbabilityTable rollUp(DynamicBayesNet dbn, RandomVariable[] query,
                                         List<AssignmentProposition> ev, List<RandomVariable> prevStep,
                                         List<Factor> factorsFromPreviousStep){
 
@@ -183,7 +192,7 @@ RandVar RAIN_t2_RV = new RandVar("Rain_t2",new BooleanDomain());
         //calcolo query per VE in questa rete (quei nodi che avranno un arco verso lo slice del prossimo turno)
         List<RandomVariable> queryForThisStep = new ArrayList();
         for(RandomVariable r : next) {
-            if(dbn.getX_0_to_X_1().keySet().contains(r))
+            if(dbn.getX_0_to_X_1list().keySet().contains(r))
                 queryForThisStep.add(r);
         }
         if(queryForThisStep.isEmpty()){
@@ -205,7 +214,10 @@ RandVar RAIN_t2_RV = new RandVar("Rain_t2",new BooleanDomain());
                                                 evidenceForThisStep.toArray(new AssignmentProposition[0]), 
                                                 bn, factorsFromPreviousStep);
         System.out.println("result: ");
+        Factor printProduct = pointwiseProduct(factorsFromPreviousStep);
+        System.out.println( Arrays.toString(normalizeFactorArray(printProduct, printProduct.getValues().length)));
         factorsFromPreviousStep.forEach(f -> System.out.println(f.getArgumentVariables()+ "  "+ f));
+        
         
         System.out.println("\n\n");
         if(stop){
@@ -218,7 +230,7 @@ RandVar RAIN_t2_RV = new RandVar("Rain_t2",new BooleanDomain());
     
     public static void main(String[] args){
         //creo rete
-        DynamicBayesianNetwork example = getExample();
+        DynamicBayesNet example = getExample();
         
         //salvo variabili
         HashMap<String, RandomVariable> bnRV = new HashMap();
@@ -236,7 +248,8 @@ RandVar RAIN_t2_RV = new RandVar("Rain_t2",new BooleanDomain());
         
         //avvio rolling up
         ProbabilityTable rollUp = rollUp(example, query, ev, example.getPriorNetwork().getVariablesInTopologicalOrder(), new ArrayList());
-        System.out.println(rollUp);        
+        System.out.println(rollUp);   
+        
     }
     
     

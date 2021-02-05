@@ -50,8 +50,8 @@ public class esInfApprossimata {
         System.out.println(f);
         
         
-        return;
-        BayesianNetwork bn = BifReader.readBIF("Sprinkler.xml");
+        
+        /*BayesianNetwork bn = BifReader.readBIF("Sprinkler.xml");
         
         Node node = bn.getNode(new RandVar("Grass",new BooleanDomain()));
         CPT cpt = (CPT)node.getCPD();
@@ -129,7 +129,7 @@ public class esInfApprossimata {
                     roots.add(node);
             }  
         }*/
-        Node query = bn.getNode(new RandVar("Road", new BooleanDomain()));
+        /*Node query = bn.getNode(new RandVar("Road", new BooleanDomain()));
         HashSet<RandomVariable> hs = new HashSet();
         getAncestors(query, hs);
         FullCPTNode n = null;
