@@ -5,15 +5,24 @@
  */
 package Project2;
 
+import aima.core.probability.CategoricalDistribution;
 import aima.core.probability.RandomVariable;
 import aima.core.probability.bayes.DynamicBayesianNetwork;
 import aima.core.probability.bayes.FiniteNode;
+import aima.core.probability.bayes.approx.ParticleFiltering;
 import aima.core.probability.bayes.impl.BayesNet;
 import aima.core.probability.bayes.impl.DynamicBayesNet;
 import aima.core.probability.bayes.impl.FullCPTNode;
 import aima.core.probability.domain.BooleanDomain;
-import aima.core.probability.example.ExampleRV;
+import aima.core.probability.example.*;
+import aima.core.probability.hmm.HiddenMarkovModel;
+import aima.core.probability.hmm.exact.HMMForwardBackward;
+import aima.core.probability.proposition.AssignmentProposition;
+import aima.core.probability.util.ProbabilityTable;
 import aima.core.probability.util.RandVar;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,15 +30,73 @@ import java.util.Set;
 
 /**
  *
- * @author Biondi Giuseppe
+ * @author torta
  */
 public class tst {
     public static final RandVar WIND_tm1_RV = new RandVar("Wind_t-1",
             new BooleanDomain());
     public static final RandVar WIND_t_RV = new RandVar("Wind_t",
             new BooleanDomain());
+
+    public static void main(String[] args) {
+        // numero di predizioni da fare
+        int n = Integer.parseInt(args[0]);
+
+        int m = args.length-1;
+        AssignmentProposition[][] aps = null;
+        if (m > 0) {
+            aps = new AssignmentProposition[m][1];
+            for (int i=0; i<m; i++) {
+                aps[i][0] = new AssignmentProposition(ExampleRV.UMBREALLA_t_RV, 
+                        Integer.parseInt(args[i+1])==0 ? Boolean.FALSE : Boolean.TRUE);
+            }
+        }        
     
-   
+        System.out.println("Rete Umbrella con stato Rain");
+        ParticleFiltering pf = new ParticleFiltering(n,
+                DynamicBayesNetExampleFactory.getUmbrellaWorldNetwork());
+
+        for (int i=0; i<m; i++) {
+            AssignmentProposition[][] S = pf.particleFiltering(aps[i]);
+            System.out.println("Time " + (i+1));
+            printSamples(S, n);
+        }
+
+        System.out.println("Rete Umbrella con stato Rain, Wind");        
+        pf = new ParticleFiltering(n,
+                tst.getRainWindNet());
+
+        for (int i=0; i<m; i++) {
+            AssignmentProposition[][] S = pf.particleFiltering(aps[i]);
+            System.out.println("Time " + (i+1));
+            printSamples(S, n);
+        }
+        
+    }
+    
+    private static void printSamples(AssignmentProposition[][] S, int n) {
+        HashMap<String,Integer> hm = new HashMap<String,Integer>();
+        
+        int nstates = S[0].length;
+        
+        for (int i = 0; i < n; i++) {
+            String key = "";
+            for (int j = 0; j < nstates; j++) {
+                AssignmentProposition ap = S[i][j];
+                key += ap.getValue().toString();
+            }
+            Integer val = hm.get(key);
+            if (val == null) {
+                hm.put(key, 1);
+            } else {
+                hm.put(key, val + 1);
+            }
+        }
+        
+        for (String key : hm.keySet()) {
+            System.out.println(key + ": " + hm.get(key)/(double)n);
+        }
+    }
     
     private static DynamicBayesianNetwork getRainWindNet() {
         FiniteNode prior_rain_tm1 = new FullCPTNode(ExampleRV.RAIN_tm1_RV,
@@ -99,10 +166,4 @@ public class tst {
         return new DynamicBayesNet(priorNetwork, X_0_to_X_1, E_1, rain_tm1, wind_tm1);
 
     }
-
-    public static void main(String[] args) {
-        DynamicBayesianNetwork w = tst.getRainWindNet();
-        System.out.println(w.getX_0_to_X_1());        
-    }
-
 }
