@@ -77,6 +77,38 @@ public class EliminationDarwiche extends EliminationAsk {
         return ((ProbabilityTable) product.pointwiseProductPOS(_identity, Query)).normalize();
     }
 
+    public List<Factor> dynamicEliminationAsk(final RandomVariable[] Query,
+			final AssignmentProposition[] e, final BayesianNetwork bn,
+                        List<Factor> prevStep) {
+        
+        // creo S
+        List<Factor> factors = new ArrayList();
+        bn.getVariablesInTopologicalOrder().forEach(var -> factors.add(makeFactor(var,e,bn)));
+        factors.addAll(prevStep);
+        
+        //rimuovo query da order list
+        for(RandomVariable q: Query)
+            order.remove(q);
+        
+        //ciclo 
+        for(RandomVariable var: order){
+            List<Factor> toMultiply = new ArrayList();
+            //cerco le tab da moltiplicare
+            for(Factor f: factors){
+                if(f.getArgumentVariables().contains(var))
+                    toMultiply.add(f);
+            }
+            // moltiplico e sommo
+            if(toMultiply.size()>0){
+                Factor f = pointwiseProduct(toMultiply).sumOut(var);
+                factors.removeAll(toMultiply);
+                factors.add(f);
+            }
+        }
+
+        return factors;
+    }
+    
     
     private Factor makeFactor(RandomVariable var, AssignmentProposition[] e,
                 BayesianNetwork bn) {

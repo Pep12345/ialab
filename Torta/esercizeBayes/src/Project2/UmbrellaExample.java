@@ -5,6 +5,8 @@
  */
 package Project2;
 
+import Project2.test.tst;
+import Project.EliminationDarwiche;
 import Project.Order;
 import aima.core.probability.CategoricalDistribution;
 import aima.core.probability.Factor;
@@ -179,7 +181,7 @@ FiniteNode prior_rain_tm1 = new FullCPTNode(ExampleRV.RAIN_tm1_RV,
         
         //creo ordinamento e creo classe elimination
         Order or = new Order(bn); 
-        EliminationDarwicheDynamic edd = new EliminationDarwicheDynamic(or.reverseTopologicalOrder());
+        EliminationDarwiche edd = new EliminationDarwiche(or.reverseTopologicalOrder());
         
         //calcolo query per VE in questa rete (quei nodi che avranno un arco verso lo slice del prossimo turno)
         List<RandomVariable> queryForThisStep = new ArrayList();
@@ -202,7 +204,7 @@ FiniteNode prior_rain_tm1 = new FullCPTNode(ExampleRV.RAIN_tm1_RV,
         System.out.println("Evidence for this BN"+evidenceForThisStep);
         
         //eseguo VE passando query, evidenze, rete e lista fattori step precedente da aggiungere
-        factorsFromPreviousStep = edd.myeliminationAsk(queryForThisStep.toArray(new RandomVariable[0]), 
+        factorsFromPreviousStep = edd.dynamicEliminationAsk(queryForThisStep.toArray(new RandomVariable[0]), 
                                                 evidenceForThisStep.toArray(new AssignmentProposition[0]), 
                                                 bn, factorsFromPreviousStep);
         System.out.println("result: ");
@@ -222,7 +224,7 @@ FiniteNode prior_rain_tm1 = new FullCPTNode(ExampleRV.RAIN_tm1_RV,
     
     public static void main(String[] args){
         //creo rete
-        DynamicBayesianNetwork example = getExample();
+        DynamicBayesianNetwork example = tst.getRainWindNet();
         
         //salvo variabili
         HashMap<String, RandomVariable> bnRV = new HashMap();
@@ -230,13 +232,13 @@ FiniteNode prior_rain_tm1 = new FullCPTNode(ExampleRV.RAIN_tm1_RV,
         System.out.println("Variabili slice 0: "+ example.getPriorNetwork().getVariablesInTopologicalOrder());
         
         //creo query finale
-        RandomVariable[] query = {bnRV.get("Rain_t2")};
+        RandomVariable[] query = {bnRV.get("Rain_t")};
         
         //creo lista evidenze
         List<AssignmentProposition> ev = new ArrayList();
         ev.add(new AssignmentProposition(bnRV.get("Umbrella_t"), Boolean.TRUE));
-        ev.add(new AssignmentProposition(bnRV.get("UMBREALLA_t1"), Boolean.TRUE));
-        ev.add(new AssignmentProposition(bnRV.get("UMBREALLA_t2"), Boolean.TRUE));
+       // ev.add(new AssignmentProposition(bnRV.get("UMBREALLA_t1"), Boolean.TRUE));
+       // ev.add(new AssignmentProposition(bnRV.get("UMBREALLA_t2"), Boolean.TRUE));
         
         //avvio rolling up
         ProbabilityTable rollUp = rollUp(example, query, ev, example.getPriorNetwork().getVariablesInTopologicalOrder(), new ArrayList());

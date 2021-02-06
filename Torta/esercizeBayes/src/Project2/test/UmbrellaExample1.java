@@ -3,14 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Project2;
+package Project2.test;
 
+import Project.EliminationDarwiche;
 import Project.Order;
 import aima.core.probability.CategoricalDistribution;
 import aima.core.probability.Factor;
 import aima.core.probability.RandomVariable;
 import aima.core.probability.bayes.BayesianNetwork;
-import Project2.DynamicBayesNet;
+import Project2.test.DynamicBayesNet;
 import aima.core.probability.bayes.DynamicBayesianNetwork;
 import aima.core.probability.bayes.FiniteNode;
 import aima.core.probability.bayes.Node;
@@ -187,7 +188,7 @@ RandVar RAIN_t2_RV = new RandVar("Rain_t2",new BooleanDomain());
         
         //creo ordinamento e creo classe elimination
         Order or = new Order(bn); 
-        EliminationDarwicheDynamic edd = new EliminationDarwicheDynamic(or.reverseTopologicalOrder());
+        EliminationDarwiche edd = new EliminationDarwiche(or.reverseTopologicalOrder());
         
         //calcolo query per VE in questa rete (quei nodi che avranno un arco verso lo slice del prossimo turno)
         List<RandomVariable> queryForThisStep = new ArrayList();
@@ -210,7 +211,7 @@ RandVar RAIN_t2_RV = new RandVar("Rain_t2",new BooleanDomain());
         System.out.println("Evidence for this BN"+evidenceForThisStep);
         
         //eseguo VE passando query, evidenze, rete e lista fattori step precedente da aggiungere
-        factorsFromPreviousStep = edd.myeliminationAsk(queryForThisStep.toArray(new RandomVariable[0]), 
+        factorsFromPreviousStep = edd.dynamicEliminationAsk(queryForThisStep.toArray(new RandomVariable[0]), 
                                                 evidenceForThisStep.toArray(new AssignmentProposition[0]), 
                                                 bn, factorsFromPreviousStep);
         System.out.println("result: ");

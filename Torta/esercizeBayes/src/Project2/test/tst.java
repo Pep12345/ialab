@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Project2;
+package Project2.test;
 
 import aima.core.probability.CategoricalDistribution;
 import aima.core.probability.RandomVariable;
@@ -98,7 +98,7 @@ public class tst {
         }
     }
     
-    private static DynamicBayesianNetwork getRainWindNet() {
+    public static DynamicBayesianNetwork getRainWindNet() {
         FiniteNode prior_rain_tm1 = new FullCPTNode(ExampleRV.RAIN_tm1_RV,
                 new double[]{0.5, 0.5});
         FiniteNode prior_wind_tm1 = new FullCPTNode(tst.WIND_tm1_RV,
