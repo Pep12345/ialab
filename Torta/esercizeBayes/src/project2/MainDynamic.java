@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import project2.example.UmbrellaExample;
+import project2.example.UmbrellaWindExample;
 
 /**
  *
@@ -22,7 +23,7 @@ import project2.example.UmbrellaExample;
 public class MainDynamic {
     public static void main(String[] args){
         //creo rete
-        DynamicBayesianNetwork example = UmbrellaExample.getExample();
+        DynamicBayesianNetwork example = UmbrellaWindExample.getExample();
         
         //salvo variabili
         HashMap<String, RandomVariable> bnRV = new HashMap();
@@ -31,16 +32,16 @@ public class MainDynamic {
         
         //creo query finale
         //query umbrella
-        RandomVariable[] query = {bnRV.get("Rain_t2")};
+        //RandomVariable[] query = {bnRV.get("Rain_t2")};
         //query umbrella-wind
-        //RandomVariable[] query = {bnRV.get("Rain_t")};
+        RandomVariable[] query = {bnRV.get("Rain_t"),bnRV.get("Wind_t")};
         
         //creo lista evidenze
         List<AssignmentProposition> ev = new ArrayList();
         //ev umbrella
-        ev.add(new AssignmentProposition(bnRV.get("Umbrella_t"), Boolean.TRUE));
-        ev.add(new AssignmentProposition(bnRV.get("UMBREALLA_t1"), Boolean.TRUE));
-        ev.add(new AssignmentProposition(bnRV.get("UMBREALLA_t2"), Boolean.TRUE));
+        ev.add(new AssignmentProposition(bnRV.get("Umbrella_t"), Boolean.FALSE));
+        //ev.add(new AssignmentProposition(bnRV.get("UMBREALLA_t1"), Boolean.TRUE));
+        //ev.add(new AssignmentProposition(bnRV.get("UMBREALLA_t2"), Boolean.TRUE));
         //ev umbrella-wind
         //ev.add(new AssignmentProposition(bnRV.get("Umbrella_t"), Boolean.TRUE));
         

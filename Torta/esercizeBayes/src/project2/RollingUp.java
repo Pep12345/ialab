@@ -45,18 +45,27 @@ public class RollingUp {
                     nextNodes.add(child.getRandomVariable());
             }
             for(Node child : n.getChildren()){
-                for(Node nepewh : child.getChildren()){
-                    if(dbn.getX_1().contains(nepewh.getRandomVariable())){
-                        if(!nextNodes.contains(dbn.getX_1_to_X_0().get(nepewh.getRandomVariable())))
-                            nextNodes.add(nepewh.getRandomVariable());
-                    }else
-                        nextNodes.add(nepewh.getRandomVariable());
-                }
+                addSuccessorSameSlice(child,dbn, previous,nextNodes);
             }
         }
         return nextNodes;
     }
   
+    private static void addSuccessorSameSlice(Node child, DynamicBayesianNetwork dbn, List<RandomVariable> previous, 
+                                        List<RandomVariable> currentTime){
+        for(Node nepewh : child.getChildren()){
+            if(dbn.getX_1().contains(nepewh.getRandomVariable())){ 
+                if(!currentTime.contains(dbn.getX_1_to_X_0().get(nepewh.getRandomVariable()))){ //è x1 ma x0 non sta in next
+                    currentTime.add(nepewh.getRandomVariable());
+                    addSuccessorSameSlice(nepewh,dbn,previous,currentTime);
+                }
+            }else{//non è x1
+                currentTime.add(nepewh.getRandomVariable());
+                addSuccessorSameSlice(nepewh,dbn,previous,currentTime);
+            }
+        }
+    }
+    
     //metodo per calcolare la probabilità mediante il medoto del rolling up
     public static ProbabilityTable rollUp(DynamicBayesianNetwork dbn, RandomVariable[] query,
                                         List<AssignmentProposition> ev, List<RandomVariable> prevStep,

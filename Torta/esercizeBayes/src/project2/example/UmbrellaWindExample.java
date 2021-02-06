@@ -5,7 +5,6 @@
  */
 package project2.example;
 
-import bozza.tst;
 import aima.core.probability.RandomVariable;
 import aima.core.probability.bayes.DynamicBayesianNetwork;
 import aima.core.probability.bayes.FiniteNode;
@@ -33,7 +32,7 @@ public class UmbrellaWindExample {
     public static DynamicBayesianNetwork getExample() {
         FiniteNode prior_rain_tm1 = new FullCPTNode(ExampleRV.RAIN_tm1_RV,
                 new double[]{0.5, 0.5});
-        FiniteNode prior_wind_tm1 = new FullCPTNode(tst.WIND_tm1_RV,
+        FiniteNode prior_wind_tm1 = new FullCPTNode(UmbrellaWindExample.WIND_tm1_RV,
                 new double[]{0.5, 0.5});
 
         BayesNet priorNetwork = new BayesNet(prior_rain_tm1, prior_wind_tm1);
@@ -41,7 +40,7 @@ public class UmbrellaWindExample {
         // Prior belief state
         FiniteNode rain_tm1 = new FullCPTNode(ExampleRV.RAIN_tm1_RV,
                 new double[]{0.5, 0.5});
-        FiniteNode wind_tm1 = new FullCPTNode(tst.WIND_tm1_RV,
+        FiniteNode wind_tm1 = new FullCPTNode(UmbrellaWindExample.WIND_tm1_RV,
                 new double[]{0.5, 0.5});
 
 
@@ -65,7 +64,7 @@ public class UmbrellaWindExample {
             0.8
         }, rain_tm1, wind_tm1);
 
-        FiniteNode wind_t = new FullCPTNode(tst.WIND_t_RV, new double[]{
+        FiniteNode wind_t = new FullCPTNode(UmbrellaWindExample.WIND_t_RV, new double[]{
             // W_t-1 = true, W_t = true
             0.7,
             // W_t-1 = true, W_t = false
@@ -89,9 +88,8 @@ public class UmbrellaWindExample {
                     0.8}, rain_t);
 
         Map<RandomVariable, RandomVariable> X_0_to_X_1 = new HashMap<RandomVariable, RandomVariable>();
-        X_0_to_X_1.put(ExampleRV.RAIN_tm1_RV, ExampleRV.RAIN_t_RV);
-        X_0_to_X_1.put(tst.WIND_tm1_RV, ExampleRV.RAIN_t_RV);        
-        X_0_to_X_1.put(tst.WIND_tm1_RV, tst.WIND_t_RV);
+        X_0_to_X_1.put(ExampleRV.RAIN_tm1_RV, ExampleRV.RAIN_t_RV);  
+        X_0_to_X_1.put(UmbrellaWindExample.WIND_tm1_RV, UmbrellaWindExample.WIND_t_RV);
         Set<RandomVariable> E_1 = new HashSet<RandomVariable>();
         E_1.add(ExampleRV.UMBREALLA_t_RV);
 

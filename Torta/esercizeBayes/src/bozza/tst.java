@@ -40,15 +40,14 @@ public class tst {
 
     public static void main(String[] args) {
         // numero di predizioni da fare
-        int n = Integer.parseInt(args[0]);
+        int n = 100;
 
-        int m = args.length-1;
+        int m = 1   ;
         AssignmentProposition[][] aps = null;
         if (m > 0) {
             aps = new AssignmentProposition[m][1];
             for (int i=0; i<m; i++) {
-                aps[i][0] = new AssignmentProposition(ExampleRV.UMBREALLA_t_RV, 
-                        Integer.parseInt(args[i+1])==0 ? Boolean.FALSE : Boolean.TRUE);
+                aps[i][0] = new AssignmentProposition(ExampleRV.UMBREALLA_t_RV, Boolean.FALSE);
             }
         }        
     
@@ -69,6 +68,11 @@ public class tst {
         for (int i=0; i<m; i++) {
             AssignmentProposition[][] S = pf.particleFiltering(aps[i]);
             System.out.println("Time " + (i+1));
+            /*for(int i1=0;i1<S.length;i1++){
+                for(int j1=0;j1<S[i1].length;j1++){
+                    System.out.println(S[i1][j1]);
+                }
+            }*/
             printSamples(S, n);
         }
         
