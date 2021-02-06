@@ -31,6 +31,8 @@ public class MainStatic {
         AssignmentProposition[] as = {new AssignmentProposition(mm.get("Age"), "0-3_days")};
         System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));                    
         
+        testQuery(query, as, bn);
+        
         bn = Prunning.prunningNodeAncestors(query, as, bn);
         System.out.println("-Added prunning of ancestors");
         bn = Prunning.prunningEdge(query, as, bn);
@@ -53,6 +55,7 @@ public class MainStatic {
     
     private static void testQuery(RandomVariable[] query, AssignmentProposition[] as, BayesianNetwork bn){
         Order or = new Order(bn);
+        System.out.println("number of node on this network: " + bn.getVariablesInTopologicalOrder().size());
         
         System.out.println("\nResult using reverse topological order:");
         List<RandomVariable> order = or.reverseTopologicalOrder();
@@ -80,6 +83,3 @@ public class MainStatic {
     }
 }
 
-/* creare tabelle e grafici per reti statiche, fattori più grandi o piccoli
-per reti dinamiche servono reti più complesse da una decina di per stato
-*/

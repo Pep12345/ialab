@@ -48,7 +48,7 @@ public class EliminationDarwiche extends EliminationAsk {
     @Override 
     public CategoricalDistribution eliminationAsk(final RandomVariable[] Query,
 			final AssignmentProposition[] e, final BayesianNetwork bn) {
-        
+        int max = 0;
         // creo S
         List<Factor> factors = new ArrayList();
         bn.getVariablesInTopologicalOrder().forEach(var -> factors.add(makeFactor(var,e,bn)));
@@ -65,6 +65,10 @@ public class EliminationDarwiche extends EliminationAsk {
                 if(f.getArgumentVariables().contains(var))
                     toMultiply.add(f);
             }
+            for(Factor f : toMultiply){
+                if(max<f.getValues().length)
+                    max = f.getValues().length;
+            }
             // moltiplico e sommo
             if(toMultiply.size()>0){
                 Factor f = pointwiseProduct(toMultiply).sumOut(var);
@@ -72,7 +76,7 @@ public class EliminationDarwiche extends EliminationAsk {
                 factors.add(f);
             }
         }
-        
+        System.out.println("max factor: " + max);
         Factor product = pointwiseProduct(factors);
         return ((ProbabilityTable) product.pointwiseProductPOS(_identity, Query)).normalize();
     }
@@ -80,6 +84,7 @@ public class EliminationDarwiche extends EliminationAsk {
     public List<Factor> dynamicEliminationAsk(final RandomVariable[] Query,
 			final AssignmentProposition[] e, final BayesianNetwork bn,
                         List<Factor> prevStep) {
+        int max = 0;
         
         // creo S
         List<Factor> factors = new ArrayList();
@@ -98,6 +103,10 @@ public class EliminationDarwiche extends EliminationAsk {
                 if(f.getArgumentVariables().contains(var))
                     toMultiply.add(f);
             }
+            for(Factor f : toMultiply){
+                if(max<f.getValues().length)
+                    max = f.getValues().length;
+            }
             // moltiplico e sommo
             if(toMultiply.size()>0){
                 Factor f = pointwiseProduct(toMultiply).sumOut(var);
@@ -105,7 +114,7 @@ public class EliminationDarwiche extends EliminationAsk {
                 factors.add(f);
             }
         }
-
+        System.out.println("max factor " + max);
         return factors;
     }
     
