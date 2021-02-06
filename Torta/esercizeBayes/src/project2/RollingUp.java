@@ -44,7 +44,7 @@ public class RollingUp {
                 if(!previous.contains(child.getRandomVariable()))
                     nextNodes.add(child.getRandomVariable());
             }
-            for(Node child : n.getChildren()){
+            for(Node child : n.getChildren()){ // puzza forse va fatto su una copia di nextnodes
                 addSuccessorSameSlice(child,dbn, previous,nextNodes);
             }
         }

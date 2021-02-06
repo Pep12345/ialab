@@ -1,4 +1,4 @@
-/*
+package bnparser;/*
  * Encog(tm) Core v3.4 - Java Version
  * http://www.heatonresearch.com/encog/
  * https://github.com/encog/encog-java-core
@@ -21,7 +21,7 @@
  * and trademarks visit:
  * http://www.heatonresearch.com/copyright
  */
-package bnparser;
+
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -295,9 +295,11 @@ public class MyBIFHandler extends DefaultHandler {
 				tmpList.remove(this.rvs.get(d.getForDefinition()));
 			}
 		}
+		RandomVariable old = null;
 		while (!tmpList.isEmpty()) {
 
 			RandomVariable next = tmpList.get(0);
+
 			if (next.getName().equals("STROKEVOLUME")) {
 				int g = 0;
 			}
@@ -322,7 +324,7 @@ public class MyBIFHandler extends DefaultHandler {
 //				a = a + ">";
 //				System.out.println(a);
 			} else {
-				tmpList.add(tmpList.size() - 1, next);
+				tmpList.add(tmpList.size(), next);
 			}
 
 		}

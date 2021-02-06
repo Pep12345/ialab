@@ -42,6 +42,7 @@ public class BIFVariable {
 	 * @param name the name to set
 	 */
 	public void setName(String name) {
+		name=upperize(name);
 		this.name = name;
 	}
 	/**
@@ -54,12 +55,17 @@ public class BIFVariable {
 	 * @param options the options to set
 	 */
 	public void setOptions(List<String> options) {
+
 		this.options = options;
 	}
 	public void addOption(String s) {
+		s=upperize(s);
 		this.options.add(s);
 		
 	}
-	
+
+	private String upperize(String name){
+		return name.substring(0,1).toUpperCase()+name.substring(1);
+	}
 	
 }

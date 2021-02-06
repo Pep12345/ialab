@@ -26,7 +26,6 @@ package bnparser.bif;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-import org.xml.sax.SAXException;
 
 import bnparser.csv.CSVFormat;
 
@@ -48,6 +47,8 @@ public class BIFDefinition {
 	 * @param forDefinition the forDefinition to set
 	 */
 	public void setForDefinition(String forDefinition) {
+
+		forDefinition = upperize(forDefinition);
 		this.forDefinition = forDefinition;
 	}
 	/**
@@ -87,7 +88,13 @@ public class BIFDefinition {
 		return givenDefinitions;
 	}
 	public void addGiven(String s) {
+		s=upperize(s);
 		this.givenDefinitions.add(s);
 		
+	}
+
+
+	private String upperize(String name){
+		return name.substring(0,1).toUpperCase()+name.substring(1);
 	}
 }
