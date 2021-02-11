@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import project2.RollingUpFiltering;
 
 /**
  *
@@ -42,23 +43,32 @@ public class tst {
         // numero di predizioni da fare
         int n = 100;
 
-        int m = 1   ;
+        int m = 3  ;
         AssignmentProposition[][] aps = null;
         if (m > 0) {
             aps = new AssignmentProposition[m][1];
             for (int i=0; i<m; i++) {
-                aps[i][0] = new AssignmentProposition(ExampleRV.UMBREALLA_t_RV, Boolean.FALSE);
+                aps[i][0] = new AssignmentProposition(ExampleRV.UMBREALLA_t_RV, Boolean.TRUE);
             }
         }        
-    
-        System.out.println("Rete Umbrella con stato Rain");
+            
+        System.out.println("Rete Umbrella con stato Rain -  rolling up");
+        RollingUpFiltering rp = new RollingUpFiltering(DynamicBayesNetExampleFactory.getUmbrellaWorldNetwork());
+
+        for (int i=0; i<m; i++) {
+            ProbabilityTable result = rp.rollUp(aps[i]);
+            System.out.println("Time " + (i+1));
+            System.out.println(result);
+        }
+        
+        //System.out.println("Rete Umbrella con stato Rain");
         ParticleFiltering pf = new ParticleFiltering(n,
                 DynamicBayesNetExampleFactory.getUmbrellaWorldNetwork());
 
         for (int i=0; i<m; i++) {
             AssignmentProposition[][] S = pf.particleFiltering(aps[i]);
             System.out.println("Time " + (i+1));
-            printSamples(S, n);
+            //printSamples(S, n);
         }
 
         System.out.println("Rete Umbrella con stato Rain, Wind");        

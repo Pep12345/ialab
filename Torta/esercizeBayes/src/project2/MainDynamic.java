@@ -23,30 +23,38 @@ import project2.example.UmbrellaWindExample;
 public class MainDynamic {
     public static void main(String[] args){
         //creo rete
-        DynamicBayesianNetwork example = UmbrellaWindExample.getExample();
+        DynamicBayesianNetwork example = UmbrellaExample.getExample();
         
         //salvo variabili
         HashMap<String, RandomVariable> bnRV = new HashMap();
         example.getVariablesInTopologicalOrder().forEach(v -> bnRV.put(v.getName(), v));
         System.out.println("Variabili slice 0: "+ example.getPriorNetwork().getVariablesInTopologicalOrder());
-        
+        /**
+         * <0.883357041251778, 0.11664295874822192>
+max factor 4
+[Rain_t]
+[0.8945272770552466, 0.10547272294475342]
+         */
         //creo query finale
         //query umbrella
-        //RandomVariable[] query = {bnRV.get("Rain_t2")};
+        RandomVariable[] query = {bnRV.get("Rain_t2")};
         //query umbrella-wind
-        RandomVariable[] query = {bnRV.get("Rain_t"),bnRV.get("Wind_t")};
+        //RandomVariable[] query = {bnRV.get("Rain_t"),bnRV.get("Wind_t")};
+        
+
         
         //creo lista evidenze
         List<AssignmentProposition> ev = new ArrayList();
         //ev umbrella
-        ev.add(new AssignmentProposition(bnRV.get("Umbrella_t"), Boolean.FALSE));
-        //ev.add(new AssignmentProposition(bnRV.get("UMBREALLA_t1"), Boolean.TRUE));
-        //ev.add(new AssignmentProposition(bnRV.get("UMBREALLA_t2"), Boolean.TRUE));
+        ev.add(new AssignmentProposition(bnRV.get("Umbrella_t"), Boolean.TRUE));
+        ev.add(new AssignmentProposition(bnRV.get("UMBREALLA_t1"), Boolean.TRUE));
+        ev.add(new AssignmentProposition(bnRV.get("UMBREALLA_t2"), Boolean.TRUE));
         //ev umbrella-wind
         //ev.add(new AssignmentProposition(bnRV.get("Umbrella_t"), Boolean.TRUE));
-        
+
         //avvio rolling up
         ProbabilityTable rollUp = rollUp(example, query, ev, example.getPriorNetwork().getVariablesInTopologicalOrder(), new ArrayList());
+        
         System.out.println(rollUp);   
         
     }

@@ -98,6 +98,7 @@ public class EliminationDarwiche extends EliminationAsk {
         //ciclo 
         for(RandomVariable var: order){
             List<Factor> toMultiply = new ArrayList();
+
             //cerco le tab da moltiplicare
             for(Factor f: factors){
                 if(f.getArgumentVariables().contains(var))

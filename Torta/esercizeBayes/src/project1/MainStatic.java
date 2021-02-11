@@ -33,6 +33,14 @@ public class MainStatic {
         
         testQuery(query, as, bn);
         
+        
+        chooseMap("../reti/20to50nodi/insurance.xml");
+        query = new RandomVariable[]{mm.get("Antilock")};
+        as = new AssignmentProposition[]{new AssignmentProposition(mm.get("OtherCarCost"), "Thousand")};
+        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
+        testQuery(query,as,bn);
+        
+        
         bn = Prunning.prunningNodeAncestors(query, as, bn);
         System.out.println("-Added prunning of ancestors");
         bn = Prunning.prunningEdge(query, as, bn);
@@ -40,9 +48,9 @@ public class MainStatic {
         
         testQuery(query, as, bn);
         
-        chooseMap("../reti/0to20nodi/Sprinkler.xml");
-        query = new RandomVariable[]{mm.get("Rain")};
-        as = new AssignmentProposition[]{new AssignmentProposition(mm.get("Season"), "winter")};
+        chooseMap("../reti/100to1000nodi/pigs.xml");
+        query = new RandomVariable[]{mm.get("P48084891")};
+        as = new AssignmentProposition[]{new AssignmentProposition(mm.get("P543551889"), "2")};
         System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
         testQuery(query,as,bn);
         
@@ -50,6 +58,7 @@ public class MainStatic {
     
     private static void chooseMap(String path){
         bn = BifReader.readBIF(path);
+        mm.clear();
         bn.getVariablesInTopologicalOrder().forEach(var -> mm.put(var.getName(), var));
     }
     
