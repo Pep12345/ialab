@@ -623,22 +623,7 @@
  (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
      (pop-focus)
 )
-(defrule fire1-fcell (declare (salience -55))
-	(moves (fires ?fires&:(> ?fires 0)))
-  (status (step ?s)(currently running))
-  ?f<-(f-cell(x ?x) (y ?y))
-  (or
-     (b-cell (x ?x)(y =(- ?y 1)))
-     (b-cell(x ?x)(y =(+ 1 ?y)))
-     (b-cell(x =(+ 1 ?x))(y ?y))
-     (b-cell(x =(- ?x 1))(y ?y))
-   )
- =>
- (retract ?f)
- (printout t " FIRE di tipo 1 - f in x: " ?x " y: " ?y  crlf)
- (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
-      (pop-focus)
-)
+
 ; //GUESS FINALI
 ;(defrule guess-where-krow-kcol-have-max-value (declare (salience -65))
 ;		(status (step ?s)(currently running))
