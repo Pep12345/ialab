@@ -79,6 +79,8 @@ def analyze_fact(fact):
             if grid[x,y]==1:
                 table.item(x,y).setForeground(QColor(0,170,0))
                 win.textEdit.append('Fire('+str(x)+','+str(y)+'): ✔️')
+                if table.item(x,y).text() == 'Guess':
+                    guessOK -= 1
                 fireOK += 1
             else:
                 table.item(x,y).setForeground(QColor(255,0,0))
