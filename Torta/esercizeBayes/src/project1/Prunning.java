@@ -62,15 +62,15 @@ public class Prunning {
                 newAddedNode.put(n.getRandomVariable().getName(), n);
             }else{
                 List<Node> parents = new ArrayList();
-                List<RandomVariable> lostParents = new ArrayList();
+                List<AssignmentProposition> lostParents = new ArrayList();
                 for (Node p : i.getParents()){
                     if(!checkEvidence(p, e))
                         parents.add(newAddedNode.get(p.getRandomVariable().getName()));
                     else
-                        lostParents.add(p.getRandomVariable());
+                        lostParents.add(getEvidence(p, e));
                 }
-
-                double[] normalizedArray = UtilsBayesNet.extractNormalizedProbability(i, lostParents);
+                
+                double[] normalizedArray = UtilsBayesNet.extractNormalizedProbability(i, lostParents.toArray(new AssignmentProposition[0]));
                 //creo nuovo nodo
                 FullCPTNode n;
                 if(parents.size()>0)
@@ -111,6 +111,15 @@ public class Prunning {
                 result = true; 
         }
         return result;
+    }
+    
+    private static AssignmentProposition getEvidence(Node nodo, AssignmentProposition[] e){
+        boolean result = false; 
+        for( AssignmentProposition a: e){
+            if(a.getTermVariable().equals(nodo.getRandomVariable()))
+                return a; 
+        }
+        return null;
     }
     
     private static void getAncestors(Node n, HashSet<RandomVariable> hs){

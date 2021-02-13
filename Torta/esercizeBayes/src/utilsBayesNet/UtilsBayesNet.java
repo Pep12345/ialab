@@ -64,6 +64,11 @@ public class UtilsBayesNet {
         return new BayesNet(newRoots.toArray(new Node[0]));
     }
     
+    public static double[] extractNormalizedProbability(Node i, AssignmentProposition[] lostParents) {
+        Factor f = ((CPT)i.getCPD()).getFactorFor(lostParents);
+        return normalizeFactorArray(f,i.getRandomVariable().getDomain().size());
+    }
+    
     
      // ricalcolo tabella togliendo lost parents e restituisco array di probabilità
     public static double[] extractNormalizedProbability(Node i, List<RandomVariable> lostParents) {
