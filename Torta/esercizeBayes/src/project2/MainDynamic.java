@@ -27,34 +27,34 @@ import project2.example.UmbrellaWindExample;
  */
 public class MainDynamic {
     public static void main(String[] args){
-        int n = 1500;
+        int n = 1000;
         int m = 20  ;
         AssignmentProposition[][] aps = null;
         
         //creo lista evidenze da passare 
         if (m > 0) {
-            aps = new AssignmentProposition[m][2];
+            aps = new AssignmentProposition[m][1];
             for (int i=0; i<m; i++) {
-                aps[i][0] = new AssignmentProposition(Asia.XRAY_t_RV, "yes");
-                aps[i][1] = new AssignmentProposition(Asia.DYSP_t_RV, "no");
+                aps[i][0] = new AssignmentProposition(ExampleRV.UMBREALLA_t_RV, Boolean.TRUE);
+               // aps[i][1] = new AssignmentProposition(Asia.DYSP_t_RV, "no");
             }
         }        
             
         System.out.println("Rete Asia -  rolling up");
         //RollingUpFiltering rp = new RollingUpFiltering(DynamicBayesNetExampleFactory.getUmbrellaWorldNetwork());
-        RollingUpFiltering rp = new RollingUpFiltering(Asia.getExample());
-        ParticleFiltering pf = new ParticleFiltering(n,Asia.getExample());
+        RollingUpFiltering rp = new RollingUpFiltering(UmbrellaWindExample.getExample());
+        ParticleFiltering pf = new ParticleFiltering(n,UmbrellaWindExample.getExample());
 
         for (int i=0; i<m; i++) {
             ProbabilityTable result = rp.rollUp(aps[i]);
             System.out.println("Time " + (i+1));
             AssignmentProposition[][] S = pf.particleFiltering(aps[i]);
             printSamples(S, n);
-            AssignmentProposition[] assignments = {new AssignmentProposition(Asia.ASIA_t_RV,"no"),
+            /*AssignmentProposition[] assignments = {new AssignmentProposition(Asia.ASIA_t_RV,"no"),
                                                    new AssignmentProposition(Asia.SMOKE_t_RV,"no"),
                                                     new AssignmentProposition(Asia.TUB_t_RV,"no"),
-                                                    new AssignmentProposition(Asia.LUNG_t_RV,"no")};
-            System.out.println("nox4 rollup: " + result.getValue(assignments));
+                                                    new AssignmentProposition(Asia.LUNG_t_RV,"no")};*/
+            System.out.println("rollup: " + result);
         }
             
     }
