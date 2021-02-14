@@ -11,6 +11,7 @@ import aima.core.probability.bayes.BayesianNetwork;
 import aima.core.probability.bayes.impl.CPT;
 import aima.core.probability.proposition.AssignmentProposition;
 import bnparser.BifReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -28,11 +29,22 @@ public class MainStatic {
         
         //ex ordinamento, rifare con altre reti più o meno grandi 
         //nota: nel caso di reti da 70+ nodi non usare reverse topological order
+        /*chooseMap("../reti/20to50nodi/insurance.xml");
+        RandomVariable[] query = new RandomVariable[]{mm.get("PropCost")};
+        AssignmentProposition[] as = new AssignmentProposition[]{new AssignmentProposition(mm.get("DrivingSkill"), "Normal")};
+        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
+        testQuery(query,as,bn);*/
+        
+        //ex prunning, provare cambiando:  
+        //      -   variare il numero di query
+        //      -   variare il numero di evidenza
+        //      -   profondità query
+        //      
         chooseMap("../reti/20to50nodi/insurance.xml");
         RandomVariable[] query = new RandomVariable[]{mm.get("PropCost")};
         AssignmentProposition[] as = new AssignmentProposition[]{new AssignmentProposition(mm.get("DrivingSkill"), "Normal")};
         System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
-        testQuery(query,as,bn);
+        testPrunning(query,as,bn);
         
         /*chooseMap("../reti/0to20nodi/Sprinkler.xml"); 
         RandomVariable[] query = {mm.get("Grass")};
@@ -125,6 +137,48 @@ public class MainStatic {
         bn.getVariablesInTopologicalOrder().forEach(var -> mm.put(var.getName(), var));
     }
     
+    private static void testPrunning(RandomVariable[] query, AssignmentProposition[] as, BayesianNetwork bn){
+        System.out.println("Test prunning using min-fill:");
+        System.out.println("number of node on this network: " + bn.getVariablesInTopologicalOrder().size());
+        
+        System.out.println("\nResult using no prunning:");
+        List<RandomVariable> or = new Order(bn).minFillOrder();
+        System.out.println("number of node: " + or.size());
+        EliminationDarwiche ed = new EliminationDarwiche(or);
+        printResult(ed,query,as,bn);
+        
+        System.out.println("\nResult using ancestor prunning:");
+        BayesianNetwork bn1 = Prunning.prunningNodeAncestors(query, as, bn);
+        or = new Order(bn1).minFillOrder();
+        System.out.println("number of node: " + or.size());
+        ed = new EliminationDarwiche(or);
+        printResult(ed,query,as,bn1);
+        
+        System.out.println("\nResult using m-separated prunning:");
+        bn1 = Prunning.prunningNodeMSeparated(query, as, bn);
+        or = new Order(bn1).minFillOrder();
+        System.out.println("number of node: " + or.size());
+        ed = new EliminationDarwiche(or);
+        printResult(ed,query,as,bn1);
+        
+        System.out.println("\nResult using edge prunning:");
+        bn1 = Prunning.prunningEdge(query, as, bn);
+        or = new Order(bn1).minFillOrder();
+        System.out.println("number of node: " + or.size());
+        ed = new EliminationDarwiche(or);
+        printResult(ed,query,as,bn1);
+        
+        System.out.println("\nResult using all prunning combinated:");
+        bn1 = Prunning.prunningNodeAncestors(query, as, bn);
+        bn1 = Prunning.prunningNodeMSeparated(query, as, bn1);
+        bn1 = Prunning.prunningEdge(query, as, bn1);
+        or = new Order(bn1).minFillOrder();
+        System.out.println("number of node: " + or.size());
+        ed = new EliminationDarwiche(or);
+        printResult(ed,query,as,bn1);
+    }
+    
+    
     private static void testQuery(RandomVariable[] query, AssignmentProposition[] as, BayesianNetwork bn){
         Order or = new Order(bn);
         System.out.println("number of node on this network: " + bn.getVariablesInTopologicalOrder().size());
@@ -143,7 +197,7 @@ public class MainStatic {
         printResult(ed,query,as,bn);
         
         System.out.println("\nResult using topological order:");
-        ed.setOrder(bn.getVariablesInTopologicalOrder());
+        ed.setOrder(new ArrayList(bn.getVariablesInTopologicalOrder()));
         printResult(ed,query,as,bn);
         
         System.out.println("\n\n\n");
