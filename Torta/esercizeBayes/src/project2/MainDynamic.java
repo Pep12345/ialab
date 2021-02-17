@@ -5,7 +5,6 @@
  */
 package project2;
 
-import static project2.RollingUp.rollUp;
 import aima.core.probability.RandomVariable;
 import aima.core.probability.bayes.DynamicBayesianNetwork;
 import aima.core.probability.bayes.approx.ParticleFiltering;
@@ -13,18 +12,24 @@ import aima.core.probability.example.DynamicBayesNetExampleFactory;
 import aima.core.probability.example.ExampleRV;
 import aima.core.probability.proposition.AssignmentProposition;
 import aima.core.probability.util.ProbabilityTable;
-import bozza.tst;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import project2.example.Alarm;
 import project2.example.Asia;
-import project2.example.UmbrellaExample;
 import project2.example.UmbrellaWindExample;
 
 /**
  *
  * @author Biondi Giuseppe
  */
+
+
+/*
+ per la rete umbrella :
+        DynamicBayesNetExampleFactory.getUmbrellaWorldNetwork()
+        ExampleRV -> per prendere le random variable
+*/
 public class MainDynamic {
     public static void main(String[] args){
         int n = 1000;
@@ -35,18 +40,18 @@ public class MainDynamic {
         if (m > 0) {
             aps = new AssignmentProposition[m][1];
             for (int i=0; i<m; i++) {
-                aps[i][0] = new AssignmentProposition(ExampleRV.UMBREALLA_t_RV, Boolean.TRUE);
+                aps[i][0] = new AssignmentProposition(Alarm.MARYCALLS_t_RV, Boolean.TRUE);
                // aps[i][1] = new AssignmentProposition(Asia.DYSP_t_RV, "no");
             }
         }        
             
         System.out.println("Rete Asia -  rolling up");
         //RollingUpFiltering rp = new RollingUpFiltering(DynamicBayesNetExampleFactory.getUmbrellaWorldNetwork());
-        RollingUpFiltering rp = new RollingUpFiltering(UmbrellaWindExample.getExample());
-        ParticleFiltering pf = new ParticleFiltering(n,UmbrellaWindExample.getExample());
+        RollingUpFiltering rp = new RollingUpFiltering(Alarm.getExample());
+        ParticleFiltering pf = new ParticleFiltering(n,Alarm.getExample());
 
         for (int i=0; i<m; i++) {
-            ProbabilityTable result = rp.rollUp(aps[i]);
+            ProbabilityTable result = rp.rollUp(aps[i], RollingUpFiltering.MIN_FILL_ORDER);
             System.out.println("Time " + (i+1));
             AssignmentProposition[][] S = pf.particleFiltering(aps[i]);
             printSamples(S, n);
@@ -84,35 +89,3 @@ public class MainDynamic {
     }
     
 }
-
-// main per rollingup vecchio
-        /*//creo rete
-        DynamicBayesianNetwork example = UmbrellaExample.getExample();
-        
-        //salvo variabili
-        HashMap<String, RandomVariable> bnRV = new HashMap();
-        example.getVariablesInTopologicalOrder().forEach(v -> bnRV.put(v.getName(), v));
-        System.out.println("Variabili slice 0: "+ example.getPriorNetwork().getVariablesInTopologicalOrder());
-        
-        //creo query finale
-        //query umbrella
-        RandomVariable[] query = {bnRV.get("Rain_t2")};
-        //query umbrella-wind
-        //RandomVariable[] query = {bnRV.get("Rain_t"),bnRV.get("Wind_t")};
-        
-
-        
-        //creo lista evidenze
-        List<AssignmentProposition> ev = new ArrayList();
-        //ev umbrella
-        ev.add(new AssignmentProposition(bnRV.get("Umbrella_t"), Boolean.TRUE));
-        ev.add(new AssignmentProposition(bnRV.get("UMBREALLA_t1"), Boolean.TRUE));
-        ev.add(new AssignmentProposition(bnRV.get("UMBREALLA_t2"), Boolean.TRUE));
-        //ev umbrella-wind
-        //ev.add(new AssignmentProposition(bnRV.get("Umbrella_t"), Boolean.TRUE));
-
-        //avvio rolling up
-        ProbabilityTable rollUp = rollUp(example, query, ev, example.getPriorNetwork().getVariablesInTopologicalOrder(), new ArrayList());
-        
-        System.out.println(rollUp);   
-     */

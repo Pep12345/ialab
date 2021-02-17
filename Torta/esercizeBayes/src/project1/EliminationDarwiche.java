@@ -9,18 +9,12 @@ import aima.core.probability.CategoricalDistribution;
 import aima.core.probability.Factor;
 import aima.core.probability.RandomVariable;
 import aima.core.probability.bayes.BayesianNetwork;
-import aima.core.probability.bayes.ConditionalProbabilityDistribution;
 import aima.core.probability.bayes.FiniteNode;
 import aima.core.probability.bayes.Node;
 import aima.core.probability.bayes.exact.EliminationAsk;
-import aima.core.probability.bayes.impl.BayesNet;
-import aima.core.probability.bayes.impl.CPT;
-import aima.core.probability.bayes.impl.FullCPTNode;
 import aima.core.probability.proposition.AssignmentProposition;
 import aima.core.probability.util.ProbabilityTable;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 /**

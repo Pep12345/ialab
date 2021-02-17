@@ -5,7 +5,6 @@
  */
 package project2.example;
 
-import bozza.tst;
 import aima.core.probability.RandomVariable;
 import aima.core.probability.bayes.DynamicBayesianNetwork;
 import aima.core.probability.bayes.FiniteNode;
@@ -13,8 +12,6 @@ import aima.core.probability.bayes.impl.BayesNet;
 import aima.core.probability.bayes.impl.DynamicBayesNet;
 import aima.core.probability.bayes.impl.FullCPTNode;
 import aima.core.probability.domain.ArbitraryTokenDomain;
-import aima.core.probability.domain.BooleanDomain;
-import aima.core.probability.example.ExampleRV;
 import aima.core.probability.util.RandVar;
 import java.util.HashMap;
 import java.util.HashSet;

@@ -2,7 +2,7 @@
 	<DefaultPath>E:\ialab\Torta\reti\0to20nodi</DefaultPath>
 	<FileExtension>.xml</FileExtension>
 	<SecondsPerRCCall>2.018421361862025E-6</SecondsPerRCCall>
-	<RecentDocuments>E:\ialab\Torta\reti\50to100nodi\win95pts.xml;E:\ialab\Torta\reti\0to20nodi\asia.net;E:\ialab\Torta\reti\0to20nodi\earthquake.xml;E:\ialab\Torta\reti\0to20nodi\Sprinkler.xml;</RecentDocuments>
+	<RecentDocuments>E:\ialab\Torta\reti\50to100nodi\win95pts.xml;E:\ialab\Torta\reti\0to20nodi\asia.net;E:\ialab\Torta\reti\0to20nodi\Sprinkler.xml;E:\ialab\Torta\reti\0to20nodi\earthquake.xml;</RecentDocuments>
 	<Algorithm>jenginegenerator6060830225489488864L</Algorithm>
 	<Property key="visiblestatusbar">true</Property>
 	<Property key="orientationinstantiationclipboardtoolbar">1</Property>
@@ -67,7 +67,7 @@
 	</PreferenceGroup>
 	<PreferenceGroup name="Inference">
 		<pref class="edu.ucla.belief.ui.preference.IntegerPreference" key="inferenceMinFillRepetitions" value="7" name="Min fill, best of N repetitions" />
-		<pref class="edu.ucla.belief.ui.preference.IntegerPreference" key="inferenceMinFillSeed" value="992781853" name="Min fill, new random seed (not saved)" />
+		<pref class="edu.ucla.belief.ui.preference.IntegerPreference" key="inferenceMinFillSeed" value="1661199188" name="Min fill, new random seed (not saved)" />
 		<pref class="edu.ucla.belief.ui.preference.BooleanPreference" key="inferenceMAPExplorerFullScreenWidth" value="true" name="MAP Solution Explorer, maximize width" />
 		<pref class="edu.ucla.belief.ui.preference.BooleanPreference" key="askBeforeCPTCopy" value="true" name="Ask before modifying cpt (cpt copy tool)" />
 		<pref class="edu.ucla.belief.ui.preference.EnumPreference$Caste" key="inferenceCaste" value="retard" name="User level (cpt copy tool)" />

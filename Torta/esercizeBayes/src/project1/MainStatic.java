@@ -39,10 +39,26 @@ public class MainStatic {
         //      -   variare il numero di query
         //      -   variare il numero di evidenza
         //      -   profondità query
-        //      
-        chooseMap("../reti/20to50nodi/insurance.xml");
-        RandomVariable[] query = new RandomVariable[]{mm.get("PropCost")};
-        AssignmentProposition[] as = new AssignmentProposition[]{new AssignmentProposition(mm.get("DrivingSkill"), "Normal")};
+        chooseMap("../reti/50to100nodi/win95pts.xml");
+        RandomVariable[] query = new RandomVariable[]{mm.get("PrtData")};
+        AssignmentProposition[] as = new AssignmentProposition[]{
+                                    new AssignmentProposition(mm.get("DataFile"), "Correct")
+                                                            };
+        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
+        testPrunning(query,as,bn);
+        
+        as = new AssignmentProposition[]{
+                                    new AssignmentProposition(mm.get("DataFile"), "Correct"),
+                                    new AssignmentProposition(mm.get("GrbldOtpt"), "No")
+                                                            };
+        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
+        testPrunning(query,as,bn);
+        
+        as = new AssignmentProposition[]{
+                                    new AssignmentProposition(mm.get("DataFile"), "Correct"),
+                                    new AssignmentProposition(mm.get("GrbldOtpt"), "No"),
+                                    new AssignmentProposition(mm.get("GDIOUT"), "Yes")
+                                                            };
         System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
         testPrunning(query,as,bn);
         
