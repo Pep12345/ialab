@@ -101,7 +101,7 @@
 )
 
 ; // REGOLA PER DECREMENTARE I VALORI IN K-ROW K-COL //
-(defrule decrement-k-row-col-battleship (declare (salience 10000))
+(defrule decrement-k-row-col-battleship (declare (salience 50))
 		(or (my-k-cell (x ?x) (y ?y) (content ?c&:(neq ?c water)))
 		    (f-cell (x ?x)(y ?y)))
 		?kpr <- (k-per-row (row ?x) (num ?num-row))
@@ -120,7 +120,7 @@
 		(crea-f-cell  (x ?x)(y ?y)(direzione ?c))
 		(not (my-k-cell (x ?x)(y ?y)))
 		(not (f-cell (x ?x)(y ?y)))
-		(not (exec (action guess) (x ?x)(y ?y))) ; non dovrebbe servire ma l'ha messa il prof nelle fire
+		(not (exec (action guess) (x ?x)(y ?y)))
 	=>
 		(assert (f-cell (x ?x)(y ?y)(direzione ?c)))
 		(assert (exec (step ?s) (action guess) (x ?x)(y ?y)))
@@ -199,7 +199,7 @@
 		(assert (crea-my-k-cell-water (x (- ?x 1)) (y ?y) (c water)))
 		(assert (crea-my-k-cell-water (x ?x) (y (+ ?y 1)) (c water)))
 
-		(assert (crea-f-cell (x ?x) (y (- ?y 1)) (direzione left)))
+		(assert (crea-f-cell (x ?x) (y (- ?y 1))))
 		(assert (crea-b-cell (x ?x)(y (- ?y 2))))
 		(printout t "Ho trovato una my-k-cell di tipo right in x: " ?x " y: " ?y  crlf)
 )
@@ -215,7 +215,7 @@
 		(assert (crea-my-k-cell-water (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
 		(assert (crea-my-k-cell-water (x (+ ?x 1)) (y (- ?y 1)) (c water)))
 
-		(assert (crea-f-cell (x =(+ 1 ?x))(y ?y)(direzione bot)))
+		(assert (crea-f-cell (x =(+ 1 ?x))(y ?y)))
 		(assert (crea-b-cell (x =(+ 2 ?x))(y ?y)))
 		(printout t "Ho trovato una my-k-cell di tipo top in x: " ?x " y: " ?y  crlf)
 )
@@ -226,7 +226,7 @@
 		(assert (crea-my-k-cell-water (x ?x) (y (- ?y 1)) (c water)))
 		(assert (crea-my-k-cell-water (x ?x) (y (+ ?y 1)) (c water)))
 
-		(assert (crea-f-cell  (x (- ?x 1))(y ?y)(direzione top)))
+		(assert (crea-f-cell  (x (- ?x 1))(y ?y)))
 		(assert (crea-b-cell (x (- ?x 2))(y ?y)))
 		(printout t "Ho trovato una my-k-cell di tipo bot in x: " ?x " y: " ?y  crlf)
 )
@@ -241,14 +241,15 @@
 		(assert (crea-b-cell (x (- ?x 2))(y ?y)))
 		(assert (crea-f-cell  (x (+ ?x 1))(y ?y)))
 		(assert (crea-b-cell (x (+ ?x 2))(y ?y)))
+		(printout t "Ho trovato una my-k-cell di tipo middle vicino al bordo in x: " ?x " y: " ?y  crlf)
 )
 (defrule my-k-cell-middle-near-horizontal-border (declare (salience 30))
 		(my-k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
 		(or (test(eq ?x 0)) (test(eq ?x 9)))
 	=>
-		(assert (crea-f-cell  (x ?x)(y (+ ?y 1))(direzione right)))
+		(assert (crea-f-cell  (x ?x)(y (+ ?y 1))))
 		(assert (crea-b-cell (x ?x)(y (+ ?y 2))))
-		(assert (crea-f-cell  (x ?x)(y (- ?y 1))(direzione left)))
+		(assert (crea-f-cell  (x ?x)(y (- ?y 1))))
 		(assert (crea-b-cell (x ?x)(y (- ?y 2))))
 		(printout t "Ho trovato una my-k-cell di tipo middle vicino al bordo in x: " ?x " y: " ?y  crlf)
 )
@@ -258,7 +259,7 @@
 		(or (my-k-cell (x ?x) (y =(- ?y 1)) (content ?c1&:(neq ?c1 water)))
 				(f-cell (x ?x) (y =(- ?y 1))))
 	=>
-		(assert (crea-f-cell  (x ?x)(y (+ ?y 1))(direzione right)))
+		(assert (crea-f-cell  (x ?x)(y (+ ?y 1))))
 		(assert (crea-b-cell (x ?x)(y (+ ?y 2))))
 )
 (defrule my-k-cell-middle-near-right-or-middle (declare (salience 10))
@@ -274,7 +275,7 @@
 		(or (my-k-cell (x =(- ?x 1)) (y ?y) (content ?c1&:(neq ?c1 water)))
 				(f-cell (x =(- ?x 1)) (y ?y)))
 	=>
-		(assert (crea-f-cell  (x (+ ?x 1))(y ?y)(direzione bot)))
+		(assert (crea-f-cell  (x (+ ?x 1))(y ?y)))
 		(assert (crea-b-cell (x (+ ?x 2))(y ?y)))
 		(printout t "Ho trovato una my-k-cell di tipo middle vicino ad una top in x: " ?x " y: " ?y  crlf)
 )
@@ -283,7 +284,7 @@
 		(or (my-k-cell (x =(+ 1 ?x)) (y ?y) (content ?c1&:(neq ?c1 water)))
 				(f-cell (x =(+ 1 ?x)) (y ?y)))
 	=>
-		(assert (crea-f-cell  (x (- ?x 1))(y ?y)(direzione top)))
+		(assert (crea-f-cell  (x (- ?x 1))(y ?y)))
 		(assert (crea-b-cell (x (- ?x 2))(y ?y)))
 )
 ; quando middle non è vicina a nulla
@@ -307,6 +308,7 @@
 	=>
 		(assert (crea-my-k-cell-water (x (+ ?x 3)) (y ?y) (c water)))
 		(assert (crea-my-k-cell-water (x (- ?x 2)) (y ?y) (c water)))
+		(printout t "Middle Near Middle in Vertical in x: " ?x " y: " ?y  crlf)
 )
 (defrule kmid-near-kmid-hor (declare (salience 20))
 		(my-k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
@@ -601,23 +603,7 @@
 )
 
 ; // REGOLE FIRE
-;FIRE 2: sparo sulla f-cell che si trova dopo una kcell estrema e una kcell middle
-
-;(defrule fire-where-krow-kcol-have-max-value (declare (salience -100))
-;		(moves (fires ?fires&:(> ?fires 0)))
-;		(k-per-row (row ?x) (num ?num-row))
-;		(not (k-per-row (num ?num-row2&:(> ?num-row2 ?num-row))))
-;		(k-per-col (col ?y) (num ?num-col))
-;		(not (k-per-col (num ?num-col2&:(> ?num-col2 ?num-col))))
-;		(status (step ?s)(currently running))
-;		(not (exec  (action fire) (x ?x) (y ?y))) ; non dovrebbe servire ma l'ha messa il prof
-;		(not (my-k-cell (x ?x) (y ?y)))
-;	=>
-;		(printout t " FIRE di tipo 3 in x: " ?x " y: " ?y  crlf)
-;		(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
-;	  (pop-focus)
-;)
-; FIRE 1: sparo su b/f cell vicina ad una f cell
+; sparo su b/f cell vicina ad una f cell
 (defrule fire-bcell-near-fcell (declare (salience -55))
 	(moves (fires ?fires&:(> ?fires 0)))
   (status (step ?s)(currently running))
@@ -639,11 +625,10 @@
 ; probabilità calcolata come: prodotto tra
 ;																	num-row diviso caselle sconosciute su quella riga
 ;																	num-col diviso caselle sconosciute su quella colonna
-; alternativa - fare max nella funzione e trovare il candidato migliore direttamente nella funzione
 (defrule fire-probability (declare (salience -65))
 		(moves (fires ?fires&:(> ?fires 0)))
 		(status (step ?s)(currently running))
-		;(test (find-max))
+
 	=>
 		(printout t " FIRE sulla probabilità in x: " (fact-slot-value (nth$ 1 (find-max)) row)
 																					" y: " (fact-slot-value (nth$ 2 (find-max)) col)  crlf)
@@ -716,6 +701,13 @@
 		(assert (exec (step ?s) (action solve)))
 )
 
+; stampa generale
+(defrule print-what-i-know-since-the-beginning (declare (salience 50))
+		(my-k-cell (x ?x) (y ?y) (content ?t) )
+	=>
+		(printout t "I know that cell [" ?x ", " ?y "] contains " ?t "." crlf)
+)
+
 ; // STAMPE DEBUG //
 ;(defrule print-k-col (declare (salience 1))
 ;		(status (step ?s)(currently running))
@@ -749,10 +741,3 @@
 ;	=>
 ;		(printout t "B cell [" ?x ", " ?y "] " crlf)
 ;)
-
-; stampa generale
-(defrule print-what-i-know-since-the-beginning (declare (salience 50))
-		(my-k-cell (x ?x) (y ?y) (content ?t) )
-	=>
-		(printout t "I know that cell [" ?x ", " ?y "] contains " ?t "." crlf)
-)

@@ -49,9 +49,6 @@
 	(barca (tipo 1)(num 4))
 )
 
-; TODO => - scegliere se dividere in moduli declaration - executation
-; TODO => - scegliere euristiche da usare quando non abbiamo più my-k-cell
-; TODO => mettere guess sulle b-cell con valori di k-row e k-col più alti
 ; // DESCRIZIONE CELLE USATE //
 ;my-k-cell: cose che sappiamo per certo
 ;b-cell: cose che supponiamo: le usiamo quando troviamo un middle che non sappiamo se andare vertiale o orizzontale
@@ -84,7 +81,7 @@
 		(crea-f-cell  (x ?x)(y ?y)(direzione ?c))
 		(not (my-k-cell (x ?x)(y ?y)))
 		(not (f-cell (x ?x)(y ?y)))
-		(not (exec (action guess) (x ?x)(y ?y))) ; non dovrebbe servire ma l'ha messa il prof nelle fire
+		(not (exec (action guess) (x ?x)(y ?y)))
 	=>
 		(assert (f-cell (x ?x)(y ?y)(direzione ?c)))
 		(assert (exec (step ?s) (action guess) (x ?x)(y ?y)))
@@ -152,7 +149,7 @@
 		(assert (crea-my-k-cell-water (x (- ?x 1)) (y ?y) (c water)))
 		(assert (crea-my-k-cell-water (x ?x) (y (- ?y 1)) (c water)))
 
-		(assert (crea-f-cell (x ?x) (y (+ ?y 1)) (direzione right)))
+		(assert (crea-f-cell (x ?x) (y (+ ?y 1))))
 		(assert (crea-b-cell (x ?x)(y (+ ?y 2))))
 		(printout t "Ho trovato una my-k-cell di tipo left in x: " ?x " y: " ?y  crlf)
 )
@@ -163,7 +160,7 @@
 		(assert (crea-my-k-cell-water (x (- ?x 1)) (y ?y) (c water)))
 		(assert (crea-my-k-cell-water (x ?x) (y (+ ?y 1)) (c water)))
 
-		(assert (crea-f-cell (x ?x) (y (- ?y 1)) (direzione left)))
+		(assert (crea-f-cell (x ?x) (y (- ?y 1))))
 		(assert (crea-b-cell (x ?x)(y (- ?y 2))))
 		(printout t "Ho trovato una my-k-cell di tipo right in x: " ?x " y: " ?y  crlf)
 )
@@ -179,7 +176,7 @@
 		(assert (crea-my-k-cell-water (x (+ ?x 1)) (y (+ ?y 1)) (c water)))
 		(assert (crea-my-k-cell-water (x (+ ?x 1)) (y (- ?y 1)) (c water)))
 
-		(assert (crea-f-cell (x =(+ 1 ?x))(y ?y)(direzione bot)))
+		(assert (crea-f-cell (x =(+ 1 ?x))(y ?y)))
 		(assert (crea-b-cell (x =(+ 2 ?x))(y ?y)))
 		(printout t "Ho trovato una my-k-cell di tipo top in x: " ?x " y: " ?y  crlf)
 )
@@ -190,7 +187,7 @@
 		(assert (crea-my-k-cell-water (x ?x) (y (- ?y 1)) (c water)))
 		(assert (crea-my-k-cell-water (x ?x) (y (+ ?y 1)) (c water)))
 
-		(assert (crea-f-cell  (x (- ?x 1))(y ?y)(direzione top)))
+		(assert (crea-f-cell  (x (- ?x 1))(y ?y)))
 		(assert (crea-b-cell (x (- ?x 2))(y ?y)))
 		(printout t "Ho trovato una my-k-cell di tipo bot in x: " ?x " y: " ?y  crlf)
 )
@@ -211,9 +208,9 @@
 		(my-k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
 		(or (test(eq ?x 0)) (test(eq ?x 9)))
 	=>
-		(assert (crea-f-cell  (x ?x)(y (+ ?y 1))(direzione right)))
+		(assert (crea-f-cell  (x ?x)(y (+ ?y 1))))
 		(assert (crea-b-cell (x ?x)(y (+ ?y 2))))
-		(assert (crea-f-cell  (x ?x)(y (- ?y 1))(direzione left)))
+		(assert (crea-f-cell  (x ?x)(y (- ?y 1))))
 		(assert (crea-b-cell (x ?x)(y (- ?y 2))))
 		(printout t "Ho trovato una my-k-cell di tipo middle vicino al bordo in x: " ?x " y: " ?y  crlf)
 )
@@ -223,16 +220,15 @@
 		(or (my-k-cell (x ?x) (y =(- ?y 1)) (content ?c1&:(neq ?c1 water)))
 				(f-cell (x ?x) (y =(- ?y 1))))
 	=>
-		(assert (crea-f-cell  (x ?x)(y (+ ?y 1))(direzione right)))
+		(assert (crea-f-cell  (x ?x)(y (+ ?y 1))))
 		(assert (crea-b-cell (x ?x)(y (+ ?y 2))))
-		(printout t "Ho trovato una my-k-cell di tipo middle vicino ad una left in x: " ?x " y: " ?y  crlf)
 )
 (defrule my-k-cell-middle-near-right-or-middle (declare (salience 10))
 		(my-k-cell (x ?x) (y ?y) (content ?c&:(eq ?c middle)))
 		(or (my-k-cell (x ?x) (y =(+ 1 ?y)) (content ?c1&:(neq ?c1 water)))
 				(f-cell (x ?x) (y =(+ 1 ?y))))
 	=>
-		(assert (crea-f-cell  (x ?x)(y (- ?y 1))(direzione  left)))
+		(assert (crea-f-cell  (x ?x)(y (- ?y 1))))
 		(assert (crea-b-cell (x ?x)(y (- ?y 2))))
 )
 (defrule my-k-cell-middle-near-top-or-middle (declare (salience 10))
@@ -240,7 +236,7 @@
 		(or (my-k-cell (x =(- ?x 1)) (y ?y) (content ?c1&:(neq ?c1 water)))
 				(f-cell (x =(- ?x 1)) (y ?y)))
 	=>
-		(assert (crea-f-cell  (x (+ ?x 1))(y ?y)(direzione bot)))
+		(assert (crea-f-cell  (x (+ ?x 1))(y ?y)))
 		(assert (crea-b-cell (x (+ ?x 2))(y ?y)))
 		(printout t "Ho trovato una my-k-cell di tipo middle vicino ad una top in x: " ?x " y: " ?y  crlf)
 )
@@ -249,7 +245,7 @@
 		(or (my-k-cell (x =(+ 1 ?x)) (y ?y) (content ?c1&:(neq ?c1 water)))
 				(f-cell (x =(+ 1 ?x)) (y ?y)))
 	=>
-		(assert (crea-f-cell  (x (- ?x 1))(y ?y)(direzione top)))
+		(assert (crea-f-cell  (x (- ?x 1))(y ?y)))
 		(assert (crea-b-cell (x (- ?x 2))(y ?y)))
 )
 ; quando middle non è vicina a nulla
@@ -384,10 +380,10 @@
 		(barca (tipo 2)(num ?t&:(eq ?t 0)))
 		?fcell <-(f-cell (x ?x) (y ?y))
 		(or
-			(my-k-cell (x =(+ ?x 1)) (y ?y) (content ?c&:(neq ?c water)))
-			(my-k-cell (x =(- ?x 1)) (y ?y) (content ?c1&:(neq ?c1 water)))
-			(my-k-cell (x ?x) (y  =(+ ?y 1)) (content ?c2&:(neq ?c2 water)))
-			(my-k-cell (x ?x) (y  =(- ?y 1)) (content ?c3&:(neq ?c3 water)))
+			(my-k-cell (x =(+ ?x 1)) (y ?y) (content ?c&:(eq ?c bot)))
+			(my-k-cell (x =(- ?x 1)) (y ?y) (content ?c1&:(eq ?c1 top)))
+			(my-k-cell (x ?x) (y  =(+ ?y 1)) (content ?c2&:(eq ?c2 right)))
+			(my-k-cell (x ?x) (y  =(- ?y 1)) (content ?c3&:(eq ?c3 left)))
 		)
 	=>
 		(retract ?fcell)
@@ -455,12 +451,12 @@
 (defrule create-f-cell-in-row-where-i-know-all-water-cells (declare (salience 20))
 		(k-per-row (row ?x) (num ?num-row&:(> ?num-row 0)))
 		(status (step ?s)(currently running))
-		(test (eq (+ 	(+ (length$ (find-all-facts ((?f my-k-cell)) (eq ?f:x ?x))) (length$ (find-all-facts ((?f1 f-cell)) (eq ?f1:x ?x)))) ?num-row) 10))
+		(test (eq (+ 	(+ (length$ (find-all-facts ((?f my-k-cell)) (eq ?f:x ?x)))
+											(length$ (find-all-facts ((?f1 f-cell)) (eq ?f1:x ?x)))) ?num-row) 10))
 		(k-per-col (col ?y)(num ?num-col&:(> ?num-col 0)))
 		(not (my-k-cell (x ?x) (y ?y)))
 		(not (f-cell (x ?x) (y ?y)))
 	=>
-		;(printout t "Creo f-cell usando nonsocomechiamarla x: " ?x " y: " ?y  crlf)
 		(assert (crea-f-cell (x ?x)(y ?y)))
 )
 (defrule create-f-cell-in-col-where-i-know-all-water-cells (declare (salience 20))
@@ -568,7 +564,7 @@
 )
 
 ; // REGOLE FIRE
-;FIRE 2: sparo sulla f-cell che si trova dopo una kcell estrema e una kcell middle
+; sparo sulla f-cell che si trova dopo una kcell estrema e una kcell middle
 (defrule fire-two (declare (salience -45))
 		(moves (fires ?fires&:(> ?fires 0)))
 		?fcell <- (f-cell (x ?x)(y ?y))
@@ -587,16 +583,16 @@
 		(assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
 	  	(pop-focus)
 )
-; FIRE 3: sparo sulla riga e colonna con la maggiore probabilità di avere una barca
+;  sparo sulla riga e colonna con la maggiore probabilità di avere una barca
 ; nota: nel caso in cui fa fire su water, k row max e k col max restano gli stessi e quindi sta regola si blocca e non fa altre fire
 (defrule fire-where-krow-kcol-have-max-value (declare (salience -65))
 		(moves (fires ?fires&:(> ?fires 0)))
 		(k-per-row (row ?x) (num ?num-row))
 		(k-per-col (col ?y) (num ?num-col))
 		(not (and
-			(k-per-row (num ?num-row2&:(> ?num-row2 ?num-row)))
-			(k-per-col (num ?num-col2&:(> ?num-col2 ?num-col)))
-			(not (exec  (action fire) (x ?num-row) (y ?num-col)))
+			(k-per-row (row ?x2) (num ?num-row2&:(> ?num-row2 ?num-row)))
+			(k-per-col (col ?y2) (num ?num-col2&:(> ?num-col2 ?num-col)))
+			(not (exec  (action fire) (x ?x2) (y ?y2)))
 		))
 		(status (step ?s)(currently running))
 		(not (exec  (action fire) (x ?x) (y ?y)))
@@ -619,29 +615,12 @@
    )
  =>
  (retract ?b)
- (printout t " FIRE di tipo 1 - b in x: " ?x " y: " ?y  crlf)
+ (printout t " Sto per eseguire Fire su b cell vicino f cell in x: " ?x " y: " ?y  crlf)
  (assert (exec (step ?s) (action fire) (x ?x) (y ?y)))
      (pop-focus)
 )
 
 ; //GUESS FINALI
-;(defrule guess-where-krow-kcol-have-max-value (declare (salience -65))
-;		(status (step ?s)(currently running))
-;		(moves (fires 0) (guesses ?g&:(> ?g 0)))
-;		(k-per-row (row ?x) (num ?num-row))
-;		(k-per-col (col ?y) (num ?num-col))
-;		(not (f-cell (x ?x) (y ?y))) ; non dovrebbe servire ma l'ha messa il prof
-;		(not (my-k-cell (x ?x) (y ?y)))
-;		(not (and
-;			(k-per-row (row ?x1)(num ?num-row2&:(> ?num-row2 ?num-row)))
-;			(k-per-col (col ?y1)(num ?num-col2&:(> ?num-col2 ?num-col)))
-;			(not (my-k-cell (x ?x1) (y ?y1)))
-;			(not (f-cell (x ?x1) (y ?y1)))
-;		))
-;	=>
-;		(printout t " guess finali in x: " ?x " y: " ?y  crlf)
-;		(assert (crea-f-cell (x ?x) (y ?y)))
-;)
 (defrule guess-where-krow-kcol-have-max-value (declare (salience -65))
 		(status (step ?s)(currently running))
 		(moves (fires 0) (guesses ?g&:(> ?g 0)))
@@ -705,7 +684,6 @@
 )
 
 ; // Termina programma
-;Bisogna asserire (exec (step ?s) (action solve)) quando vogliamo concludere
 (defrule solve (declare (salience -999))
 		(status (step ?s)(currently running))
 	=>
@@ -719,10 +697,3 @@
 	=>
 		(printout t "I know that cell [" ?x ", " ?y "] contains " ?t "." crlf)
 )
-
-
-
-;DOMANDE:
-; se facciamo la fire su una casella su cui abbiamo fatto la guess dobbiamo fare unguess?
-; dovremmo fare guess sulle my-k-cell iniziali?
-; l'app per i risultati, conviene salvare i fatti su file e leggere per creare immagine o usare librerie e avviare clips da java?

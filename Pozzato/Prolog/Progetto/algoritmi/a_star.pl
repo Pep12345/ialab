@@ -18,9 +18,6 @@ Sia s il nodo iniziale
 nodo(posizione, costo G, costo H, percorso per raggiungerlo)
 G = costo funzione, quanto costa arivare a quel nodo, ovvero la lunghezza del percoso
 H = euristica, quanto si suppone costi arrivare da li alla fine
-
-nota: secondo me si può modificare nodo come in ida_star_v3, credo sia più 
-	leggibile ma forse meno efficente (deve calcolarsi sempre g invece di portarselo dietro)
 */
 
 a_star(Result):-
@@ -33,7 +30,7 @@ a_star_aux(Opens,Closed,Result):-
 	search(Opens,Closed,CurrentMin,Result).
 	
 /* tolgo currentMin dai nodi aperti, lo sposto in chiusi, aggiungo figli e cerco */
-search(_,_,nodo(CurrentMin,_,_,Actions),Actions):-finale(CurrentMin),!.   % non deve guardare se ci sono altri percorsi aperti migliori?
+search(_,_,nodo(CurrentMin,_,_,Actions),Actions):-finale(CurrentMin),!.   
 search(Opens,Closed,CurrentMin,Result):-
 	subtract(Opens,[CurrentMin],NewOpens), % cancella CurrentMin da opens
 	generateChild(CurrentMin,Figli),
@@ -44,7 +41,7 @@ search(Opens,Closed,CurrentMin,Result):-
  	se il nuovo pecorso per tale nodo ha un costo minore viene riaperto
 */
 search_aux(O,C,[],O,C).	
-search_aux(Open,Closed,[F|Figli],ResOpens,ResClosed):-  % marco come aperti i figli che non sono nella lista chiusi
+search_aux(Open,Closed,[F|Figli],ResOpens,ResClosed):- 
 	\+isMember(F,Closed),!,
 	search_aux([F|Open],Closed,Figli,ResOpens,ResClosed).
 search_aux(Open,Closed,[nodo(Nodo,G,H,Actions)|Figli],ResOpens,ResClosed):- % se Nodo è già closed ma troviamo una F migliore
@@ -69,7 +66,6 @@ isMember(nodo(N,G,H,Actions),[_|Tail]):-
 	estrae un nodo da una lista
 	getNodeFromList(NodeToSearch,ListWithNode,Result)	  
 */ 
-% DOMANDA: che succede se non lo trova?? 
 getNodeFromList(Node,[nodo(N1,G1,H1,_)|_],nodo(N1,G1,H1,_)):-
 	Node == N1,!.
 getNodeFromList(Node,[_|Tail],Res):-
@@ -78,7 +74,7 @@ getNodeFromList(Node,[_|Tail],Res):-
 /*
 	resituisco tutti i nodi raggiungibili dato un nodo
 */
-generateChild(nodo(N,G,H,Actions),Result):-  % non serve tracciare i nodi visitati tanto si usano open/closed
+generateChild(nodo(N,G,H,Actions),Result):-  
 	findall(Action,applicabile(Action,N),ListaApplicabili),  % cerco quali azioni sono applicabili al nodo
 	generateChild_aux(nodo(N,G,H,Actions),ListaApplicabili,Result).
 	
@@ -90,7 +86,7 @@ generateChild_aux(nodo(N,G,H,ActSequence),[Action|ActionResult],[nodo(Figlio,GFi
 	append(ActSequence,[Action],SonActions), % action+actsequence
 	generateChild_aux(nodo(N,G,H,ActSequence),ActionResult,ListaFigli).
 	
-/* funzione euristica, manhattan? */
+/* funzione euristica, manhattan */
 calcola_H(pos(X,Y),H):-
 	finale(pos(Xf,Yf)),
 	DistX is Xf - X,
@@ -108,12 +104,6 @@ min_aux([Head|Tail],CurrentMin,Result):-
 min_aux([_|Tail],CurrentMin,Result):-
 	min_aux(Tail,CurrentMin,Result).
 
-/* credo questa soluzione sia identica ma più compatta
-
-min_aux([Head|Tail],CurrentMin,Result):-
-	lessthen(Head,CurrentMin,Res), min_aux(Tail,Head,Result);
-	min_aux(Tail,CurrentMin,Result).
-*/
 	
 lessthen(nodo(_,G1,H1,_),nodo(_,G2,H2,_)):-
 	(G1 + H1) < (G2 + H2).

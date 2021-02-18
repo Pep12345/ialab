@@ -25,15 +25,14 @@ ida_aux(Nodo,Res):-
 	generaFigli(Nodo,[],Figli),
 	retractall(thresholdCheck(_)), 
 	asserta(thresholdCheck(Threshold)),	% aggiorno il nuovo thresholdCheck per controllare se si blocca
-	ida_aux2(Nodo,Figli,Threshold,[Nodo],Res),!. %CUT DISCUTIBILE
+	ida_aux2(Nodo,Figli,Threshold,[Nodo],Res),!.
 
 /* 
 	ricerco in profondita, se fallisce:
 		controllo di non essermi bloccato e riparto da sopra
-	DOMANDA: i cut son da rivedere, non so perchè funzionano
  */
 ida_aux2(_,Figli,Threshold,Espansi,Res):-  
-	ricerca_in_profondita(Figli,Threshold,Espansi,Res),!. %CUT DISCUTIBILE
+	ricerca_in_profondita(Figli,Threshold,Espansi,Res),!.
 ida_aux2(Nodo,_,_,_,Res):-
 	thresholdCheck(Vs),
 	prossimoThreshold(Ps),
@@ -41,17 +40,16 @@ ida_aux2(Nodo,_,_,_,Res):-
 	write("   nuovo: "),write_ln(Ps),
 	write_ln(Vs =\= Ps),
 	(Vs =\= Ps ; Vs =:= 0),!,
-	ida_aux(Nodo,Res),!.		%DOMANDA: perchèquesta riga causa casi di backtracking con altre soluzioni senza cut?
+	ida_aux(Nodo,Res),!.
 
 /* 
 	ricerca in profondità
 */
-%ricerca_in_profondita([],_,_,_):- !,fail.   % DOMANDA: perchè questa riga causa casi di backtracking con altre soluzioni?
-ricerca_in_profondita([nodo(N,Az)|_],_,_,Az):-finale(N),!.	%CUT DISCUTIBILE		%se è nodo finale
+ricerca_in_profondita([nodo(N,Az)|_],_,_,Az):-finale(N),!.	%se è nodo finale
 ricerca_in_profondita([nodo(N,Az)|Figli],Threshold,Espansi,Res):-	%se il nodo espanso ha costo F <Threshold allora espando figli
 	calcola_F(nodo(N,Az),F),
 	F =< Threshold,!,
-	generaFigli(nodo(N,Az),Espansi,FigliDiN),%write("genero i figli di "+ N + " "),write_ln(FigliDiN),
+	generaFigli(nodo(N,Az),Espansi,FigliDiN),
 	append(FigliDiN,Figli,NodiDaVisitare),
 	ricerca_in_profondita(NodiDaVisitare,Threshold,[nodo(N,Az)|Espansi],Res).
 ricerca_in_profondita([nodo(N,Az)|Figli],Threshold,Espansi,Res):-	%se il nodo espanso ha costo > Threshold, non lo espando e aggiorno soglia
@@ -59,7 +57,7 @@ ricerca_in_profondita([nodo(N,Az)|Figli],Threshold,Espansi,Res):-	%se il nodo es
 	calcola_F(nodo(N,Az),F),
 	(F < ProssimoThreshold ; ProssimoThreshold == Threshold),!,	 % se il consto F è minore dell'attuale soglia salvo F come soglia
 	retract(prossimoThreshold(ProssimoThreshold)),
-	asserta(prossimoThreshold(F)),%write("nuovo prossimoThreshold: "),write(F + " "),writeln(N),
+	asserta(prossimoThreshold(F)),
 	ricerca_in_profondita(Figli,Threshold,Espansi,Res).		% invece di usare una lista di valori tengo traccia solo del Threshold
 ricerca_in_profondita([_|Tail],Threshold,Espansi,Res):-
 	ricerca_in_profondita(Tail,Threshold,Espansi,Res),!.

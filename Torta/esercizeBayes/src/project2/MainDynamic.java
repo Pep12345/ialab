@@ -33,7 +33,7 @@ import project2.example.UmbrellaWindExample;
 public class MainDynamic {
     public static void main(String[] args){
         int n = 1000;
-        int m = 20  ;
+        int m = 40  ;
         AssignmentProposition[][] aps = null;
         
         //creo lista evidenze da passare 
@@ -47,7 +47,7 @@ public class MainDynamic {
             
         System.out.println("Rete Asia -  rolling up");
         //RollingUpFiltering rp = new RollingUpFiltering(DynamicBayesNetExampleFactory.getUmbrellaWorldNetwork());
-        RollingUpFiltering rp = new RollingUpFiltering(Alarm.getExample());
+        RollingUpFiltering rp = new RollingUpFiltering(UmbrellaWindExample.getExample());
         ParticleFiltering pf = new ParticleFiltering(n,Alarm.getExample());
 
         for (int i=0; i<m; i++) {

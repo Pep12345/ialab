@@ -1,5 +1,0 @@
-Tempi di esecuzione
-Ultimo vincolo
-
-dovremmo creare un "mini-orario" per il sabato che ha solo 4-5h (per non avere una lezione alle 9 e una alle 17)
-
