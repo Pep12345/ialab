@@ -27,124 +27,35 @@ public class MainStatic {
     
     public static void main(String[] args) throws CloneNotSupportedException {
         
-        //ex ordinamento, rifare con altre reti più o meno grandi 
+        /*
+        mappe:
+        chooseMap("../reti/0to20nodi/Sprinkler.xml");
+        chooseMap("../reti/20to50nodi/insurance.xml");
+        chooseMap("../reti/20to50nodi/child.xml");
+        chooseMap("../reti/50to100nodi/win95pts.xml");
+        chooseMap("../reti/100to1000nodi/pigs.xml");
+        */
+        
+        
+        
+        //esempio ordinamento, rifare con altre reti più o meno grandi 
         //nota: nel caso di reti da 70+ nodi non usare reverse topological order
-        /*chooseMap("../reti/20to50nodi/insurance.xml");
+        chooseMap("../reti/20to50nodi/insurance.xml");
         RandomVariable[] query = new RandomVariable[]{mm.get("PropCost")};
         AssignmentProposition[] as = new AssignmentProposition[]{new AssignmentProposition(mm.get("DrivingSkill"), "Normal")};
         System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
-        testQuery(query,as,bn);*/
+        testQuery(query,as,bn);
         
-        //ex prunning, provare cambiando:  
-        //      -   variare il numero di query
-        //      -   variare il numero di evidenza
-        //      -   profondità query
+        
+        //esempio prunning  
         chooseMap("../reti/50to100nodi/win95pts.xml");
-        RandomVariable[] query = new RandomVariable[]{mm.get("PrtData")};
-        AssignmentProposition[] as = new AssignmentProposition[]{
-                                    new AssignmentProposition(mm.get("DataFile"), "Correct")
+        query = new RandomVariable[]{mm.get("PrtData")};
+        as = new AssignmentProposition[]{new AssignmentProposition(mm.get("DataFile"), "Correct")
                                                             };
         System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
         testPrunning(query,as,bn);
-        
-        as = new AssignmentProposition[]{
-                                    new AssignmentProposition(mm.get("DataFile"), "Correct"),
-                                    new AssignmentProposition(mm.get("GrbldOtpt"), "No")
-                                                            };
-        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
-        testPrunning(query,as,bn);
-        
-        as = new AssignmentProposition[]{
-                                    new AssignmentProposition(mm.get("DataFile"), "Correct"),
-                                    new AssignmentProposition(mm.get("GrbldOtpt"), "No"),
-                                    new AssignmentProposition(mm.get("GDIOUT"), "Yes")
-                                                            };
-        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
-        testPrunning(query,as,bn);
-        
-        /*chooseMap("../reti/0to20nodi/Sprinkler.xml"); 
-        RandomVariable[] query = {mm.get("Grass")};
-        AssignmentProposition[] as = {new AssignmentProposition(mm.get("Rain"), "Heavy")};
-        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));                    
-        
-        testQuery(query, as, bn);
-        
-        
-        chooseMap("../reti/20to50nodi/insurance.xml");
-        query = new RandomVariable[]{mm.get("Antilock")};
-        as = new AssignmentProposition[]{new AssignmentProposition(mm.get("OtherCarCost"), "Thousand")};
-        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
-        testQuery(query,as,bn);
-        
-        
-        bn = Prunning.prunningNodeAncestors(query, as, bn);
-        System.out.println("-Added prunning of ancestors");
-        bn = Prunning.prunningEdge(query, as, bn);
-        System.out.println("-Added prunning of edge");
-        
-        testQuery(query, as, bn);
-        
-        chooseMap("../reti/100to1000nodi/pigs.xml");
-        query = new RandomVariable[]{mm.get("P48084891")};
-        as = new AssignmentProposition[]{new AssignmentProposition(mm.get("P543551889"), "2")};
-        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
-        testQuery(query,as,bn);*/
-        
-        /*chooseMap("../reti/20to50nodi/child.xml");
-        
-        RandomVariable[] query = {mm.get("CO2")};
-        AssignmentProposition[] as = {new AssignmentProposition(mm.get("Age"), "0-3_days")};
-        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));                    
-        
-        testQuery(query, as, bn);
-        
-        bn = Prunning.prunningNodeAncestors(query, as, bn);
-        System.out.println("-Added prunning of ancestors");
-        bn = Prunning.prunningEdge(query, as, bn);
-        System.out.println("-Added prunning of edge");
-        
-        testQuery(query, as, bn);
-        
-        chooseMap("../reti/20to50nodi/insurance.xml");
-        query = new RandomVariable[]{mm.get("PropCost")};
-        as = new AssignmentProposition[]{new AssignmentProposition(mm.get("DrivingSkill"), "Normal")};
-        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
-        testQuery(query,as,bn);
-        
-        bn = Prunning.prunningNodeAncestors(query, as, bn);
-        System.out.println("-Added prunning of ancestors");
-        bn = Prunning.prunningEdge(query, as, bn);
-        System.out.println("-Added prunning of edge");
-        
-        testQuery(query, as, bn);
-        
-        mm.clear();
-        chooseMap("../reti/50to100nodi/win95pts.xml");
-        query = new RandomVariable[]{mm.get("EPSGrphc")};
-        as = new AssignmentProposition[]{new AssignmentProposition(mm.get("GDIOUT"), "No")};
-        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
-        testQuery(query,as,bn);
-        
-        bn = Prunning.prunningNodeAncestors(query, as, bn);
-        System.out.println("-Added prunning of ancestors");
-        bn = Prunning.prunningEdge(query, as, bn);
-        System.out.println("-Added prunning of edge");
-        
-        testQuery(query, as, bn);
-        
-        
-        chooseMap("../reti/100to1000nodi/pigs.xml");
-        query = new RandomVariable[]{mm.get("P48084891")};
-        as = new AssignmentProposition[]{new AssignmentProposition(mm.get("P543551889"), "2")};
-        testQuery(query, as, bn);
-        
-        bn = Prunning.prunningNodeAncestors(query, as, bn);
-        System.out.println("-Added prunning of ancestors");
-        bn = Prunning.prunningEdge(query, as, bn);
-        System.out.println("-Added prunning of edge");
-        
-        testQuery(query, as, bn);*/
-        
+
+        //in fondo al file son presenti altri esempi come commento
     }
     
     private static void chooseMap(String path){
@@ -229,3 +140,36 @@ public class MainStatic {
     }
 }
 
+/* 
+        chooseMap("../reti/0to20nodi/Sprinkler.xml"); 
+        query = {mm.get("Grass")};
+        as = {new AssignmentProposition(mm.get("Rain"), "Heavy")};
+        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));                    
+        testQuery(query, as, bn);
+        //testPrunning(query,as,bn);
+        */
+        /*
+        chooseMap("../reti/100to1000nodi/pigs.xml");
+        query = new RandomVariable[]{mm.get("P48084891")};
+        as = new AssignmentProposition[]{new AssignmentProposition(mm.get("P543551889"), "2")};
+        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
+        testQuery(query,as,bn);
+        //testPrunning(query,as,bn);
+        */
+        /*
+        chooseMap("../reti/20to50nodi/child.xml");      
+        query = {mm.get("CO2")};
+        as = {new AssignmentProposition(mm.get("Age"), "0-3_days")};
+        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));                    
+        testQuery(query, as, bn);
+        //testPrunning(query,as,bn);
+        */
+        /*
+        chooseMap("../reti/20to50nodi/insurance.xml");
+        query = new RandomVariable[]{mm.get("PropCost")};
+        as = new AssignmentProposition[]{new AssignmentProposition(mm.get("DrivingSkill"), "Normal")};
+        System.out.println("Test con query: "+ Arrays.asList(query) +" and evidence: "+ Arrays.asList(as));
+        testQuery(query,as,bn);
+        //testPrunning(query,as,bn);
+        */
+        

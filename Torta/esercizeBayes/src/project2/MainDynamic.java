@@ -33,7 +33,7 @@ import project2.example.UmbrellaWindExample;
 public class MainDynamic {
     public static void main(String[] args){
         int n = 1000;
-        int m = 40  ;
+        int m = 20  ;
         AssignmentProposition[][] aps = null;
         
         //creo lista evidenze da passare 
@@ -41,13 +41,14 @@ public class MainDynamic {
             aps = new AssignmentProposition[m][1];
             for (int i=0; i<m; i++) {
                 aps[i][0] = new AssignmentProposition(Alarm.MARYCALLS_t_RV, Boolean.TRUE);
-               // aps[i][1] = new AssignmentProposition(Asia.DYSP_t_RV, "no");
             }
         }        
             
-        System.out.println("Rete Asia -  rolling up");
-        //RollingUpFiltering rp = new RollingUpFiltering(DynamicBayesNetExampleFactory.getUmbrellaWorldNetwork());
-        RollingUpFiltering rp = new RollingUpFiltering(UmbrellaWindExample.getExample());
+        System.out.println("Rete Alarm -  rolling up");
+        // rain: DynamicBayesNetExampleFactory.getUmbrellaWorldNetwork()
+        // rain-wind: UmbrellaWindExample.getExample()
+        // asia: Asia.getExample()
+        RollingUpFiltering rp = new RollingUpFiltering(Alarm.getExample());
         ParticleFiltering pf = new ParticleFiltering(n,Alarm.getExample());
 
         for (int i=0; i<m; i++) {
@@ -55,10 +56,6 @@ public class MainDynamic {
             System.out.println("Time " + (i+1));
             AssignmentProposition[][] S = pf.particleFiltering(aps[i]);
             printSamples(S, n);
-            /*AssignmentProposition[] assignments = {new AssignmentProposition(Asia.ASIA_t_RV,"no"),
-                                                   new AssignmentProposition(Asia.SMOKE_t_RV,"no"),
-                                                    new AssignmentProposition(Asia.TUB_t_RV,"no"),
-                                                    new AssignmentProposition(Asia.LUNG_t_RV,"no")};*/
             System.out.println("rollup: " + result);
         }
             
