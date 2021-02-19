@@ -95,10 +95,6 @@ insegnamento_successivo(elementi_di_fotografia_digitale,acquisizione_ed_elaboraz
 insegnamento_successivo(acquisizione_ed_elaborazione_di_sequenze_di_immagini_digitali,elementi_di_fotografia_digitale).
 insegnamento_successivo(grafica_3D,acquisizione_ed_elaborazione_di_immagini_statiche_grafica).
 
-%insegnamento_successivo_4ore(progettazione_di_basi_di_dati,fondamenti_di_ICT_e_Paradigmi_di_Programmazione).
-%insegnamento_successivo_4ore(introduzione_al_social_media_management,tecniche_e_strumenti_di_Marketing_digitale).
-%insegnamento_successivo_4ore(la_gestione_delle_risorse_umane,comunicazione_pubblicitaria_e_comunicazione_pubblica).
-%insegnamento_successivo_4ore(progettazione_e_sviluppo_di_applicazioni_web_su_dispositivi_mobile_I,tecnologie_server_side_per_il_web).
 
 %ad ogni settimana  associamo i suoi giorni 
 2{giorno_in_settimana(S,G):giorni_settimana(G)}2:-settimane(S).
@@ -120,8 +116,7 @@ insegnamento_successivo(grafica_3D,acquisizione_ed_elaborazione_di_immagini_stat
 :-lezione(S,G,O,I1),lezione(S,G,O,I2),I1!=I2.
 
 
-%un professore non può tenere corsi diversi nello stesso slot(inutile)
-%:-lezione(S,G,O,I),lezione(S,G,O,I2),I!=I2, professori_Insegnamento(I,P),professori_Insegnamento(I2,P).
+
 
 
 %in un giorno un corso deve avere minimo 2 ore e massimo 4 ore(count)
