@@ -108,15 +108,11 @@ insegnamento_successivo(grafica_3D,acquisizione_ed_elaborazione_di_immagini_stat
 %se è sabato  abbiamo 4 o 5  ore
 4{inizio_ora_giorno_settimana(S,G,O):inizio_ora(O)}5:-giorno_in_settimana(S,G),G==sabato.
 
-%per ogni ora di ogni giorno di ogni settimana associo uno ed un solo insegnamento
-%1{lezione(S,G,O,I):insegnamenti(I)}1:-inizio_ora_giorno_settimana(S,G,O).
 
+%Assegna ad ogni slot temporale un insegnamento
 {lezione(S,G,O,I):insegnamenti(I)}:-inizio_ora_giorno_settimana(S,G,O).
-
+%Evita di avere più lezioni nello stesso slot
 :-lezione(S,G,O,I1),lezione(S,G,O,I2),I1!=I2.
-
-
-
 
 
 %in un giorno un corso deve avere minimo 2 ore e massimo 4 ore(count)
